@@ -80,3 +80,12 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   (median time relative to the mastery time, capped).
 - **2026-11-20 — Import replaces** (doesn't merge) progress and preferences, after a
   confirmation; invalid entries are skipped and counted.
+- **2026-11-20 — PWA via `vite-plugin-pwa` (generateSW, autoUpdate, skipWaiting +
+  clientsClaim)**: every built asset is precached; the app reloads into the new version
+  automatically after an update. Icons are rendered from `public/icon.svg` with
+  `node scripts/make-icons.mjs` (uses the local Chromium) and committed as PNGs.
+  `npm audit` reports moderate advisories in build-time-only Workbox dependencies
+  (glob/minimatch); they don't ship to the browser.
+- **2026-11-20 — Deploy workflow** builds and publishes `dist/` to GitHub Pages on every
+  push to `main` (`actions/configure-pages` with `enablement: true`). If Pages isn't
+  enabled for the repo, the owner needs to set Settings → Pages → Source: GitHub Actions.
