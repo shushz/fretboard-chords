@@ -1,7 +1,7 @@
 import type { AnchorMode, Preferences } from '../prefs/model';
 import { anchorStringList } from '../prefs/model';
 import { CORE_DEGREES, type DegreeIndex } from '../theory/chords';
-import type { Key } from '../theory/keys';
+import { type Key, type Mode, type SpellingOptions, sameKey, selectableKeys } from '../theory/keys';
 import {
   type FretWindow,
   STRING_SET_TIER,
@@ -24,6 +24,43 @@ export interface PracticeConfig {
   variant?: string;
   /** Progression walk: find each chord within the beat limit. */
   tempo?: boolean;
+  /**
+   * Random key: a new key for every question (every progression in the walk), drawn
+   * from the keys selectable under the spelling preferences. Unset = fixed `key`.
+   */
+  randomKey?: RandomKeyModes;
+  /** Chord (degree) selection per mode, used with `randomKey`. */
+  degreesByMode?: Partial<Record<Mode, DegreeIndex[]>>;
+}
+
+export type RandomKeyModes = 'major' | 'minor' | 'both';
+
+/** Keys a random-key session draws from. */
+export function randomKeyPool(modes: RandomKeyModes, spelling: SpellingOptions): Key[] {
+  return selectableKeys(spelling).filter((k) => modes === 'both' || k.mode === modes);
+}
+
+export function degreesForMode(cfg: PracticeConfig, mode: Mode): DegreeIndex[] {
+  const d = cfg.degreesByMode?.[mode];
+  return d && d.length ? [...d] : [...CORE_DEGREES[mode]];
+}
+
+/**
+ * The concrete config for one question: with a random key, pick a key (never the same
+ * as `previousKey` when the pool has more than one) and that mode's chord selection.
+ */
+export function concreteConfig(
+  cfg: PracticeConfig,
+  p: Preferences,
+  previousKey: Key | null,
+  rand: () => number,
+): PracticeConfig {
+  if (!cfg.randomKey) return cfg;
+  const pool = randomKeyPool(cfg.randomKey, p.spelling);
+  const choices =
+    previousKey && pool.length > 1 ? pool.filter((k) => !sameKey(k, previousKey)) : pool;
+  const key = choices[Math.floor(rand() * choices.length)] ?? cfg.key;
+  return { ...cfg, key, degrees: degreesForMode(cfg, key.mode) };
 }
 
 export function defaultConfig(

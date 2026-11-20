@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { strum } from '../../audio/engine';
 import { chordNumeral, chordSymbol } from '../../theory/chords';
-import { formatKey } from '../../theory/keys';
+import { formatKey, key } from '../../theory/keys';
+import { note } from '../../theory/notes';
 import { formatStringSet, formatWindow } from '../../fretboard/regions';
 import type { Voicing } from '../../fretboard/voicings';
 import { type Preferences, numeralOptions, symbolOptions } from '../../prefs/model';
@@ -170,11 +171,18 @@ export function ProgressionSetup(props: {
 }) {
   const c = props.config;
   const p: Preferences = prefs.value;
-  const list = progressionsFor(c.key.mode);
+  // With random keys from both modes, only "Random" makes sense (progressions are mode-specific).
+  const mode = c.randomKey && c.randomKey !== 'both' ? c.randomKey : c.key.mode;
+  const list = c.randomKey === 'both' ? [] : progressionsFor(mode);
+  const refKey = c.randomKey
+    ? mode === 'major'
+      ? key(note('C'), 'major')
+      : key(note('A'), 'minor')
+    : c.key;
   const label = (degrees: number[]) =>
     degrees
       .map((d) =>
-        chordNumeral(diatonicChord(c.key, d as DegreeIndex, false, p.harmony), numeralOptions(p)),
+        chordNumeral(diatonicChord(refKey, d as DegreeIndex, false, p.harmony), numeralOptions(p)),
       )
       .join('–');
   return (
