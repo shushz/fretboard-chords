@@ -10,7 +10,8 @@ import {
   diatonicChord,
 } from '../../theory/chords';
 import type { StringNum } from '../../fretboard/tuning';
-import { type StringSetId, TRIAD_STRING_SETS } from '../../fretboard/regions';
+import { SEVENTH_STRING_SETS, type StringSetId, TRIAD_STRING_SETS } from '../../fretboard/regions';
+import { Segmented } from '../controls';
 import { voicingsInRegion } from '../../fretboard/voicings';
 import { pairAnchors } from '../../fretboard/anchors';
 import { Fretboard, type Marker } from '../Fretboard';
@@ -28,17 +29,23 @@ export function Explore() {
   const [degree, setDegree] = useState<DegreeIndex>(0);
   const [set, setSet] = useState<StringSetId>(p.fretboard.stringSets[0] ?? '1-3');
   const [win, setWin] = useState(p.fretboard.window);
+  const [sevenths, setSevenths] = useState(p.sevenths.enabled);
   const [taps, setTaps] = useState<{ string: StringNum; fret: number }[]>([]);
   const vw = useViewportWidth();
   const maxFret = p.fretboard.fretRange;
 
-  const chord = useMemo(() => diatonicChord(k, degree, false, p.harmony), [k, degree, p.harmony]);
+  const chord = useMemo(
+    () => diatonicChord(k, degree, sevenths, p.harmony),
+    [k, degree, sevenths, p.harmony],
+  );
   const region = { stringSet: set, window: win };
   const voicings = voicingsInRegion(chord, region, {
     maxFret,
     maxSpan: p.fretboard.maxSpan,
     allowOutside: p.fretboard.allowOutside,
+    shells: true,
   });
+  const sets = sevenths ? [...SEVENTH_STRING_SETS, ...TRIAD_STRING_SETS] : TRIAD_STRING_SETS;
   const markers: Marker[] = [];
   for (const v of voicings) for (const n of v.notes) markers.push(noteMarker(n, 'shown', p));
   if (p.fretboard.anchor !== 'off') {
@@ -101,7 +108,7 @@ export function Explore() {
       </div>
       <div class="chips" role="group" aria-label="Degree">
         {ordered.map((d) => {
-          const c = diatonicChord(k, d, false, p.harmony);
+          const c = diatonicChord(k, d, sevenths, p.harmony);
           return (
             <button
               type="button"
@@ -117,7 +124,20 @@ export function Explore() {
       </div>
       <div class="controls">
         <KeyPicker value={k} prefs={p} onChange={setKey} />
-        <StringSetPicker value={set} sets={TRIAD_STRING_SETS} onChange={setSet} />
+        <Segmented
+          label="Chord type"
+          value={sevenths ? 'sevenths' : 'triads'}
+          options={[
+            { value: 'triads', label: 'Triads' },
+            { value: 'sevenths', label: 'Sevenths' },
+          ]}
+          onChange={(v) => {
+            const on = v === 'sevenths';
+            setSevenths(on);
+            setSet(on ? '2-5' : '1-3');
+          }}
+        />
+        <StringSetPicker value={set} sets={sets} onChange={setSet} />
         <WindowPicker value={win} maxFret={maxFret} onChange={setWin} />
       </div>
     </div>
