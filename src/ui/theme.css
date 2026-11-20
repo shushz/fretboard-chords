@@ -1,5 +1,28 @@
+/* Visual style: "Workshop" — neutral warm-grey surfaces, one blue accent, wood-tone
+   fretboard with high-contrast strings. Light + dark via tokens. */
 :root {
-  color-scheme: light dark;
+  --bg: #f4f2ee;
+  --surface: #ffffff;
+  --surface-2: #ebe8e2;
+  --text: #1c2129;
+  --muted: #646b76;
+  --border: #d8d3ca;
+  --accent: #2563d9;
+  --accent-text: #ffffff;
+  --good: #1f9d55;
+  --bad: #d64545;
+  --board: #d9b98c;
+  --board-2: #c9a676;
+  --fret: #9b9fa6;
+  --nut: #f5f0e6;
+  --string: #6d6a66;
+  --dot: rgba(60, 40, 20, 0.28);
+  --dim: rgba(244, 242, 238, 0.5);
+  --region: #2563d9;
+  --note-neutral: #39414d;
+  --note-text: #ffffff;
+  --radius: 14px;
+  color-scheme: light;
   font-family:
     system-ui,
     -apple-system,
@@ -7,9 +30,466 @@
     Roboto,
     sans-serif;
 }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #14181f;
+    --surface: #1d222b;
+    --surface-2: #272d38;
+    --text: #e9ecf1;
+    --muted: #9aa3b2;
+    --border: #333b48;
+    --accent: #5b8cff;
+    --accent-text: #0b1020;
+    --good: #3ccf7a;
+    --bad: #ff6b6b;
+    --board: #4a3527;
+    --board-2: #3b2a1f;
+    --fret: #b9bec7;
+    --nut: #e8e1d2;
+    --string: #d9d4cb;
+    --dot: rgba(255, 245, 230, 0.3);
+    --dim: rgba(20, 24, 31, 0.6);
+    --region: #7aa2ff;
+    --note-neutral: #e9ecf1;
+    --note-text: #14181f;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #14181f;
+  --surface: #1d222b;
+  --surface-2: #272d38;
+  --text: #e9ecf1;
+  --muted: #9aa3b2;
+  --border: #333b48;
+  --accent: #5b8cff;
+  --accent-text: #0b1020;
+  --good: #3ccf7a;
+  --bad: #ff6b6b;
+  --board: #4a3527;
+  --board-2: #3b2a1f;
+  --fret: #b9bec7;
+  --nut: #e8e1d2;
+  --string: #d9d4cb;
+  --dot: rgba(255, 245, 230, 0.3);
+  --dim: rgba(20, 24, 31, 0.6);
+  --region: #7aa2ff;
+  --note-neutral: #e9ecf1;
+  --note-text: #14181f;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
 body {
   margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
 }
-.home {
+body {
+  min-height: 100dvh;
+}
+button,
+select,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: max(8px, env(safe-area-inset-top)) 12px 8px;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 2;
+}
+.topbar h1 {
+  flex: 1;
+  font-size: 1.15rem;
+  margin: 0;
+  font-weight: 650;
+}
+.logo {
+  width: 44px;
+  text-align: center;
+  color: var(--accent);
+  font-size: 1.4rem;
+}
+.icon-btn {
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--surface-2);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.screen {
+  flex: 1;
+  padding: 0 12px calc(16px + env(safe-area-inset-bottom));
+}
+
+/* Home */
+.lead {
+  color: var(--muted);
+  margin: 4px 4px 16px;
+  line-height: 1.45;
+}
+.menu {
+  display: grid;
+  gap: 10px;
+}
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  text-align: left;
   padding: 16px;
+  min-height: 72px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+}
+.menu-item strong {
+  font-size: 1.05rem;
+}
+.menu-item span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.menu-item.primary {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: transparent;
+}
+.menu-item.primary span {
+  color: inherit;
+  opacity: 0.85;
+}
+
+/* Cards and fields */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+.card h2 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin: 4px 0 8px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 0;
+}
+.field-label {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.segmented {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.segmented button,
+.chip {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 14px;
+  border-radius: 11px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  cursor: pointer;
+}
+.segmented button.on,
+.chip.on {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: transparent;
+  font-weight: 600;
+}
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 52px;
+  cursor: pointer;
+}
+.toggle span {
+  display: flex;
+  flex-direction: column;
+}
+.hint {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.toggle input {
+  appearance: none;
+  width: 52px;
+  height: 32px;
+  border-radius: 16px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  position: relative;
+  flex: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.toggle input::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: transform 0.15s;
+}
+.toggle input:checked {
+  background: var(--accent);
+}
+.toggle input:checked::after {
+  transform: translateX(20px);
+  background: var(--accent-text);
+}
+.select select {
+  min-height: 44px;
+  border-radius: 11px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  padding: 0 10px;
+}
+.stepper-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.stepper-row button {
+  width: 48px;
+  height: 44px;
+  border-radius: 11px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+.stepper-row button:disabled {
+  opacity: 0.4;
+}
+.stepper-row output {
+  min-width: 72px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.colors {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.color-swatch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.color-swatch input {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  padding: 0;
+  background: none;
+}
+
+.btn {
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn.secondary {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--border);
+}
+.btn.wide {
+  width: 100%;
+}
+.btn:disabled {
+  opacity: 0.5;
+}
+.muted {
+  color: var(--muted);
+}
+
+/* Prompt / explore */
+.prompt {
+  padding: 4px 4px 10px;
+}
+.prompt-main {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.prompt-main .muted {
+  font-size: 1rem;
+  font-weight: 500;
+}
+.prompt-sub {
+  color: var(--muted);
+  margin-top: 2px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0;
+}
+.chip.minor:not(.on) {
+  opacity: 0.7;
+}
+.controls {
+  display: grid;
+  gap: 4px;
+}
+@media (min-width: 700px) {
+  .controls {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+}
+
+/* Fretboard */
+.board-wrap {
+  overflow-x: auto;
+  display: flex;
+  justify-content: center;
+  touch-action: manipulation;
+}
+.fretboard {
+  max-width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.fb-board {
+  fill: var(--board);
+}
+.fb-fret {
+  stroke: var(--fret);
+  stroke-width: 2.5;
+}
+.fb-nut {
+  stroke: var(--nut);
+  stroke-width: 7;
+}
+.fb-string {
+  stroke: var(--string);
+}
+.fb-dot {
+  fill: var(--dot);
+}
+.fb-dim {
+  fill: var(--dim);
+  pointer-events: none;
+}
+.fb-region {
+  fill: none;
+  stroke: var(--region);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+  pointer-events: none;
+}
+.fb-fretnum {
+  fill: var(--muted);
+  font-size: 12px;
+  text-anchor: middle;
+}
+.fb-fretnum.strong {
+  fill: var(--text);
+  font-weight: 700;
+}
+.fb-note {
+  pointer-events: none;
+}
+.fb-note circle {
+  fill: var(--note-neutral);
+  stroke: var(--board-2);
+  stroke-width: 2;
+}
+.fb-note.ghost {
+  opacity: 0.42;
+}
+.fb-note.ghost circle {
+  stroke-dasharray: 4 3;
+  stroke: var(--text);
+}
+.fb-note.tap circle {
+  fill: var(--note-neutral);
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+.fb-note.correct circle {
+  stroke: var(--good);
+  stroke-width: 4;
+}
+.fb-note.wrong circle {
+  fill: var(--bad) !important;
+  stroke: var(--bad);
+}
+.fb-note.reveal circle {
+  stroke: var(--good);
+  stroke-width: 3;
+  stroke-dasharray: 5 3;
+}
+.fb-label {
+  fill: var(--note-text);
+  font-size: 14px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+.fb-note circle[style] + .fb-label {
+  fill: #fff;
+}
+.fb-sublabel {
+  fill: var(--text);
+  font-size: 10px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+.fb-target {
+  fill: transparent;
+  cursor: pointer;
+}
+.fb-target:focus-visible {
+  outline: none;
+  fill: rgba(37, 99, 217, 0.18);
 }
