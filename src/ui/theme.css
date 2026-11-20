@@ -829,3 +829,31 @@ input {
 .prog-step.bad {
   background: color-mix(in srgb, var(--bad) 22%, var(--surface));
 }
+.choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 16px 0;
+}
+.choice {
+  min-height: 72px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.choice.right {
+  background: var(--good);
+  color: #fff;
+  border-color: transparent;
+}
+.choice.wrong {
+  background: var(--bad);
+  color: #fff;
+  border-color: transparent;
+}
+.choice.dim {
+  opacity: 0.45;
+}

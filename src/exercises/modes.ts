@@ -6,6 +6,7 @@ import { ShapeRunner, ShapeSetup } from './shape/ShapeRunner';
 import { TonesRunner, TonesSetup } from './tones/TonesRunner';
 import { SwitchRunner } from './switch/SwitchRunner';
 import { ProgressionRunner, ProgressionSetup } from './progression/ProgressionRunner';
+import { NameChordRunner, NameChordSetup } from './namechord/NameChordRunner';
 
 export const MODES: ModeDef[] = [
   {
@@ -46,6 +47,13 @@ export const MODES: ModeDef[] = [
     description: 'Find each chord of a real progression, staying close to the last one',
     Runner: ProgressionRunner,
     SetupExtras: ProgressionSetup,
+  },
+  {
+    id: 'nameChord',
+    name: 'Name the chord',
+    description: '"In E♭m, what is iv?" — and the reverse',
+    Runner: NameChordRunner,
+    SetupExtras: NameChordSetup,
   },
 ];
 

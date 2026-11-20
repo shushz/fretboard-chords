@@ -126,3 +126,9 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   set, the window is widened by up to 3 frets for that progression (shown in the prompt).
   Tempo mode (setup toggle) allows `practice.tempoBeats` beats at `practice.tempoBpm`
   per chord; running out of time counts as a miss.
+- **2026-11-20 — Mode 6 (Name the chord):** 4 options. Forward distractors always
+  include the enharmonic misspelling when the root has an accidental (G♯m for A♭m), then
+  a random mix of: right root/wrong quality, neighbouring degrees, the same degree in the
+  relative key. Reverse distractors include the case-flipped numeral (IV for iv) plus
+  other diatonic numerals. The chord is played after answering. The typed-answer
+  variant is left for later (SPEC says "later").
