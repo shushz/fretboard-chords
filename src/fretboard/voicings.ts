@@ -195,3 +195,22 @@ export function matchVoicing(
 export function sortLowToHigh<T extends FrettedNote>(notes: readonly T[]): T[] {
   return [...notes].sort((a, b) => b.string - a.string);
 }
+
+/** Frets between a voicing and a window (0 when they overlap). */
+export function distanceToWindow(v: Voicing, w: FretWindow): number {
+  return Math.max(0, w.start - v.highestFret, v.position - (w.start + w.width - 1));
+}
+
+/**
+ * Voicings that don't fit the window, nearest first (ties: lower position first).
+ * Used to point at the closest shapes when none fits.
+ */
+export function nearestOutside(
+  all: readonly Voicing[],
+  w: FretWindow,
+  allowOutside = false,
+): Voicing[] {
+  return all
+    .filter((v) => !fitsWindow(v, w, allowOutside))
+    .sort((a, b) => distanceToWindow(a, w) - distanceToWindow(b, w) || a.position - b.position);
+}

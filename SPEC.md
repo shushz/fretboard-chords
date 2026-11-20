@@ -116,6 +116,9 @@ Each fretted note in a voicing carries its role.
 - **Voicing** = exactly one note per string of the set, containing every required
   chord tone, span ≤ 4 frets (configurable), all frets inside the window
   (optionally allow a note one fret outside the window, setting).
+- If a chord has no voicing inside the window on a string set, questions widen the window
+  for that chord by the fewest frets needed (shown in the prompt) instead of never asking
+  for it; reference views show the nearest shapes outside the window.
 - Triads on 3 adjacent strings have 3 closed inversions per octave; the engine
   enumerates every voicing along the whole neck and tags each with inversion
   (root position / 1st / 2nd, by lowest-string role) and position (lowest fret).

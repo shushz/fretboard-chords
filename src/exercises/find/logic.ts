@@ -11,11 +11,11 @@ import {
   type VoicingOptions,
   fretted,
   matchVoicing,
-  voicingsInRegion,
 } from '../../fretboard/voicings';
 import type { Item } from '../../progress/types';
 import { type PracticeConfig, stringSetWeight } from '../config';
 import { weightedPick } from '../session';
+import { fittingRegion } from '../region';
 import { type Taps, applyTapTo } from '../taps';
 
 export interface FindQuestion {
@@ -75,9 +75,10 @@ export function generateFindQuestion(cfg: PracticeConfig, o: GenerateOptions): F
   for (const degree of cfg.degrees) {
     const chord = diatonicChord(cfg.key, degree, cfg.sevenths, o.harmony);
     for (const stringSet of cfg.stringSets) {
-      const region: Region = { stringSet, window: cfg.window };
-      const valid = voicingsInRegion(chord, region, o.voicing);
-      if (valid.length === 0) continue;
+      const fit = fittingRegion([chord], stringSet, cfg.window, o.voicing);
+      if (!fit) continue;
+      const region = fit.region;
+      const valid = fit.valid[0];
       let anchorOpts: (5 | 6 | null)[] = [null];
       if (cfg.anchor === 'required') {
         const a = anchorCandidates(region, cfg.anchorStrings).filter(

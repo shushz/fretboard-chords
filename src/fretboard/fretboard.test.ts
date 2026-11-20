@@ -7,6 +7,8 @@ import {
   enumerateVoicings,
   fitsWindow,
   isDrop2,
+  distanceToWindow,
+  nearestOutside,
   fretsForPitchClass,
   fretted,
   matchVoicing,
@@ -124,6 +126,18 @@ describe('voicing enumeration', () => {
   it('randomWindow fits', () => {
     expect(randomWindow(5, 15, () => 0.999).start).toBe(11);
     expect(randomWindow(5, 15, () => 0).start).toBe(0);
+  });
+});
+
+describe('nearest shapes outside a window', () => {
+  it('F♯m V on 1–3 has no shape in frets 5–9; nearest are 4–6 and 9–10', () => {
+    const V = buildChord(note('C', 1), 'maj');
+    const w = { start: 5, width: 5 };
+    expect(voicingsInRegion(V, { stringSet: '1-3', window: w }, opts)).toEqual([]);
+    const near = nearestOutside(enumerateVoicings(V, '1-3', opts), w);
+    expect(near.slice(0, 2).map((v) => `${v.position}-${v.highestFret}`)).toEqual(['4-6', '9-10']);
+    expect(distanceToWindow(near[0], w)).toBe(0);
+    expect(distanceToWindow(near[near.length - 1], w)).toBeGreaterThan(0);
   });
 });
 

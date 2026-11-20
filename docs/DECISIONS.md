@@ -175,3 +175,12 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   (wider than tall, < 600 px high) the question, buttons and feedback move to a 280 px
   side column and the board fills the rest; the visible fret range is sized so tap cells
   stay ≥ 44 px in both directions.
+- **2026-11-20 — No chord is silently skipped any more** (owner report: F minor i/♭VI and
+  F♯m V "missing" in frets 5–9 on strings 1–3 — their shapes there sit at 4–6 and 8–10/9–10,
+  straddling the window). Practice modes now widen the window for that question by the
+  fewest frets needed (`fittingRegion`, max 5; on the default string sets never more than
+  2, usually 1); the prompt shows the widened frets. Applies to Find the chord, From the
+  tonic, Next/previous shape, Name the tones (label), Quality switch and the progression
+  walk (which already did this, limit raised from 3 to 5). The Chord explorer keeps the
+  user's window but shows shapes outside it faded, and when none fits says so and names
+  the nearest frets; ▶ Play then plays the nearest shape.

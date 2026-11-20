@@ -15,6 +15,7 @@ import type { Item } from '../../progress/types';
 import { type PracticeConfig, stringSetWeight } from '../config';
 import type { GenerateOptions } from '../find/logic';
 import { weightedPick } from '../session';
+import { fittingRegion } from '../region';
 import type { Taps } from '../taps';
 
 export type ShapeDirection = 'up' | 'down';
@@ -54,7 +55,11 @@ export function generateShapeQuestion(
     const chord = diatonicChord(cfg.key, degree, cfg.sevenths, o.harmony);
     for (const stringSet of cfg.stringSets) {
       const all = enumerateVoicings(chord, stringSet, o.voicing);
-      for (const shown of all.filter((v) => fitsWindow(v, cfg.window, o.voicing.allowOutside))) {
+      const fit = fittingRegion([chord], stringSet, cfg.window, o.voicing);
+      if (!fit) continue;
+      for (const shown of all.filter((v) =>
+        fitsWindow(v, fit.region.window, o.voicing.allowOutside),
+      )) {
         for (const direction of directions(cfg)) {
           const target = adjacentShape(shown, all, direction === 'up' ? 1 : -1);
           if (!target) continue;

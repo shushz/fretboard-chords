@@ -14,13 +14,13 @@ import {
   fretted,
   matchVoicing,
   voicingId,
-  voicingsInRegion,
 } from '../../fretboard/voicings';
 import { smoothestVoicings } from '../../fretboard/movement';
 import type { Item } from '../../progress/types';
 import { type PracticeConfig, stringSetWeight } from '../config';
 import type { GenerateOptions } from '../find/logic';
 import { weightedPick } from '../session';
+import { fittingRegion } from '../region';
 import type { Taps } from '../taps';
 
 export interface TonicQuestion {
@@ -81,20 +81,25 @@ export function generateTonicQuestion(
   const cands: { q: TonicQuestion; item: Item }[] = [];
   for (const stringSet of cfg.stringSets) {
     // Tonic shapes with the region each question uses.
-    const shapes: { tv: Voicing; region: Region }[] =
-      placement === 'window'
-        ? voicingsInRegion(tonic, { stringSet, window: cfg.window }, o.voicing).map((tv) => ({
-            tv,
-            region: { stringSet, window: cfg.window },
-          }))
-        : enumerateVoicings(tonic, stringSet, o.voicing).map((tv) => ({
-            tv,
-            region: { stringSet, window: windowAround(tv, cfg.window.width, o.voicing.maxFret) },
-          }));
-    for (const { tv, region } of shapes) {
+    // Window placement: tonic shapes inside the (minimally widened) session window.
+    // Neck placement: any tonic shape, with a window of the usual width around it.
+    let shapes: { tv: Voicing; window: FretWindow }[];
+    if (placement === 'window') {
+      const fit = fittingRegion([tonic], stringSet, cfg.window, o.voicing);
+      shapes = fit ? fit.valid[0].map((tv) => ({ tv, window: fit.region.window })) : [];
+    } else {
+      shapes = enumerateVoicings(tonic, stringSet, o.voicing).map((tv) => ({
+        tv,
+        window: windowAround(tv, cfg.window.width, o.voicing.maxFret),
+      }));
+    }
+    for (const { tv, window } of shapes) {
       for (const target of targets) {
-        const valid = voicingsInRegion(target, region, o.voicing);
-        if (!valid.length) continue;
+        // Widen (keeping the tonic inside) if the target has no shape near it.
+        const fit = fittingRegion([target], stringSet, window, o.voicing);
+        if (!fit) continue;
+        const region = fit.region;
+        const valid = fit.valid[0];
         const q: TonicQuestion = {
           tonic,
           tonicVoicing: tv,
