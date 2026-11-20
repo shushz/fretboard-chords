@@ -6,7 +6,7 @@ Order for the first unattended run: 1–7, 15, then 8–14 (see `AUTONOMOUS_RUN.
 | --- | ---------------------------------- | ------ | ------------------------------------------------------- | ----- |
 | 1   | Scaffold                           | done   | [#1](https://github.com/shushz/fretboard-chords/pull/1) |       |
 | 2   | Theory engine                      | done   | [#2](https://github.com/shushz/fretboard-chords/pull/2) |       |
-| 3   | Fretboard engine                   | todo   |                                                         |       |
+| 3   | Fretboard engine                   | done   | [#3](https://github.com/shushz/fretboard-chords/pull/3) |       |
 | 4   | Fretboard view + preferences store | todo   |                                                         |       |
 | 5   | Audio                              | todo   |                                                         |       |
 | 6   | Mode 1: Find the chord             | todo   |                                                         |       |
