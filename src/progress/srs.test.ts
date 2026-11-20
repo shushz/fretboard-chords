@@ -3,7 +3,7 @@ import { DEFAULT_PREFERENCES } from '../prefs/model';
 import { type ItemStats, updateStats } from './stats';
 import { dueItems, makeItemWeight, matchesItem, srsWeight } from './srs';
 import type { Attempt, Item } from './types';
-import { drillConfig, drillWeight } from '../exercises/drill';
+import { drillConfig, drillQueue, drillWeight, drillWindow, occurrence } from '../exercises/drill';
 
 const item = (o: Partial<Item> = {}): Item => ({
   mode: 'find',
@@ -78,5 +78,40 @@ describe('drilling', () => {
     const tw = drillWeight(item({ mode: 'nameTones', stringSet: '*', variant: 'tap b3 s2' }));
     expect(tw(item({ mode: 'nameTones', stringSet: '*', variant: 'tap b3 s2' }))).toBe(1);
     expect(tw(item({ mode: 'nameTones', stringSet: '*', variant: 'tap R s2' }))).toBeLessThan(0.01);
+  });
+});
+
+describe('drill queues', () => {
+  const a = item({ degree: 0 });
+  const b = item({ degree: 3 });
+  const c = item({ degree: 4 });
+  function seeded(seed = 3) {
+    let s = seed;
+    return () => {
+      s = (s * 16807) % 2147483647;
+      return s / 2147483647;
+    };
+  }
+  it('review asks each item once; no padding with repeats', () => {
+    expect(drillQueue([a], 1, seeded())).toEqual([a]);
+    expect(drillQueue([a, b, c], 1, seeded())).toHaveLength(3);
+  });
+  it('drill asks each item twice, never back to back', () => {
+    for (let seed = 1; seed < 50; seed++) {
+      const q = drillQueue([a, b, c], 2, seeded(seed));
+      expect(q).toHaveLength(6);
+      for (let i = 1; i < q.length; i++) expect(q[i]).not.toBe(q[i - 1]);
+      expect(occurrence(q, q.lastIndexOf(a))).toBe(1);
+    }
+  });
+  it('a repeated item gets a different fret window', () => {
+    const base = { start: 5, width: 5 };
+    expect(drillWindow(base, 0, 15, seeded())).toBe(base);
+    for (let seed = 1; seed < 50; seed++) {
+      const w = drillWindow(base, 1, 15, seeded(seed), 7);
+      expect(w.start).not.toBe(5);
+      expect(w.start).not.toBe(7);
+      expect(w.start + w.width - 1).toBeLessThanOrEqual(15);
+    }
   });
 });

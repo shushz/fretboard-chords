@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { strum } from '../../audio/engine';
 import { chordNumeral, chordSymbol } from '../../theory/chords';
-import { formatKey, key } from '../../theory/keys';
+import { type Mode, formatKey, key } from '../../theory/keys';
 import { note } from '../../theory/notes';
 import { formatStringSet, formatWindow } from '../../fretboard/regions';
 import type { Voicing } from '../../fretboard/voicings';
@@ -17,6 +17,8 @@ import {
   beatLimitMs,
   generateProgressionQuestion,
   gradeStep,
+  PROGRESSIONS,
+  type Progression,
   progressionsFor,
   stepItem,
   stepStrings,
@@ -171,20 +173,26 @@ export function ProgressionSetup(props: {
 }) {
   const c = props.config;
   const p: Preferences = prefs.value;
-  // With random keys from both modes, only "Random" makes sense (progressions are mode-specific).
-  const mode = c.randomKey && c.randomKey !== 'both' ? c.randomKey : c.key.mode;
-  const list = c.randomKey === 'both' ? [] : progressionsFor(mode);
-  const refKey = c.randomKey
-    ? mode === 'major'
-      ? key(note('C'), 'major')
-      : key(note('A'), 'minor')
-    : c.key;
-  const label = (degrees: number[]) =>
-    degrees
+  // Fixed key or one random mode: that mode's progressions. Random keys from both modes:
+  // all progressions; choosing one limits the random keys to its mode.
+  const both = c.randomKey === 'both';
+  const mode: Mode = c.randomKey && c.randomKey !== 'both' ? c.randomKey : c.key.mode;
+  const list = both ? PROGRESSIONS : progressionsFor(mode);
+  const refFor = (m: Mode) =>
+    !c.randomKey && m === c.key.mode
+      ? c.key
+      : m === 'major'
+        ? key(note('C'), 'major')
+        : key(note('A'), 'minor');
+  const label = (x: Progression) =>
+    x.degrees
       .map((d) =>
-        chordNumeral(diatonicChord(refKey, d as DegreeIndex, false, p.harmony), numeralOptions(p)),
+        chordNumeral(
+          diatonicChord(refFor(x.mode), d as DegreeIndex, false, p.harmony),
+          numeralOptions(p),
+        ),
       )
-      .join('–');
+      .join('–') + (both ? ` (${x.mode})` : '');
   return (
     <>
       <Select
@@ -192,7 +200,7 @@ export function ProgressionSetup(props: {
         value={list.some((x) => x.id === c.variant) ? c.variant! : 'random'}
         options={[
           { value: 'random', label: 'Random' },
-          ...list.map((x) => ({ value: x.id, label: label(x.degrees) })),
+          ...list.map((x) => ({ value: x.id, label: label(x) })),
         ]}
         onChange={(variant) => props.onChange({ ...c, variant })}
       />
