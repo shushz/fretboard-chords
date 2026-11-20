@@ -11,7 +11,7 @@ import { Fretboard, type Marker } from '../ui/Fretboard';
 import { FeedbackBar } from '../ui/Feedback';
 import { chooseVisibleRange } from '../ui/fretboardGeometry';
 import { noteMarker } from '../ui/markers';
-import { useViewportWidth } from '../ui/useViewport';
+import { useBoardWidth } from '../ui/useViewport';
 import { type Taps, applyTapTo } from './taps';
 
 export type { Taps };
@@ -69,7 +69,7 @@ export function TapQuestion(props: TapQuestionProps) {
   const tapsRef = useRef<Taps>(taps);
   tapsRef.current = taps;
   const gradedRef = useRef(false);
-  const vw = useViewportWidth();
+  const vw = useBoardWidth();
   const maxFret = p.fretboard.fretRange;
 
   useEffect(() => {
@@ -160,7 +160,7 @@ export function TapQuestion(props: TapQuestionProps) {
   }
 
   const view = props.view ?? props.region.window;
-  const range = chooseVisibleRange(view, maxFret, Math.min(vw, 1200) - 24);
+  const range = chooseVisibleRange(view, maxFret, vw);
 
   return (
     <div class="runner">

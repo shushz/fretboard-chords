@@ -18,3 +18,4 @@
 - M14 Sevenths: drop-2 voicings on 4-string sets, optional R–3–7 shells, sevenths in every mode, sevenths suggestion after triad mastery, explorer support.
 - Fix: From the tonic picks a random tonic shape across the neck (option: inside the window) and never repeats the previous question.
 - Fix: random-key practice — a new key every question (major, minor or both), never the same key twice in a row.
+- Fix: fret numbers no longer clipped, region border clears the fret dots, landscape layout puts the question beside the board.

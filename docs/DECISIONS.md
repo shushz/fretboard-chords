@@ -168,3 +168,10 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   question for the setup, up to 5 other keys are tried before skipping. Stats stay per
   key. The sevenths suggestion is hidden in random-key sessions. Config fields:
   `randomKey`, `degreesByMode`.
+- **2026-11-20 — Fretboard layout fixes** (owner feedback). Fret numbers sit below the
+  wood, clear of the fret wires. The region highlight hugs its strings (±32 % of a string
+  gap) so its dashed border no longer runs through the fret dots, and the dots are drawn
+  above the dimming so they stay readable outside the region. On short landscape screens
+  (wider than tall, < 600 px high) the question, buttons and feedback move to a 280 px
+  side column and the board fills the rest; the visible fret range is sized so tap cells
+  stay ≥ 44 px in both directions.

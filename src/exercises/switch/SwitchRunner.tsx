@@ -9,7 +9,7 @@ import { FeedbackBar } from '../../ui/Feedback';
 import { chooseVisibleRange } from '../../ui/fretboardGeometry';
 import { chordToneName, noteMarker } from '../../ui/markers';
 import { roleLabel } from '../../ui/roleStyle';
-import { useViewportWidth } from '../../ui/useViewport';
+import { useBoardWidth } from '../../ui/useViewport';
 import { voicingOptions } from '../config';
 import type { RunnerProps } from '../types';
 import {
@@ -47,7 +47,7 @@ export function SwitchRunner(props: RunnerProps) {
     tap?: { s: StringNum; f: number };
   } | null>(null);
   const [named, setNamed] = useState<string | null>(null);
-  const vw = useViewportWidth();
+  const vw = useBoardWidth();
 
   useEffect(() => {
     if (!q) {
@@ -118,7 +118,7 @@ export function SwitchRunner(props: RunnerProps) {
       }
     }
   }
-  const range = chooseVisibleRange(q.region.window, p.fretboard.fretRange, Math.min(vw, 1200) - 24);
+  const range = chooseVisibleRange(q.region.window, p.fretboard.fretRange, vw);
   const moved = q.moving;
   const movedTo = after.find((n) => n.string === moved.string)!;
 

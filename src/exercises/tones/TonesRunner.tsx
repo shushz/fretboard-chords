@@ -12,7 +12,7 @@ import { FeedbackBar } from '../../ui/Feedback';
 import { chooseVisibleRange } from '../../ui/fretboardGeometry';
 import { chordToneName, noteMarker } from '../../ui/markers';
 import { roleColor, roleLabel } from '../../ui/roleStyle';
-import { useViewportWidth } from '../../ui/useViewport';
+import { useBoardWidth } from '../../ui/useViewport';
 import { Segmented } from '../../ui/controls';
 import { type PracticeConfig, voicingOptions } from '../config';
 import type { RunnerProps } from '../types';
@@ -59,7 +59,7 @@ function LabelView(props: RunnerProps & { q: LabelQuestion }) {
   const [labels, setLabels] = useState<Role[]>([]);
   const [done, setDone] = useState<ReturnType<typeof gradeLabels> | null>(null);
   const elapsed = useTimer();
-  const vw = useViewportWidth();
+  const vw = useBoardWidth();
   const notes = q.voicing.notes; // low → high
   const midis = notes.map((n) => n.midi);
 
@@ -101,7 +101,7 @@ function LabelView(props: RunnerProps & { q: LabelQuestion }) {
       label: l ? roleLabel(l, p) : i === labels.length ? '?' : undefined,
     };
   });
-  const range = chooseVisibleRange(q.region.window, p.fretboard.fretRange, Math.min(vw, 1200) - 24);
+  const range = chooseVisibleRange(q.region.window, p.fretboard.fretRange, vw);
   const current = notes[labels.length];
   const numeral = chordNumeral(q.chord, numeralOptions(p));
 
@@ -184,9 +184,9 @@ function TapRoleView(props: RunnerProps & { q: TapRoleQuestion }) {
   const [tap, setTap] = useState<{ s: StringNum; f: number } | null>(null);
   const [ok, setOk] = useState<boolean | null>(null);
   const elapsed = useTimer();
-  const vw = useViewportWidth();
+  const vw = useBoardWidth();
   const maxFret = p.fretboard.fretRange;
-  const range = chooseVisibleRange(q.window, maxFret, Math.min(vw, 1200) - 24);
+  const range = chooseVisibleRange(q.window, maxFret, vw);
   const numeral = chordNumeral(q.chord, numeralOptions(p));
   const chordMidis = () => {
     const f = roleFrets(

@@ -885,3 +885,62 @@ input {
 .suggest span {
   flex: 1;
 }
+
+/* Phones on their side: question and controls beside the board, board fits the height. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .app {
+    max-width: none;
+  }
+  .topbar {
+    padding-top: max(4px, env(safe-area-inset-top));
+    padding-bottom: 4px;
+  }
+  .topbar h1 {
+    font-size: 1rem;
+  }
+  .runner:has(> .board-wrap),
+  .explore {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    column-gap: 16px;
+    align-items: start;
+  }
+  .runner:has(> .board-wrap) > *,
+  .explore > * {
+    grid-column: 2;
+    min-width: 0;
+  }
+  .runner > .board-wrap,
+  .explore > .board-wrap {
+    grid-column: 1;
+    grid-row: 1 / span 20;
+  }
+  .fretboard {
+    max-height: calc(100dvh - 104px);
+  }
+  .prompt {
+    padding-top: 0;
+  }
+  .prompt-main {
+    font-size: 1.2rem;
+  }
+  .prompt .play {
+    float: none;
+    margin-top: 6px;
+  }
+  .feedback {
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 0;
+  }
+  .actions {
+    margin-top: 8px;
+  }
+  .explore .controls {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .session-bar {
+    min-height: 0;
+  }
+}

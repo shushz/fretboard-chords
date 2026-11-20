@@ -16,7 +16,7 @@ import { voicingsInRegion } from '../../fretboard/voicings';
 import { pairAnchors } from '../../fretboard/anchors';
 import { Fretboard, type Marker } from '../Fretboard';
 import { chooseVisibleRange } from '../fretboardGeometry';
-import { useViewportWidth } from '../useViewport';
+import { useBoardWidth } from '../useViewport';
 import { KeyPicker, StringSetPicker, WindowPicker, keyFromAscii } from '../pickers';
 import { chordToneName, noteMarker } from '../markers';
 import { formatKey } from '../../theory/keys';
@@ -31,7 +31,7 @@ export function Explore() {
   const [win, setWin] = useState(p.fretboard.window);
   const [sevenths, setSevenths] = useState(p.sevenths.enabled);
   const [taps, setTaps] = useState<{ string: StringNum; fret: number }[]>([]);
-  const vw = useViewportWidth();
+  const vw = useBoardWidth();
   const maxFret = p.fretboard.fretRange;
 
   const chord = useMemo(
@@ -62,7 +62,7 @@ export function Explore() {
       markers.push({ ...t, kind: 'tap' });
     }
   }
-  const range = chooseVisibleRange(win, maxFret, Math.min(vw, 1200) - 24);
+  const range = chooseVisibleRange(win, maxFret, vw);
   const degrees = k.mode === 'minor' ? CORE_DEGREES.minor : CORE_DEGREES.major;
   const ordered = [...DEGREES].sort((a, b) => a - b);
 
