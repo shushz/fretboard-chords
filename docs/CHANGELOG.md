@@ -7,3 +7,4 @@
 - M4 Fretboard view + preferences: responsive SVG fretboard (region highlight/dim, tap input, role/name labels, ghost anchors, left-handed), full §7.1 preferences model with IndexedDB persistence, Preferences screen, Chord explorer, light/dark themes.
 - M5 Audio: Karplus–Strong plucked-string synth, note on tap, strum, correct/wrong feedback sounds, mute button and volume.
 - M6 Mode 1 Find the chord (incl. anchored variant) with setup → questions → summary session flow.
+- M7 Progress store: IndexedDB item stats (rolling accuracy, median time, Leitner box), daily log, stats screen v1 (streak, minutes, 14-day trend, key × degree heat grid, by string set/mode, weakest items), JSON export/import, reset per key or all.

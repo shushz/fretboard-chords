@@ -10,7 +10,7 @@ Order for the first unattended run: 1–7, 15, then 8–14 (see `AUTONOMOUS_RUN.
 | 4   | Fretboard view + preferences store | done   | [#4](https://github.com/shushz/fretboard-chords/pull/4) | Includes a Chord explorer screen |
 | 5   | Audio                              | done   | [#5](https://github.com/shushz/fretboard-chords/pull/5) | Sound not checked by ear         |
 | 6   | Mode 1: Find the chord             | done   | [#6](https://github.com/shushz/fretboard-chords/pull/6) |                                  |
-| 7   | Progress store                     | todo   |                                                         |                                  |
+| 7   | Progress store                     | done   | [#7](https://github.com/shushz/fretboard-chords/pull/7) |                                  |
 | 15  | PWA & deploy                       | todo   |                                                         |                                  |
 | 8   | Modes 2 & 3                        | todo   |                                                         |                                  |
 | 9   | Mode 4: Name the tones             | todo   |                                                         |                                  |

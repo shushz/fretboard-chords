@@ -68,3 +68,15 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   (× anchor string). Modes that _show_ a specific shape will track inversions.
 - **2026-11-20 — Last practice setup is remembered per device** in `localStorage` (a
   convenience, not a preference).
+- **2026-11-20 — Progress storage: two IndexedDB records** (`stats`: item key → stats,
+  `daily`: date → attempts/correct/ms) instead of a full attempt log; enough for
+  rolling accuracy (last 10), median time, Leitner box/due date, streak, minutes and a
+  14-day trend while staying small. "Minutes practiced" sums answer times, capped at
+  60 s per answer.
+- **2026-11-20 — Leitner boxes 1–5** with intervals 0 / 10 min / 1 day / 3 days / 7 days;
+  wrong → box 1. Mastery = ≥ 90 % of the last 10 _and_ median correct time ≤ 3 s
+  (triads) / 5 s (sevenths) — so an item needs 10 attempts before it can be mastered.
+- **2026-11-20 — Weakest items** need ≥ 3 attempts; score = 2 × error rate + slowness
+  (median time relative to the mastery time, capped).
+- **2026-11-20 — Import replaces** (doesn't merge) progress and preferences, after a
+  confirmation; invalid entries are skipped and counted.

@@ -4,6 +4,7 @@ import { Home } from './screens/Home';
 import { Explore } from './screens/Explore';
 import { PreferencesScreen } from './screens/PreferencesScreen';
 import { Practice } from './screens/Practice';
+import { Stats } from './screens/Stats';
 
 const TITLES: Record<Route, string> = {
   home: 'Fretboard Chords',
@@ -53,6 +54,7 @@ export function App() {
         {r === 'explore' && <Explore />}
         {r === 'prefs' && <PreferencesScreen />}
         {r === 'practice' && <Practice />}
+        {r === 'stats' && <Stats />}
       </main>
     </div>
   );
