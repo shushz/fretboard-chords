@@ -27,3 +27,9 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   Seventh numerals: Imaj7, ii7, V7, viiø7 (lowercase numeral implies minor).
 - **2026-11-20 — Role set includes `#5` and `bb7`** in addition to SPEC's list, so
   augmented and diminished-7 chords (quality-switch extensions) have labels.
+- **2026-11-20 — Voicing span is inclusive** (frets 5–8 = span 4), matching how fret
+  windows are counted ("width 5 = frets 5–9"); open strings count as fret 0.
+  Preference: `fretboard.maxSpan` (default 4).
+- **2026-11-20 — "Next/previous shape" ordering uses the average fret** of a voicing on
+  the same string set; ties in anchor distance prefer the lower fret. Movement between
+  voicings = sum of per-string fret differences.
