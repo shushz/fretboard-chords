@@ -6,3 +6,4 @@
 - M3 Fretboard engine: tuning/pitch at (string, fret), string sets & fret windows, full-neck voicing enumeration with inversion tags, shells, window fit (one-note-outside option), root anchors, minimal-movement and next/previous-shape helpers.
 - M4 Fretboard view + preferences: responsive SVG fretboard (region highlight/dim, tap input, role/name labels, ghost anchors, left-handed), full §7.1 preferences model with IndexedDB persistence, Preferences screen, Chord explorer, light/dark themes.
 - M5 Audio: Karplus–Strong plucked-string synth, note on tap, strum, correct/wrong feedback sounds, mute button and volume.
+- M6 Mode 1 Find the chord (incl. anchored variant) with setup → questions → summary session flow.
