@@ -23,4 +23,9 @@ export interface ModeDef {
   name: string;
   description: string;
   Runner: FunctionComponent<RunnerProps>;
+  /** Mode-specific setup controls. */
+  SetupExtras?: FunctionComponent<{
+    config: PracticeConfig;
+    onChange: (c: PracticeConfig) => void;
+  }>;
 }

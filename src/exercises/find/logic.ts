@@ -16,6 +16,7 @@ import {
 import type { Item } from '../../progress/types';
 import { type PracticeConfig, stringSetWeight } from '../config';
 import { weightedPick } from '../session';
+import { type Taps, applyTapTo } from '../taps';
 
 export interface FindQuestion {
   chord: DiatonicChord;
@@ -26,7 +27,7 @@ export interface FindQuestion {
   anchorString: 5 | 6 | null;
 }
 
-export type Taps = ReadonlyMap<StringNum, number>;
+export type { Taps };
 
 export interface GenerateOptions {
   harmony: HarmonyOptions;
@@ -34,7 +35,8 @@ export interface GenerateOptions {
   rand: () => number;
   /** Optional weight per candidate item (spaced repetition hook). */
   itemWeight?: (item: Item) => number;
-  previous?: FindQuestion | null;
+  /** Previous question of the session (mode-specific shape). */
+  previous?: unknown;
 }
 
 export function findItem(q: FindQuestion, mode: Item['mode'] = 'find'): Item {
@@ -91,7 +93,7 @@ export function generateFindQuestion(cfg: PracticeConfig, o: GenerateOptions): F
     }
   }
   if (cands.length === 0) return null;
-  const prev = o.previous;
+  const prev = o.previous as FindQuestion | null | undefined;
   const pool =
     prev && cands.length > 1
       ? cands.filter(
@@ -118,11 +120,7 @@ export function requiredStrings(q: FindQuestion): StringNum[] {
 
 /** Apply a tap: replaces the note on that string, or removes it if tapped again. */
 export function applyTap(q: FindQuestion, taps: Taps, string: StringNum, fret: number): Taps {
-  if (!requiredStrings(q).includes(string)) return taps;
-  const next = new Map(taps);
-  if (next.get(string) === fret) next.delete(string);
-  else next.set(string, fret);
-  return next;
+  return applyTapTo(requiredStrings(q), taps, string, fret);
 }
 
 export function isComplete(q: FindQuestion, taps: Taps): boolean {

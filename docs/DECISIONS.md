@@ -89,3 +89,14 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
 - **2026-11-20 — Deploy workflow** builds and publishes `dist/` to GitHub Pages on every
   push to `main` (`actions/configure-pages` with `enablement: true`). If Pages isn't
   enabled for the repo, the owner needs to set Settings → Pages → Source: GitHub Actions.
+- **2026-11-20 — Shared tap-answer UI (`TapQuestion`)** used by modes 1–3 (and later the
+  progression walk), so tap rules, feedback, reveal and sounds behave the same everywhere.
+- **2026-11-20 — Mode 2 (From the tonic):** the target is any selected degree except I/i
+  (all core degrees except the tonic if only I/i is selected). The tonic shape is shown
+  with its roles and played; any valid voicing in the region is correct; the "Smooth ✦"
+  badge marks a voicing with minimal total fret movement. On a miss, the smoothest
+  shape(s) are revealed. Item inversion = the shown tonic's inversion.
+- **2026-11-20 — Mode 3 (Next/previous shape):** the shown shape lies in the window; the
+  answer is the adjacent shape on the whole neck (may lie outside the window, so the
+  board widens to include both). Direction up/down/both is a setup option
+  (`config.variant`). Item = shown inversion + direction.
