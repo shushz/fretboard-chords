@@ -10,7 +10,7 @@ async function tap(page: Page, s: number, f: number) {
 test('walk i–iv–V–i in F#m', async ({ page }) => {
   await page.goto('./#/practice');
   await page.getByRole('radio', { name: /Progression walk/ }).click();
-  await page.getByLabel('Key').selectOption('F#m');
+  await page.getByLabel('Key', { exact: true }).selectOption('F#m');
   await page.getByLabel('Progression').selectOption('i-iv-V-i');
   await page.getByRole('group', { name: 'Strings' }).getByRole('button', { name: '2–4' }).click();
   await page.getByRole('button', { name: /^Start/ }).click();

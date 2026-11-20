@@ -5,7 +5,7 @@ test('In E♭m, what is iv? → A♭m', async ({ page }) => {
   await page.goto('./#/practice');
   await page.getByRole('radio', { name: /Name the chord.*E♭m/ }).click();
   await page.getByRole('radio', { name: 'Degree → chord' }).click();
-  await page.getByLabel('Key').selectOption('Ebm');
+  await page.getByLabel('Key', { exact: true }).selectOption('Ebm');
   for (const n of ['i', 'V', 'ii°', '♭VI', '♭VII']) {
     await page
       .getByRole('group', { name: 'Chords' })

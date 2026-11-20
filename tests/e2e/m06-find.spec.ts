@@ -9,7 +9,7 @@ async function tap(page: Page, s: number, f: number) {
 
 async function setupSingle(page: Page) {
   await page.goto('./#/practice');
-  await page.getByLabel('Key').selectOption('F#m');
+  await page.getByLabel('Key', { exact: true }).selectOption('F#m');
   // keep only "i": deselect others in the core set
   for (const n of ['iv', 'V', 'ii°', '♭VI', '♭VII']) {
     await page
