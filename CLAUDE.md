@@ -51,6 +51,11 @@ docs/          CHANGELOG.md, screenshots, design notes
   in the PR description.
 - Strict TypeScript (`strict: true`), no `any` without a comment explaining why.
 
+## Unattended runs
+If the task says the owner is away, follow `docs/AUTONOMOUS_RUN.md`: don't ask
+questions, log choices in `docs/DECISIONS.md`, keep `docs/PROGRESS.md` current, and
+merge each milestone PR yourself once checks pass.
+
 ## Workflow
 - One milestone (SPEC §8) or one clearly scoped fix per branch/PR.
 - Branch name: `m<NN>-short-name` for milestones, `fix-short-name` for fixes.
