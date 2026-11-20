@@ -22,6 +22,8 @@ export interface PracticeConfig {
   anchorStrings: (5 | 6)[];
   /** Mode-specific options. */
   variant?: string;
+  /** Progression walk: find each chord within the beat limit. */
+  tempo?: boolean;
 }
 
 export function defaultConfig(

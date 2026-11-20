@@ -117,3 +117,12 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   With sevenths on, the switches are maj7 ↔ 7 and m7 ↔ m7b5. The "name the new chord"
   step (`practice.switchNameChord`) is practice feedback only and isn't scored.
   Item variant records `from>to` and the string that carries the moving tone.
+- **2026-11-20 — Mode 5 (Progression walk):** one session "question" = one progression;
+  each chord is graded and tracked as its own attempt (item per key × degree × string
+  set). The previous chord stays on the board dimmed; "Smooth ✦" marks a minimal-movement
+  choice; a miss reveals the smoothest shape and the walk continues from it. Correct
+  steps auto-advance after 0.7 s; at the end the user's voicings are played back as a
+  progression (▶ Replay). If the session window has no shape for some chord on a string
+  set, the window is widened by up to 3 frets for that progression (shown in the prompt).
+  Tempo mode (setup toggle) allows `practice.tempoBeats` beats at `practice.tempoBpm`
+  per chord; running out of time counts as a miss.

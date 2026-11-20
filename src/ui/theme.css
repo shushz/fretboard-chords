@@ -778,3 +778,54 @@ input {
   background: var(--bad);
   color: #fff;
 }
+.actions {
+  flex-wrap: wrap;
+}
+.tempo-bar {
+  flex-basis: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.tempo-bar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: left;
+  animation: tempo linear forwards;
+}
+@keyframes tempo {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+.prog-strip {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.prog-step {
+  min-width: 52px;
+  min-height: 36px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  text-align: center;
+  font-weight: 600;
+}
+.prog-step.current {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.prog-step.ok {
+  background: color-mix(in srgb, var(--good) 22%, var(--surface));
+}
+.prog-step.bad {
+  background: color-mix(in srgb, var(--bad) 22%, var(--surface));
+}
