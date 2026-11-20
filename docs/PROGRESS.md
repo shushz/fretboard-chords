@@ -19,3 +19,27 @@ Order for the first unattended run: 1–7, 15, then 8–14 (see `AUTONOMOUS_RUN.
 | 12  | Mode 6: Name the chord             | done   | [#13](https://github.com/shushz/fretboard-chords/pull/13) | Typed-answer variant left for later                                        |
 | 13  | Spaced repetition & weak spots     | done   | [#14](https://github.com/shushz/fretboard-chords/pull/14) |                                                                            |
 | 14  | Sevenths                           | done   | [#15](https://github.com/shushz/fretboard-chords/pull/15) |                                                                            |
+
+## Run summary (2026-11-20, first unattended run)
+
+All 15 milestones are done. Each one was merged through a GitHub PR with a merge
+commit; nothing was merged locally. CI (lint, unit, build, Playwright e2e) and the
+Pages deploy were green on every merge.
+
+- **Live app:** https://shushz.github.io/fretboard-chords/. It installs as a PWA and works offline.
+- **Tests:** 95 unit tests (Vitest) and 22 e2e tests (Playwright, 412×915). Phone screenshots
+  are in `docs/screenshots/` (`npm run screenshots` regenerates them).
+- **Decisions:** every choice made without the owner is in `docs/DECISIONS.md`.
+
+### Open points for the owner
+
+- **Sound is untested by ear.** The cloud session can't play audio, so the
+  Karplus–Strong tone was only checked numerically (pitch within 20 cents). It may
+  need tuning: `DEFAULT_PLUCK` in `src/audio/synth.ts`.
+- **Name the chord: typed-answer variant not built.** SPEC says "later".
+- **`npm audit` reports moderate advisories** in build-time-only Workbox
+  dependencies (glob/minimatch via `vite-plugin-pwa`). They don't ship to the browser.
+- **Toolchain pins** (Preact 10, TypeScript ~6.0, Playwright 1.63) can be bumped once
+  plugin peers support the newer majors.
+- **The Chord explorer screen is an extra**, not in the SPEC. It's a reference view
+  added with M4.
