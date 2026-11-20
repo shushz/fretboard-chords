@@ -4,7 +4,8 @@ import { formatKey } from '../../theory/keys';
 import { formatStringSet, formatWindow } from '../../fretboard/regions';
 import { numeralOptions, symbolOptions } from '../../prefs/model';
 import { chordToneName } from '../../ui/markers';
-import { voicingOptions } from '../config';
+import { type PracticeConfig, voicingOptions } from '../config';
+import { Segmented } from '../../ui/controls';
 import type { RunnerProps } from '../types';
 import { TapQuestion, inversionName } from '../TapQuestion';
 import {
@@ -12,6 +13,7 @@ import {
   generateTonicQuestion,
   gradeTonic,
   tonicItem,
+  tonicPlacement,
   tonicRequiredStrings,
 } from './logic';
 
@@ -85,6 +87,23 @@ export function TonicRunner(props: RunnerProps) {
         ])
       }
       onNext={props.onNext}
+    />
+  );
+}
+
+export function TonicSetup(props: {
+  config: PracticeConfig;
+  onChange: (c: PracticeConfig) => void;
+}) {
+  return (
+    <Segmented
+      label="Tonic shape"
+      value={tonicPlacement(props.config)}
+      options={[
+        { value: 'neck', label: 'Anywhere on the neck' },
+        { value: 'window', label: 'Inside the fret window' },
+      ]}
+      onChange={(variant) => props.onChange({ ...props.config, variant })}
     />
   );
 }

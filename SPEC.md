@@ -148,6 +148,9 @@ and the item it tested (see §6).
 2. **From the tonic** (relative chords) — a I/i voicing is shown and played; user finds
    the target degree (IV, V, vi…) in the same region. Correct = any valid voicing;
    extra "smooth" badge if it is the one with minimal total fret movement.
+   The shown I/i shape is random per question — anywhere on the neck by default, with
+   the region placed around it (option: only shapes inside the chosen fret window).
+   Two consecutive questions never show the same shape _and_ ask for the same chord.
 3. **Next / previous shape** — a voicing is shown; user finds the next inversion of the
    same chord up (or down) the neck on the same string set.
 4. **Name the tones** — a voicing is shown (and played); user labels each string's note

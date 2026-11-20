@@ -151,3 +151,11 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   give R–3–7 shells. All seven modes accept sevenths; the quality switch uses maj7 ↔ 7
   and m7 ↔ m7b5. The setup screen suggests sevenths once ≥ 80 % of the key's core degrees
   have a mastered triad item. The Chord explorer gained a Triads/Sevenths switch.
+- **2026-11-20 — From the tonic: random tonic shape + no repeated questions** (owner
+  request). By default the shown I/i shape is picked from every shape on the neck on the
+  enabled string sets, and the question's region is a fret window of the usual width
+  centred on it (`windowAround`); "Inside the fret window" keeps the previous behaviour.
+  Setup option "Tonic shape" (`config.variant`: `neck` default / `window`). Consecutive
+  questions prefer a different tonic shape _and_ a different target; if that's
+  impossible (e.g. one target selected) they still always differ in at least one of the
+  two. Only a config with exactly one possible question can repeat.
