@@ -1,0 +1,200 @@
+/** Item statistics, mastery, daily log and aggregation (pure). */
+import { median } from '../exercises/session';
+import { type Attempt, type Item, itemKey, parseItemKey } from './types';
+
+export const RECENT = 10;
+export const MAX_BOX = 5;
+
+export interface ItemStats {
+  key: string;
+  attempts: number;
+  correct: number;
+  /** Last RECENT results, oldest first. */
+  recent: { ok: boolean; ms: number }[];
+  firstSeen: number;
+  lastSeen: number;
+  /** Leitner box 1..5. */
+  box: number;
+  /** Epoch ms when the item is due again. */
+  due: number;
+}
+
+/** Leitner intervals per box (ms): 0, 10 min, 1 day, 3 days, 7 days. */
+export const BOX_INTERVALS = [0, 10 * 60_000, 86_400_000, 3 * 86_400_000, 7 * 86_400_000];
+
+export function updateStats(prev: ItemStats | undefined, a: Attempt): ItemStats {
+  const key = itemKey(a.item);
+  const base: ItemStats = prev ?? {
+    key,
+    attempts: 0,
+    correct: 0,
+    recent: [],
+    firstSeen: a.at,
+    lastSeen: a.at,
+    box: 1,
+    due: a.at,
+  };
+  const box = a.correct ? Math.min(MAX_BOX, base.box + 1) : 1;
+  return {
+    ...base,
+    attempts: base.attempts + 1,
+    correct: base.correct + (a.correct ? 1 : 0),
+    recent: [...base.recent, { ok: a.correct, ms: Math.round(a.timeMs) }].slice(-RECENT),
+    lastSeen: a.at,
+    box,
+    due: a.at + BOX_INTERVALS[box - 1],
+  };
+}
+
+export function rollingAccuracy(s: ItemStats): number {
+  if (s.recent.length === 0) return 0;
+  return s.recent.filter((r) => r.ok).length / s.recent.length;
+}
+
+/** Median time of correct recent answers (falls back to all recent). */
+export function medianTime(s: ItemStats): number {
+  const ok = s.recent.filter((r) => r.ok).map((r) => r.ms);
+  return median(ok.length ? ok : s.recent.map((r) => r.ms));
+}
+
+export interface MasteryThresholds {
+  accuracy: number;
+  triadMs: number;
+  seventhMs: number;
+}
+
+export function isMastered(s: ItemStats, t: MasteryThresholds, sevenths: boolean): boolean {
+  return (
+    s.recent.length >= RECENT &&
+    rollingAccuracy(s) >= t.accuracy &&
+    medianTime(s) <= (sevenths ? t.seventhMs : t.triadMs)
+  );
+}
+
+export function isSeventhItem(item: Item): boolean {
+  return ['maj7', '7', 'm7', 'm7b5', 'dim7'].includes(item.quality);
+}
+
+// ---------------------------------------------------------------------------
+// Daily log
+// ---------------------------------------------------------------------------
+
+export interface DayStats {
+  attempts: number;
+  correct: number;
+  ms: number;
+}
+
+export function dayKey(at: number): string {
+  const d = new Date(at);
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${m}-${day}`;
+}
+
+export function updateDaily(daily: Record<string, DayStats>, a: Attempt): Record<string, DayStats> {
+  const k = dayKey(a.at);
+  const d = daily[k] ?? { attempts: 0, correct: 0, ms: 0 };
+  return {
+    ...daily,
+    [k]: {
+      attempts: d.attempts + 1,
+      correct: d.correct + (a.correct ? 1 : 0),
+      // cap a single answer at 60 s so idle time doesn't inflate "minutes practiced"
+      ms: d.ms + Math.min(60_000, a.timeMs),
+    },
+  };
+}
+
+/** Consecutive days with practice, ending today (or yesterday if not yet today). */
+export function streak(daily: Record<string, DayStats>, now: number): number {
+  let n = 0;
+  let t = now;
+  if (!daily[dayKey(t)]) t -= 86_400_000;
+  while (daily[dayKey(t)]?.attempts) {
+    n++;
+    t -= 86_400_000;
+  }
+  return n;
+}
+
+export function totalMinutes(daily: Record<string, DayStats>): number {
+  return Object.values(daily).reduce((s, d) => s + d.ms, 0) / 60_000;
+}
+
+/** Last `days` days (oldest first) for trend charts. */
+export function trend(daily: Record<string, DayStats>, now: number, days = 14) {
+  const out: { day: string; attempts: number; accuracy: number | null }[] = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const k = dayKey(now - i * 86_400_000);
+    const d = daily[k];
+    out.push({
+      day: k,
+      attempts: d?.attempts ?? 0,
+      accuracy: d?.attempts ? d.correct / d.attempts : null,
+    });
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
+// Aggregation
+// ---------------------------------------------------------------------------
+
+export interface Aggregate {
+  attempts: number;
+  recentCount: number;
+  recentCorrect: number;
+  times: number[];
+}
+
+export function aggregate(stats: Iterable<ItemStats>): Aggregate {
+  const a: Aggregate = { attempts: 0, recentCount: 0, recentCorrect: 0, times: [] };
+  for (const s of stats) {
+    a.attempts += s.attempts;
+    a.recentCount += s.recent.length;
+    a.recentCorrect += s.recent.filter((r) => r.ok).length;
+    a.times.push(...s.recent.filter((r) => r.ok).map((r) => r.ms));
+  }
+  return a;
+}
+
+export function aggAccuracy(a: Aggregate): number | null {
+  return a.recentCount ? a.recentCorrect / a.recentCount : null;
+}
+
+export function aggMedian(a: Aggregate): number | null {
+  return a.times.length ? median(a.times) : null;
+}
+
+/** Group stats by a projection of their item. */
+export function groupBy(
+  stats: Record<string, ItemStats>,
+  by: (item: Item) => string | null,
+): Map<string, ItemStats[]> {
+  const m = new Map<string, ItemStats[]>();
+  for (const s of Object.values(stats)) {
+    const g = by(parseItemKey(s.key));
+    if (g === null) continue;
+    const arr = m.get(g) ?? [];
+    arr.push(s);
+    m.set(g, arr);
+  }
+  return m;
+}
+
+/**
+ * Weakness score: low recent accuracy and slow answers rank first. Items with fewer
+ * than 3 attempts are skipped (not enough evidence).
+ */
+export function weakest(stats: Record<string, ItemStats>, n = 10, triadMs = 3000): ItemStats[] {
+  return Object.values(stats)
+    .filter((s) => s.attempts >= 3)
+    .map((s) => ({
+      s,
+      score: (1 - rollingAccuracy(s)) * 2 + Math.min(2, medianTime(s) / triadMs / 2),
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, n)
+    .map((x) => x.s);
+}

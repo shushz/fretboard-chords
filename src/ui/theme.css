@@ -628,3 +628,106 @@ input {
   color: var(--muted);
   font-size: 0.85rem;
 }
+
+/* Stats */
+.empty {
+  padding: 8px 4px;
+}
+.trend {
+  width: 100%;
+  height: auto;
+}
+.trend-label {
+  font-size: 8px;
+  fill: var(--muted);
+  text-anchor: middle;
+}
+.heat-wrap {
+  overflow-x: auto;
+}
+.heat {
+  border-collapse: separate;
+  border-spacing: 2px;
+  font-size: 0.75rem;
+}
+.heat th {
+  text-align: left;
+  padding-right: 6px;
+  white-space: nowrap;
+}
+.heat td {
+  width: 40px;
+  min-width: 38px;
+  height: 52px;
+  font-size: 0.7rem;
+  border-radius: 8px;
+  text-align: center;
+  color: #fff;
+  vertical-align: middle;
+}
+.heat td span,
+.heat td b {
+  display: block;
+  line-height: 1.2;
+}
+.heat td.empty-cell {
+  background: var(--surface-2) !important;
+}
+.rows,
+.weak {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.rows li,
+.weak li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  border-bottom: 1px solid var(--border);
+}
+.rows li > span:first-child,
+.weak li > span:first-child {
+  flex: 1;
+}
+.bar {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.bar span {
+  display: block;
+  height: 100%;
+}
+.num {
+  font-variant-numeric: tabular-nums;
+  min-width: 44px;
+  text-align: right;
+}
+.actions.wrap {
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+.actions select {
+  flex: 1;
+  min-height: 48px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  padding: 0 8px;
+}
+.file-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.file-btn input {
+  display: none;
+}
+.btn.danger {
+  color: var(--bad);
+  margin-top: 4px;
+}
