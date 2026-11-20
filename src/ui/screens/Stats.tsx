@@ -21,6 +21,8 @@ import { MODE_NAMES, degreeLabel, itemLabel, keyLabel } from '../../progress/lab
 import { type ModeId, parseItemKey } from '../../progress/types';
 import type { Preferences } from '../../prefs/model';
 import { Section } from '../controls';
+import { pendingDrill } from '../../exercises/drillState';
+import { navigate } from '../router';
 
 function pct(x: number | null): string {
   return x === null ? '–' : `${Math.round(x * 100)}%`;
@@ -217,6 +219,16 @@ function Weakest(props: { stats: Record<string, ItemStats>; p: Preferences }) {
           </li>
         ))}
       </ol>
+      <button
+        type="button"
+        class="btn wide"
+        onClick={() => {
+          pendingDrill.value = { title: 'Weak spots', items: w.map((x) => parseItemKey(x.key)) };
+          navigate('practice');
+        }}
+      >
+        Drill these
+      </button>
     </Section>
   );
 }
