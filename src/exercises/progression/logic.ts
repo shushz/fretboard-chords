@@ -37,6 +37,15 @@ export function progressionsFor(mode: Mode): Progression[] {
   return PROGRESSIONS.filter((p) => p.mode === mode);
 }
 
+/**
+ * Progressions offered in setup. Fixed key or one random mode: that mode's progressions;
+ * random keys from both modes: all of them (choosing one limits the keys to its mode).
+ */
+export function progressionChoices(cfg: Pick<PracticeConfig, 'key' | 'randomKey'>): Progression[] {
+  if (cfg.randomKey === 'both') return [...PROGRESSIONS];
+  return progressionsFor(cfg.randomKey ?? cfg.key.mode);
+}
+
 export interface ProgressionQuestion {
   progression: Progression;
   chords: DiatonicChord[];

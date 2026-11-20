@@ -21,6 +21,7 @@ import { MODE_NAMES, degreeLabel, itemLabel, keyLabel } from '../../progress/lab
 import { type ModeId, parseItemKey } from '../../progress/types';
 import type { Preferences } from '../../prefs/model';
 import { Section } from '../controls';
+import { readableTextOn } from '../contrast';
 import { pendingDrill } from '../../exercises/drillState';
 import { navigate } from '../router';
 
@@ -33,7 +34,24 @@ function secs(ms: number | null): string {
 /** Red → amber → green by accuracy. */
 function heat(acc: number | null): string {
   if (acc === null) return 'transparent';
-  return `hsl(${Math.round(acc * 120)} 65% 45% / 0.85)`;
+  return hslHex(acc * 120, 0.65, 0.45);
+}
+
+/** #rrggbb for an HSL colour (so text colour can be picked for contrast). */
+function hslHex(h: number, s: number, l: number): string {
+  const k = (n: number) => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return (
+    '#' +
+    [f(0), f(8), f(4)]
+      .map((x) =>
+        Math.round(x * 255)
+          .toString(16)
+          .padStart(2, '0'),
+      )
+      .join('')
+  );
 }
 
 export function Stats() {
@@ -158,7 +176,10 @@ function HeatGrid(props: { stats: Record<string, ItemStats>; p: Preferences }) {
                     const a = aggregate(g);
                     const acc = aggAccuracy(a);
                     return (
-                      <td key={deg} style={{ background: heat(acc) }}>
+                      <td
+                        key={deg}
+                        style={{ background: heat(acc), color: readableTextOn(heat(acc)) }}
+                      >
                         <b>{degreeLabel(parseItemKey(g[0].key), props.p)}</b>
                         <span>{pct(acc)}</span>
                         <span>{secs(aggMedian(a))}</span>

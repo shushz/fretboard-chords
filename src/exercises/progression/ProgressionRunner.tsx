@@ -17,9 +17,8 @@ import {
   beatLimitMs,
   generateProgressionQuestion,
   gradeStep,
-  PROGRESSIONS,
   type Progression,
-  progressionsFor,
+  progressionChoices,
   stepItem,
   stepStrings,
 } from './logic';
@@ -176,8 +175,7 @@ export function ProgressionSetup(props: {
   // Fixed key or one random mode: that mode's progressions. Random keys from both modes:
   // all progressions; choosing one limits the random keys to its mode.
   const both = c.randomKey === 'both';
-  const mode: Mode = c.randomKey && c.randomKey !== 'both' ? c.randomKey : c.key.mode;
-  const list = both ? PROGRESSIONS : progressionsFor(mode);
+  const list = progressionChoices(c);
   const refFor = (m: Mode) =>
     !c.randomKey && m === c.key.mode
       ? c.key

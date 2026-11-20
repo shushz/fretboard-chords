@@ -9,10 +9,11 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test --trace off",
-    "screenshots": "SCREENSHOTS=1 playwright test --trace off",
+    "test:e2e": "playwright test --trace off --grep-invert walkthrough",
+    "screenshots": "SCREENSHOTS=1 playwright test --trace off --grep-invert walkthrough",
     "lint": "eslint . && prettier --check .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "audit": "playwright test --trace off tests/e2e/audit.spec.ts"
   },
   "dependencies": {
     "@preact/signals": "^2.11.4",

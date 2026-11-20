@@ -1,3 +1,4 @@
+import { formatNote } from '../../theory/notes';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { feedback, playNote, strum } from '../../audio/engine';
 import { chordNumeral, chordSymbol, toneForPitchClass } from '../../theory/chords';
@@ -12,6 +13,7 @@ import { FeedbackBar } from '../../ui/Feedback';
 import { chooseVisibleRange } from '../../ui/fretboardGeometry';
 import { chordToneName, noteMarker } from '../../ui/markers';
 import { roleColor, roleLabel } from '../../ui/roleStyle';
+import { readableTextOn } from '../../ui/contrast';
 import { useBoardWidth } from '../../ui/useViewport';
 import { Segmented } from '../../ui/controls';
 import { type PracticeConfig, voicingOptions } from '../config';
@@ -88,7 +90,8 @@ function LabelView(props: RunnerProps & { q: LabelQuestion }) {
 
   const markers: Marker[] = notes.map((n, i) => {
     if (done) {
-      return noteMarker(n, done.perNote[i] ? 'correct' : 'wrong', p, {
+      // Mislabelled notes keep their role colour (that's the lesson) with a red ring.
+      return noteMarker(n, done.perNote[i] ? 'correct' : 'missed', p, {
         showRoles: true,
         colored: true,
       });
@@ -136,8 +139,14 @@ function LabelView(props: RunnerProps & { q: LabelQuestion }) {
         <FeedbackBar state={done.correct ? 'correct' : 'wrong'} onNext={props.onNext}>
           <strong>{done.correct ? '✓ Correct' : '✕ Not quite'}</strong>{' '}
           <span>
-            {chordSymbol(q.chord, symbolOptions(p))} ({chordToneName(q.chord, p)}) — strings{' '}
-            {notes.map((n) => `${n.string}: ${roleLabel(n.role, p)}`).join(', ')}
+            {chordSymbol(q.chord, symbolOptions(p))}:{' '}
+            {notes
+              .map(
+                (n, i) =>
+                  `string ${n.string} = ${roleLabel(n.role, p)} (${formatNote(n.tone.note)})` +
+                  (done.perNote[i] ? '' : `, not ${roleLabel(labels[i], p)}`),
+              )
+              .join(' · ')}
           </span>
         </FeedbackBar>
       ) : (
@@ -165,7 +174,10 @@ function RoleButtons(props: {
           type="button"
           key={r}
           class="role-btn"
-          style={{ background: roleColor(r, props.p) }}
+          style={{
+            background: roleColor(r, props.p),
+            color: readableTextOn(roleColor(r, props.p)),
+          }}
           aria-label={`Role ${r}`}
           onClick={() => props.onPick(r)}
         >
