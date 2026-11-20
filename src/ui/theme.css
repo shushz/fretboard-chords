@@ -771,3 +771,10 @@ input {
 .role-btn:disabled {
   opacity: 0.4;
 }
+.name-step {
+  margin-top: 12px;
+}
+.segmented button.bad {
+  background: var(--bad);
+  color: #fff;
+}

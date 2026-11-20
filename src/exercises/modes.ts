@@ -4,6 +4,7 @@ import { FindRunner } from './find/FindRunner';
 import { TonicRunner } from './tonic/TonicRunner';
 import { ShapeRunner, ShapeSetup } from './shape/ShapeRunner';
 import { TonesRunner, TonesSetup } from './tones/TonesRunner';
+import { SwitchRunner } from './switch/SwitchRunner';
 
 export const MODES: ModeDef[] = [
   {
@@ -31,6 +32,12 @@ export const MODES: ModeDef[] = [
     description: 'Label each note of a shape R / 3 / 5 / 7 — or tap a given chord tone',
     Runner: TonesRunner,
     SetupExtras: TonesSetup,
+  },
+  {
+    id: 'qualitySwitch',
+    name: 'Quality switch',
+    description: 'Turn major into minor (and back) by moving just the 3rd',
+    Runner: SwitchRunner,
   },
 ];
 

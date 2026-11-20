@@ -302,6 +302,29 @@ export function PreferencesScreen() {
         />
       </Section>
 
+      <Section title="Quality switch">
+        <Toggle
+          label="Minor ↔ diminished (move the 5th)"
+          checked={p.practice.switchMinDim}
+          onChange={(v) => editPreferences((d) => void (d.practice.switchMinDim = v))}
+        />
+        <Toggle
+          label="Major → augmented (move the 5th)"
+          checked={p.practice.switchMajAug}
+          onChange={(v) => editPreferences((d) => void (d.practice.switchMajAug = v))}
+        />
+        <Toggle
+          label="V → V7 (root down to ♭7)"
+          checked={p.practice.switchDom7}
+          onChange={(v) => editPreferences((d) => void (d.practice.switchDom7 = v))}
+        />
+        <Toggle
+          label="Name the new chord afterwards"
+          checked={p.practice.switchNameChord}
+          onChange={(v) => editPreferences((d) => void (d.practice.switchNameChord = v))}
+        />
+      </Section>
+
       <Section title="Sound & look">
         <Toggle
           label="Mute"
