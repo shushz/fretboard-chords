@@ -6,12 +6,12 @@ choice, record it in `docs/DECISIONS.md`, and keep going.
 
 ## Answers given up front
 
-| Question | Answer |
-|---|---|
-| Merging | One PR per milestone. **Merge it into `main` yourself** once `npm run lint && npm test && npm run build` pass (and e2e, when the UI changed and browsers are available). Then start the next milestone from the updated `main`. |
-| Scope / order | Get a usable app first: milestones **1 → 7, then 15 (PWA & deploy)**, then **8 → 14** as time allows. |
-| Visual style | Agent's choice. Pick one clean, cohesive look, support light and dark themes, and record the choice in `docs/DECISIONS.md`. |
-| Publishing | Yes — GitHub Pages via GitHub Actions, at `https://shushz.github.io/fretboard-chords/` (Vite `base: '/fretboard-chords/'`). |
+| Question      | Answer                                                                                                                                                                                                                          |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Merging       | One PR per milestone. **Merge it into `main` yourself** once `npm run lint && npm test && npm run build` pass (and e2e, when the UI changed and browsers are available). Then start the next milestone from the updated `main`. |
+| Scope / order | Get a usable app first: milestones **1 → 7, then 15 (PWA & deploy)**, then **8 → 14** as time allows.                                                                                                                           |
+| Visual style  | Agent's choice. Pick one clean, cohesive look, support light and dark themes, and record the choice in `docs/DECISIONS.md`.                                                                                                     |
+| Publishing    | Yes — GitHub Pages via GitHub Actions, at `https://shushz.github.io/fretboard-chords/` (Vite `base: '/fretboard-chords/'`).                                                                                                     |
 
 ## Loop for each milestone
 

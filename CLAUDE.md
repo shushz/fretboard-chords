@@ -5,10 +5,12 @@ music theory rules and milestones. If a task conflicts with the spec, say so in 
 description instead of silently diverging.
 
 ## Project in one line
+
 Offline-first PWA (TypeScript + Vite + Preact, SVG fretboard, Web Audio) for drilling
 diatonic chord shapes, chord-tone roles and chord relationships on the guitar neck.
 
 ## Commands
+
 - `npm install` — install deps
 - `npm run dev` — dev server
 - `npm test` — Vitest unit tests (must pass)
@@ -21,6 +23,7 @@ Run e2e when UI changed; if Playwright browsers can't be installed in the enviro
 say so in the PR rather than skipping silently.
 
 ## Layout
+
 ```
 src/
   theory/      notes, spelling, keys, chords, roles — pure TS, no DOM
@@ -34,6 +37,7 @@ docs/          CHANGELOG.md, screenshots, design notes
 ```
 
 ## Rules
+
 - **Theory and fretboard logic must be pure and unit-tested.** Any change in
   `src/theory` or `src/fretboard` needs tests; keep the fixtures in SPEC §3.5 green.
 - **Spelling matters.** Never derive note names from pitch class alone; spell from the
@@ -52,11 +56,13 @@ docs/          CHANGELOG.md, screenshots, design notes
 - Strict TypeScript (`strict: true`), no `any` without a comment explaining why.
 
 ## Unattended runs
+
 If the task says the owner is away, follow `docs/AUTONOMOUS_RUN.md`: don't ask
 questions, log choices in `docs/DECISIONS.md`, keep `docs/PROGRESS.md` current, and
 merge each milestone PR yourself once checks pass.
 
 ## Workflow
+
 - One milestone (SPEC §8) or one clearly scoped fix per branch/PR.
 - Branch name: `m<NN>-short-name` for milestones, `fix-short-name` for fixes.
 - PR description: what changed, how it was tested, screenshots for UI changes,
