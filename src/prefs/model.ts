@@ -127,7 +127,13 @@ export function mergePreferences(
   stored: Json,
   base: Preferences = DEFAULT_PREFERENCES,
 ): Preferences {
-  return mergeValue(base, stored) as Preferences;
+  const p = mergeValue(base, stored) as Preferences;
+  // The per-pair "Default" (auto) option was removed: pin each pair to the choice it
+  // resolved to, so existing spellings don't change.
+  for (const id of Object.keys(p.spelling.pairs) as (keyof typeof p.spelling.pairs)[]) {
+    if (p.spelling.pairs[id] === 'auto') p.spelling.pairs[id] = p.spelling.prefer;
+  }
+  return p;
 }
 
 function mergeValue(def: Json, val: Json): Json {

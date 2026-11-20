@@ -29,8 +29,14 @@ export function recordAttempt<Q>(s: SessionState<Q>, a: Attempt | Attempt[]): Se
   return { ...s, attempts: [...s.attempts, ...(Array.isArray(a) ? a : [a])], phase: 'feedback' };
 }
 
-export function isSessionOver<Q>(s: SessionState<Q>, now: number): boolean {
-  if (s.length.kind === 'questions') return s.index + 1 >= s.length.count;
+/**
+ * `countAttempts`: a session of N "questions" counts graded attempts instead of
+ * questions (the progression walk grades every chord of a progression).
+ */
+export function isSessionOver<Q>(s: SessionState<Q>, now: number, countAttempts = false): boolean {
+  if (s.length.kind === 'questions') {
+    return countAttempts ? s.attempts.length >= s.length.count : s.index + 1 >= s.length.count;
+  }
   return now - s.startedAt >= s.length.minutes * 60_000;
 }
 

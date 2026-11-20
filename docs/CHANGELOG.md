@@ -23,3 +23,4 @@
 - Fix: progression picker lists every progression with random keys from both modes; review/drill sessions don't repeat the same question back to back.
 - Change: always use ♯ ♭ ° ø and ♭3 (notation preferences removed); optional hiding of roles/colours on the shape given in From the tonic and Next/previous shape.
 - Audit: property tests across all modes/setups, automated walkthrough (npm run audit, in CI), and the fixes it found (tap-target sizes, contrast, Quality switch Show answer, summary median, Name the tones feedback, landscape buttons).
+- Audit recommendations: compact mode picker, Labels & hints prefs, simpler spelling prefs, faded given shape with key, scroll cue, tablet side column, grouped seventh string sets, progression sessions count chords, heat-grid headings.

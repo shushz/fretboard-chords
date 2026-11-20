@@ -21,6 +21,9 @@ import { MODE_NAMES, degreeLabel, itemLabel, keyLabel } from '../../progress/lab
 import { type ModeId, parseItemKey } from '../../progress/types';
 import type { Preferences } from '../../prefs/model';
 import { Section } from '../controls';
+import { parseKeyName } from '../../theory/keys';
+import { type DegreeIndex, chordNumeral, diatonicChord } from '../../theory/chords';
+import { numeralOptions } from '../../prefs/model';
 import { readableTextOn } from '../contrast';
 import { pendingDrill } from '../../exercises/drillState';
 import { navigate } from '../router';
@@ -162,6 +165,18 @@ function HeatGrid(props: { stats: Record<string, ItemStats>; p: Preferences }) {
     <Section title="Keys × degrees (accuracy · median time)">
       <div class="heat-wrap">
         <table class="heat">
+          <thead>
+            <tr>
+              <th scope="col">
+                <span class="sr-only">Key</span>
+              </th>
+              {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+                <th key={n} scope="col" class="heat-col">
+                  {n}
+                </th>
+              ))}
+            </tr>
+          </thead>
           <tbody>
             {keys.map((k) => {
               const byDeg = groupBy(Object.fromEntries(byKey.get(k)!.map((x) => [x.key, x])), (i) =>
@@ -172,7 +187,21 @@ function HeatGrid(props: { stats: Record<string, ItemStats>; p: Preferences }) {
                   <th scope="row">{keyLabel(k, props.p)}</th>
                   {[0, 1, 2, 3, 4, 5, 6].map((deg) => {
                     const g = byDeg.get(String(deg));
-                    if (!g) return <td key={deg} class="empty-cell" />;
+                    if (!g) {
+                      // Name the degree even where nothing is recorded yet, so gaps are readable.
+                      const kk = parseKeyName(k);
+                      const label = kk
+                        ? chordNumeral(
+                            diatonicChord(kk, deg as DegreeIndex, false, props.p.harmony),
+                            numeralOptions(),
+                          )
+                        : String(deg + 1);
+                      return (
+                        <td key={deg} class="empty-cell" title={`${label}: not practised yet`}>
+                          <b>{label}</b>
+                        </td>
+                      );
+                    }
                     const a = aggregate(g);
                     const acc = aggAccuracy(a);
                     return (

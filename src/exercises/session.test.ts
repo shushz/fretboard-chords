@@ -40,6 +40,15 @@ describe('session flow', () => {
     const sum = summarize(s.attempts, 20);
     expect(sum).toMatchObject({ total: 2, correct: 1, accuracy: 0.5, medianMs: 1000 }); // correct answers only;
   });
+  it('can count graded attempts instead of questions (progression walk)', () => {
+    let s = startSession({ kind: 'questions', count: 4 }, 'p1', 0);
+    s = recordAttempt(s, [att(true, 1), att(true, 1), att(false, 1)]);
+    expect(isSessionOver(s, 0, true)).toBe(false);
+    expect(isSessionOver(s, 0, false)).toBe(false);
+    s = recordAttempt(s, att(true, 1));
+    expect(isSessionOver(s, 0, true)).toBe(true); // 4 chords graded in one progression
+    expect(isSessionOver(s, 0, false)).toBe(false);
+  });
   it('timed sessions', () => {
     const s = startSession({ kind: 'minutes', minutes: 1 }, 'q', 0);
     expect(isSessionOver(s, 59_000)).toBe(false);

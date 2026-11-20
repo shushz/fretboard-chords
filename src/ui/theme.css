@@ -396,6 +396,47 @@ input {
 }
 
 /* Fretboard */
+.board-frame {
+  position: relative;
+}
+/* Fade the edge(s) that have more frets off screen */
+.board-frame[data-more-right] .board-wrap {
+  mask-image: linear-gradient(to right, #000 calc(100% - 20px), transparent);
+}
+.board-frame[data-more-left] .board-wrap {
+  mask-image: linear-gradient(to left, #000 calc(100% - 20px), transparent);
+}
+.board-frame[data-more-left][data-more-right] .board-wrap {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 36px,
+    #000 calc(100% - 36px),
+    transparent
+  );
+}
+.more-cue {
+  /* sits on the fret-number row below the strings, clear of the notes */
+  position: absolute;
+  bottom: 4px;
+  width: 26px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}
+.more-cue.left {
+  left: 2px;
+}
+.more-cue.right {
+  right: 2px;
+}
 .board-wrap {
   overflow-x: auto;
   display: flex;
@@ -510,29 +551,34 @@ input {
 /* Practice */
 .mode-list {
   display: grid;
-  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
 }
 .mode-item {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  text-align: left;
-  min-height: 56px;
-  padding: 10px 12px;
-  border-radius: 12px;
+  min-height: 48px;
+  padding: 6px 10px;
+  border-radius: 11px;
   border: 1px solid var(--border);
   background: var(--surface-2);
+  text-align: left;
+  font-weight: 600;
+  line-height: 1.2;
   cursor: pointer;
 }
-.mode-item span {
-  color: var(--muted);
-  font-size: 0.85rem;
-}
 .mode-item.on {
-  border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px var(--accent);
-  background: var(--surface);
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: transparent;
+}
+.mode-desc {
+  margin: 8px 2px 4px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+@media (min-width: 700px) {
+  .mode-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 .row-links {
   display: flex;
@@ -678,6 +724,22 @@ input {
 .heat td b {
   display: block;
   line-height: 1.2;
+}
+.heat-col {
+  text-align: center;
+  color: var(--muted);
+  font-weight: 600;
+}
+.heat td.empty-cell b {
+  color: var(--muted);
+  font-weight: 600;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
 }
 .heat td.empty-cell {
   background: var(--surface-2) !important;
@@ -895,7 +957,7 @@ input {
   flex: 1;
 }
 
-/* Phones on their side: question and controls beside the board, board fits the height. */
+/* Phones on their side: compact chrome, board fits the height. */
 @media (orientation: landscape) and (max-height: 600px) {
   .app {
     max-width: none;
@@ -907,31 +969,36 @@ input {
   .topbar h1 {
     font-size: 1rem;
   }
-  .runner:has(> .board-wrap),
+  .fretboard {
+    max-height: calc(100dvh - 104px);
+  }
+  .prompt-main {
+    font-size: 1.2rem;
+  }
+}
+
+/* Phones on their side and wide screens (tablets): question and controls beside the board.
+   Keep in sync with usesSideColumn() in useViewport.ts. */
+@media (orientation: landscape) and (max-height: 600px), (min-width: 700px) {
+  .runner:has(> .board-frame),
   .explore {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 280px;
     column-gap: 16px;
     align-items: start;
   }
-  .runner:has(> .board-wrap) > *,
+  .runner:has(> .board-frame) > *,
   .explore > * {
     grid-column: 2;
     min-width: 0;
   }
-  .runner > .board-wrap,
-  .explore > .board-wrap {
+  .runner > .board-frame,
+  .explore > .board-frame {
     grid-column: 1;
     grid-row: 1 / span 20;
   }
-  .fretboard {
-    max-height: calc(100dvh - 104px);
-  }
   .prompt {
     padding-top: 0;
-  }
-  .prompt-main {
-    font-size: 1.2rem;
   }
   .prompt .play {
     float: none;
@@ -957,6 +1024,28 @@ input {
 .fb-note.missed circle {
   stroke: var(--bad-fill);
   stroke-width: 4;
+}
+.fb-note.given {
+  opacity: 0.4;
+}
+.board-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 6px 4px 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.legend-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--note-neutral);
+}
+.legend-dot.faded {
+  opacity: 0.4;
 }
 .fb-note.outside {
   opacity: 0.38;

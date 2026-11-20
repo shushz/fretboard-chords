@@ -140,11 +140,13 @@ export function Practice() {
     );
   }
 
+  // The progression walk counts chords, not progressions (20 ≈ 5 progressions).
+  const byChords = !drill && config.mode === 'progression';
   const advance = () =>
     setSession((s) => {
       if (!s) return s;
       const now = Date.now();
-      return isSessionOver(s, now) ? finishSession(s) : nextQuestion(s, s.index + 1, now);
+      return isSessionOver(s, now, byChords) ? finishSession(s) : nextQuestion(s, s.index + 1, now);
     });
 
   const cfg = current.config;
@@ -152,7 +154,9 @@ export function Practice() {
   const sl = session.length;
   const progress =
     sl.kind === 'questions'
-      ? `${session.index + 1} / ${sl.count}`
+      ? byChords
+        ? `chord ${Math.min(session.attempts.length + 1, sl.count)} of ${sl.count}`
+        : `${session.index + 1} / ${sl.count}`
       : `${Math.max(0, Math.ceil((sl.minutes * 60_000 - (Date.now() - session.startedAt)) / 60_000))} min left`;
 
   return (

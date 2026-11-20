@@ -37,6 +37,7 @@ non-diatonic harmony beyond the harmonic-minor V/V7.
 - **Deploy**: GitHub Pages via GitHub Actions on push to `main`
   (Vite `base` set to `/<repo-name>/`).
 - Mobile-first, portrait and landscape; touch targets ≥ 44 px; dark and light themes.
+  Phones in landscape and screens ≥ 700 px wide show the question beside the board.
 
 ## 3. Music theory model
 
@@ -141,7 +142,7 @@ A memory anchor ties an upper-string triad to the familiar root on string 6 or 5
 ## 5. Exercise modes
 
 All modes share: key, chord set, region, triads/sevenths toggle, and session length
-(N questions or T minutes). The key is either fixed for the session or **random**: a new
+(N questions or T minutes; the progression walk counts chords). The key is either fixed for the session or **random**: a new
 key from major, minor or both for every question (every progression in the walk), never
 the same key twice in a row, with the chord set chosen per mode. Each question records correctness, time-to-answer,
 and the item it tested (see §6).
@@ -218,7 +219,7 @@ key reaches the threshold).
 preference with a sensible default. It is not hard-coded. Preferences are stored on the
 device and included in the export/import. The Preferences screen is grouped:
 
-- **Spelling:** global prefer ♯/♭; per-pair toggles D♭/C♯, G♭/F♯, C♭/B, B♭m/A♯m, E♭m/D♯m,
+- **Spelling:** per-pair ♭/♯ choice for D♭/C♯, G♭/F♯, C♭/B, B♭m/A♯m, E♭m/D♯m,
   A♭m/G♯m (defaults D♭, G♭, B, B♭m, E♭m, G♯m); allow theoretical keys (off).
   Accidentals are always shown as ♯ ♭ 𝄪 𝄫 (not a preference).
 - **Harmony:** minor-key V as V/V7 (harmonic, default) or v/m7 (natural). Labels are

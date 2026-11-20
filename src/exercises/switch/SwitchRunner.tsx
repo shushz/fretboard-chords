@@ -1,3 +1,4 @@
+import { BoardFrame } from '../../ui/BoardFrame';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { feedback, playNote, strum } from '../../audio/engine';
 import { buildChord, chordSymbol, qualityName } from '../../theory/chords';
@@ -151,7 +152,7 @@ export function SwitchRunner(props: RunnerProps) {
           </div>
         )}
       </div>
-      <div class="board-wrap">
+      <BoardFrame>
         <Fretboard
           fromFret={range.from}
           toFret={range.to}
@@ -162,7 +163,7 @@ export function SwitchRunner(props: RunnerProps) {
           onTap={onTap}
           label={`Fretboard: change ${src} to ${qualityName(q.def.to)}`}
         />
-      </div>
+      </BoardFrame>
       {result ? (
         <>
           <FeedbackBar

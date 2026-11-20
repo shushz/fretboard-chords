@@ -59,6 +59,7 @@ export function TonicRunner(props: RunnerProps) {
       region={q.region}
       shown={q.tonicVoicing.notes}
       shownRoles={p.practice.givenShapeRoles}
+      legend={{ given: `${tonicNum} (given)`, answer: numeral }}
       playOnShow={q.tonicVoicing.notes.map((n) => n.midi)}
       requiredStrings={tonicRequiredStrings(q)}
       grade={(taps) => {
