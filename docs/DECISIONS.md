@@ -55,3 +55,16 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   low-E "thunk". A mute button sits in the top bar (`sound.muted`). Couldn't listen to
   the output in the cloud session — tone is tuned by numbers only; adjust
   `DEFAULT_PLUCK` in `src/audio/synth.ts` if it sounds off.
+- **2026-11-20 — Find the chord: grading is automatic** once every string of the set (plus
+  the anchor string when required) has a note; tapping a string again moves the note,
+  tapping the same note removes it; taps outside the required strings are ignored.
+  "Show answer" counts as wrong. No auto-advance — a big Next button (one-handed use).
+- **2026-11-20 — Ghost anchors appear in feedback, not during the question**, so the
+  anchor root doesn't give the answer away; in "required" mode the anchor string is
+  named in the prompt. Anchor roots are accepted anywhere on that string within the
+  window ± 2 frets.
+- **2026-11-20 — Mode-1 items don't include the inversion** (`inversion: '*'`): the user
+  chooses which valid shape to play, so stats are per key × degree × string set
+  (× anchor string). Modes that _show_ a specific shape will track inversions.
+- **2026-11-20 — Last practice setup is remembered per device** in `localStorage` (a
+  convenience, not a preference).

@@ -1,0 +1,167 @@
+import {
+  CORE_DEGREES,
+  DEGREES,
+  type DegreeIndex,
+  chordNumeral,
+  diatonicChord,
+} from '../theory/chords';
+import { numeralOptions, type Preferences } from '../prefs/model';
+import { TRIAD_STRING_SETS, SEVENTH_STRING_SETS, randomWindow } from '../fretboard/regions';
+import { KeyPicker, WindowPicker } from '../ui/pickers';
+import { Segmented } from '../ui/controls';
+import { type PracticeConfig, stringSetsFor } from './config';
+import { MODES } from './modes';
+
+export function Setup(props: {
+  config: PracticeConfig;
+  prefs: Preferences;
+  onChange: (c: PracticeConfig) => void;
+  onStart: () => void;
+}) {
+  const { config: c, prefs: p } = props;
+  const set = (patch: Partial<PracticeConfig>) => props.onChange({ ...c, ...patch });
+  const allSets = c.sevenths
+    ? [...SEVENTH_STRING_SETS, ...(p.sevenths.shells ? TRIAD_STRING_SETS : [])]
+    : TRIAD_STRING_SETS;
+  const toggleDegree = (d: DegreeIndex) => {
+    const on = c.degrees.includes(d);
+    if (on && c.degrees.length === 1) return;
+    set({ degrees: on ? c.degrees.filter((x) => x !== d) : [...c.degrees, d].sort() });
+  };
+  const toggleSet = (s: (typeof allSets)[number]) => {
+    const on = c.stringSets.includes(s);
+    if (on && c.stringSets.length === 1) return;
+    set({ stringSets: on ? c.stringSets.filter((x) => x !== s) : [...c.stringSets, s] });
+  };
+  const sl = p.practice.sessionLength;
+
+  return (
+    <div class="setup">
+      <section class="card">
+        <h2>Mode</h2>
+        <div class="mode-list" role="radiogroup" aria-label="Mode">
+          {MODES.map((m) => (
+            <button
+              type="button"
+              key={m.id}
+              role="radio"
+              aria-checked={c.mode === m.id}
+              class={`mode-item${c.mode === m.id ? ' on' : ''}`}
+              onClick={() => set({ mode: m.id })}
+            >
+              <strong>{m.name}</strong>
+              <span>{m.description}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+      <section class="card">
+        <h2>Key & chords</h2>
+        <KeyPicker
+          value={c.key}
+          prefs={p}
+          onChange={(key) =>
+            set({
+              key,
+              degrees: key.mode === c.key.mode ? c.degrees : [...CORE_DEGREES[key.mode]],
+            })
+          }
+        />
+        <div class="field">
+          <span class="field-label">Chords</span>
+          <div class="segmented multi" role="group" aria-label="Chords">
+            {DEGREES.map((d) => {
+              const on = c.degrees.includes(d);
+              return (
+                <button
+                  type="button"
+                  key={d}
+                  aria-pressed={on}
+                  class={on ? 'on' : ''}
+                  onClick={() => toggleDegree(d)}
+                >
+                  {chordNumeral(diatonicChord(c.key, d, c.sevenths, p.harmony), numeralOptions(p))}
+                </button>
+              );
+            })}
+          </div>
+          <div class="row-links">
+            <button
+              type="button"
+              class="link"
+              onClick={() => set({ degrees: [...CORE_DEGREES[c.key.mode]] })}
+            >
+              Core set
+            </button>
+            <button type="button" class="link" onClick={() => set({ degrees: [...DEGREES] })}>
+              All seven
+            </button>
+          </div>
+        </div>
+        <Segmented
+          label="Chord type"
+          value={c.sevenths ? 'sevenths' : 'triads'}
+          options={[
+            { value: 'triads', label: 'Triads' },
+            { value: 'sevenths', label: 'Sevenths' },
+          ]}
+          onChange={(v) => {
+            const sevenths = v === 'sevenths';
+            set({ sevenths, stringSets: stringSetsFor(p, sevenths) });
+          }}
+        />
+      </section>
+      <section class="card">
+        <h2>Region</h2>
+        <div class="field">
+          <span class="field-label">Strings</span>
+          <div class="segmented multi" role="group" aria-label="Strings">
+            {allSets.map((s) => {
+              const on = c.stringSets.includes(s);
+              return (
+                <button
+                  type="button"
+                  key={s}
+                  aria-pressed={on}
+                  class={on ? 'on' : ''}
+                  onClick={() => toggleSet(s)}
+                >
+                  {s.replace('-', '–')}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div class="window-row">
+          <WindowPicker
+            value={c.window}
+            maxFret={p.fretboard.fretRange}
+            onChange={(window) => set({ window })}
+          />
+          <button
+            type="button"
+            class="btn secondary"
+            onClick={() =>
+              set({ window: randomWindow(c.window.width, p.fretboard.fretRange, Math.random) })
+            }
+          >
+            Random
+          </button>
+        </div>
+        <Segmented
+          label="Root anchor"
+          value={c.anchor}
+          options={[
+            { value: 'off', label: 'Off' },
+            { value: 'ghost', label: 'Ghost' },
+            { value: 'required', label: 'Required' },
+          ]}
+          onChange={(anchor) => set({ anchor })}
+        />
+      </section>
+      <button type="button" class="btn wide start" onClick={props.onStart}>
+        Start · {sl.kind === 'questions' ? `${sl.count} questions` : `${sl.minutes} min`}
+      </button>
+    </div>
+  );
+}
