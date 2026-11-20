@@ -2,6 +2,21 @@
   "name": "fretboard-chords",
   "private": true,
   "version": "0.1.0",
+  "description": "Offline-first PWA for learning diatonic chord shapes, chord tones and chord relationships on the guitar neck.",
+  "license": "MIT",
+  "homepage": "https://shushz.github.io/fretboard-chords/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shushz/fretboard-chords.git"
+  },
+  "keywords": [
+    "guitar",
+    "chords",
+    "fretboard",
+    "music-theory",
+    "pwa",
+    "practice"
+  ],
   "type": "module",
   "scripts": {
     "dev": "vite",
