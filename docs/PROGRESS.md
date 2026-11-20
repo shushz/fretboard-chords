@@ -17,5 +17,5 @@ Order for the first unattended run: 1–7, 15, then 8–14 (see `AUTONOMOUS_RUN.
 | 10  | Mode 7: Quality switch             | done   | [#11](https://github.com/shushz/fretboard-chords/pull/11) |                                                                            |
 | 11  | Mode 5: Progression walk           | done   | [#12](https://github.com/shushz/fretboard-chords/pull/12) |                                                                            |
 | 12  | Mode 6: Name the chord             | done   | [#13](https://github.com/shushz/fretboard-chords/pull/13) | Typed-answer variant left for later                                        |
-| 13  | Spaced repetition & weak spots     | todo   |                                                           |                                                                            |
+| 13  | Spaced repetition & weak spots     | done   | [#14](https://github.com/shushz/fretboard-chords/pull/14) |                                                                            |
 | 14  | Sevenths                           | todo   |                                                           |                                                                            |
