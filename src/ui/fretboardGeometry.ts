@@ -15,13 +15,24 @@ export interface BoardGeometry {
   openWidth: number;
   /** x of the nut (only if fromFret === 0) or of the left edge line. */
   edgeX: number;
+  /** Bottom edge of the wood (fret wires stop here). */
+  boardBottom: number;
+  /** Baseline of the fret numbers, below the board. */
+  numbersY: number;
 }
 
 export const STRING_GAP = 46;
 export const FRET_WIDTH = 50;
 export const OPEN_WIDTH = 40;
+/**
+ * Vertical half-extent of the region highlight around its outer strings. Kept under
+ * half a string gap so the dashed border never crosses the fret dots, which sit midway
+ * between strings.
+ */
+export const REGION_PAD = Math.round(STRING_GAP * 0.32);
 const PAD_TOP = 26;
-const PAD_BOTTOM = 30;
+/** Below the board: room for the fret numbers, clear of the board edge and fret wires. */
+const PAD_BOTTOM = STRING_GAP / 2 + 24;
 const PAD_SIDE = 6;
 
 export function boardGeometry(fromFret: number, toFret: number, leftHanded = false): BoardGeometry {
@@ -43,6 +54,8 @@ export function boardGeometry(fromFret: number, toFret: number, leftHanded = fal
     fretWidth: FRET_WIDTH,
     openWidth: hasOpen ? OPEN_WIDTH : 0,
     edgeX: PAD_SIDE + (hasOpen ? OPEN_WIDTH : 0),
+    boardBottom: bottom + STRING_GAP / 2,
+    numbersY: bottom + STRING_GAP / 2 + 17,
   };
 }
 
@@ -96,9 +109,13 @@ export function chooseVisibleRange(
   availablePx: number,
   minCellPx = 44,
 ): { from: number; to: number } {
-  const fullCells = maxFret + 1;
-  if (availablePx / fullCells >= minCellPx) return { from: 0, to: maxFret };
-  const cells = Math.max(window.width, Math.floor(availablePx / minCellPx));
+  // The SVG scales uniformly, so the string gap (the smaller dimension) sets the limit.
+  const scale = Math.min(1, minCellPx / STRING_GAP);
+  const fits = (cells: number, withOpen: boolean) =>
+    (PAD_SIDE * 2 + (withOpen ? OPEN_WIDTH : 0) + cells * FRET_WIDTH) * scale <= availablePx;
+  if (fits(maxFret, true)) return { from: 0, to: maxFret };
+  let cells = window.width;
+  while (fits(cells + 1, false)) cells++;
   const extra = cells - window.width;
   let from = window.start - Math.floor(extra / 2);
   let to = from + cells - 1;

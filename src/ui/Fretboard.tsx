@@ -5,6 +5,7 @@ import {
   boardGeometry,
   fretCell,
   fretCenterX,
+  REGION_PAD,
   fretWireX,
   stringY,
   visibleFrets,
@@ -68,8 +69,8 @@ export function Fretboard(props: FretboardProps) {
       const b = fretCell(g, hi);
       const x = Math.min(a.x, b.x);
       const w = Math.max(a.x + a.w, b.x + b.w) - x;
-      const y = stringY(g, ss[0]) - g.stringGap / 2;
-      const h = (ss.length - 1) * g.stringGap + g.stringGap;
+      const y = stringY(g, ss[0]) - REGION_PAD;
+      const h = (ss.length - 1) * g.stringGap + 2 * REGION_PAD;
       regionRect = { x, y, w, h };
     }
   }
@@ -107,19 +108,6 @@ export function Fretboard(props: FretboardProps) {
         height={g.stringGap * 6}
         rx="6"
       />
-      {/* Fret position markers */}
-      {fretted
-        .filter((f) => FRET_MARKERS.includes(f))
-        .map((f) =>
-          isDoubleMarker(f) ? (
-            <g key={`m${f}`}>
-              <circle class="fb-dot" cx={fretCenterX(g, f)} cy={midY - g.stringGap} r="6" />
-              <circle class="fb-dot" cx={fretCenterX(g, f)} cy={midY + g.stringGap} r="6" />
-            </g>
-          ) : (
-            <circle key={`m${f}`} class="fb-dot" cx={fretCenterX(g, f)} cy={midY} r="6" />
-          ),
-        )}
       {/* Fret wires */}
       {fretted.map((f) => (
         <line
@@ -128,7 +116,7 @@ export function Fretboard(props: FretboardProps) {
           x1={fretWireX(g, f)}
           x2={fretWireX(g, f)}
           y1={g.top - g.stringGap / 2 + 2}
-          y2={g.bottom + g.stringGap / 2 - 2}
+          y2={g.boardBottom - 2}
         />
       ))}
       {/* Nut or left edge */}
@@ -137,7 +125,7 @@ export function Fretboard(props: FretboardProps) {
         x1={leftHanded ? g.width - g.edgeX : g.edgeX}
         x2={leftHanded ? g.width - g.edgeX : g.edgeX}
         y1={g.top - g.stringGap / 2 + 2}
-        y2={g.bottom + g.stringGap / 2 - 2}
+        y2={g.boardBottom - 2}
       />
       {/* Strings */}
       {STRINGS.map((s) => (
@@ -172,6 +160,19 @@ export function Fretboard(props: FretboardProps) {
           />
         </>
       )}
+      {/* Fret position markers (drawn above the dimming so they stay readable) */}
+      {fretted
+        .filter((f) => FRET_MARKERS.includes(f))
+        .map((f) =>
+          isDoubleMarker(f) ? (
+            <g key={`m${f}`}>
+              <circle class="fb-dot" cx={fretCenterX(g, f)} cy={midY - g.stringGap} r="6" />
+              <circle class="fb-dot" cx={fretCenterX(g, f)} cy={midY + g.stringGap} r="6" />
+            </g>
+          ) : (
+            <circle key={`m${f}`} class="fb-dot" cx={fretCenterX(g, f)} cy={midY} r="6" />
+          ),
+        )}
       {/* Fret numbers */}
       {props.showFretNumbers !== false &&
         frets.map((f) => (
@@ -179,7 +180,7 @@ export function Fretboard(props: FretboardProps) {
             key={`n${f}`}
             class={`fb-fretnum${FRET_MARKERS.includes(f) ? ' strong' : ''}`}
             x={fretCenterX(g, f)}
-            y={g.height - 8}
+            y={g.numbersY}
           >
             {f}
           </text>
