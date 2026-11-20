@@ -54,6 +54,10 @@ export function Setup(props: {
             </button>
           ))}
         </div>
+        {(() => {
+          const Extras = MODES.find((m) => m.id === c.mode)?.SetupExtras;
+          return Extras ? <Extras config={c} onChange={props.onChange} /> : null;
+        })()}
       </section>
       <section class="card">
         <h2>Key & chords</h2>
