@@ -10,17 +10,13 @@ import { keyToAscii } from '../../theory/keys';
 import { type ChordMember, memberOf } from '../../theory/roles';
 import type { Region } from '../../fretboard/regions';
 import type { StringNum } from '../../fretboard/tuning';
-import {
-  type Voicing,
-  type VoicingNote,
-  fretted,
-  voicingsInRegion,
-} from '../../fretboard/voicings';
+import { type Voicing, type VoicingNote, fretted } from '../../fretboard/voicings';
 import { toneForPitchClass } from '../../theory/chords';
 import type { Item } from '../../progress/types';
 import { type PracticeConfig, stringSetWeight } from '../config';
 import type { GenerateOptions } from '../find/logic';
 import { weightedPick } from '../session';
+import { fittingRegion } from '../region';
 
 export type SwitchFamily = 'core' | 'minDim' | 'majAug' | 'dom7' | 'sevenths';
 
@@ -101,8 +97,10 @@ export function generateSwitchQuestion(
       if (def.family === 'dom7' && degree !== 4) continue;
       const target = buildChord(source.root, def.to);
       for (const stringSet of cfg.stringSets) {
-        const region: Region = { stringSet, window: cfg.window };
-        for (const voicing of voicingsInRegion(source, region, o.voicing)) {
+        const fit = fittingRegion([source], stringSet, cfg.window, o.voicing);
+        if (!fit) continue;
+        const region = fit.region;
+        for (const voicing of fit.valid[0]) {
           const moving = voicing.notes.find((n) => memberOf(n.role) === def.member);
           if (!moving) continue;
           const toFret = moving.fret + def.delta;

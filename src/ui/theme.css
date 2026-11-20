@@ -944,3 +944,9 @@ input {
     min-height: 0;
   }
 }
+.fb-note.outside {
+  opacity: 0.38;
+}
+.no-fit {
+  color: var(--text);
+}

@@ -10,9 +10,14 @@ import {
   diatonicChord,
 } from '../../theory/chords';
 import type { StringNum } from '../../fretboard/tuning';
-import { SEVENTH_STRING_SETS, type StringSetId, TRIAD_STRING_SETS } from '../../fretboard/regions';
+import {
+  SEVENTH_STRING_SETS,
+  type StringSetId,
+  TRIAD_STRING_SETS,
+  formatWindow,
+} from '../../fretboard/regions';
 import { Segmented } from '../controls';
-import { voicingsInRegion } from '../../fretboard/voicings';
+import { enumerateVoicings, nearestOutside, voicingsInRegion } from '../../fretboard/voicings';
 import { pairAnchors } from '../../fretboard/anchors';
 import { Fretboard, type Marker } from '../Fretboard';
 import { chooseVisibleRange } from '../fretboardGeometry';
@@ -39,15 +44,36 @@ export function Explore() {
     [k, degree, sevenths, p.harmony],
   );
   const region = { stringSet: set, window: win };
-  const voicings = voicingsInRegion(chord, region, {
+  const vOpts = {
     maxFret,
     maxSpan: p.fretboard.maxSpan,
     allowOutside: p.fretboard.allowOutside,
     shells: true,
-  });
+  };
+  const voicings = voicingsInRegion(chord, region, vOpts);
+  const range = chooseVisibleRange(win, maxFret, vw);
+  // Shapes that don't fit the window, nearest first; shown faded where they are on screen.
+  const outside = nearestOutside(enumerateVoicings(chord, set, vOpts), win, vOpts.allowOutside);
+  const nearest = outside
+    .slice(0, 2)
+    .sort((a, b) => a.position - b.position)
+    .map((v) =>
+      v.position === v.highestFret ? `${v.position}` : `${v.position}–${v.highestFret}`,
+    );
   const sets = sevenths ? [...SEVENTH_STRING_SETS, ...TRIAD_STRING_SETS] : TRIAD_STRING_SETS;
+  // Play a shape in the region, or the nearest one when none fits.
+  const playable = voicings[0] ?? outside[0] ?? null;
   const markers: Marker[] = [];
-  for (const v of voicings) for (const n of v.notes) markers.push(noteMarker(n, 'shown', p));
+  const put = (m: Marker) => {
+    const i = markers.findIndex((x) => x.string === m.string && x.fret === m.fret);
+    if (i >= 0) markers[i] = m;
+    else markers.push(m);
+  };
+  for (const v of outside) {
+    if (v.highestFret < range.from || v.position > range.to) continue;
+    for (const n of v.notes) put(noteMarker(n, 'outside', p));
+  }
+  for (const v of voicings) for (const n of v.notes) put(noteMarker(n, 'shown', p));
   if (p.fretboard.anchor !== 'off') {
     for (const a of pairAnchors(chord, voicings, anchorStringList(p), maxFret, win)) {
       if (
@@ -62,7 +88,6 @@ export function Explore() {
       markers.push({ ...t, kind: 'tap' });
     }
   }
-  const range = chooseVisibleRange(win, maxFret, vw);
   const degrees = k.mode === 'minor' ? CORE_DEGREES.minor : CORE_DEGREES.major;
   const ordered = [...DEGREES].sort((a, b) => a - b);
 
@@ -78,14 +103,24 @@ export function Explore() {
         <button
           type="button"
           class="btn secondary play"
-          disabled={voicings.length === 0}
-          onClick={() => voicings[0] && strum(voicings[0].notes.map((n) => n.midi))}
+          disabled={!playable}
+          onClick={() => playable && strum(playable.notes.map((n) => n.midi))}
         >
           ▶ Play
         </button>
         <div class="prompt-sub">
-          {chordToneName(chord, p)} · {voicings.length} voicing{voicings.length === 1 ? '' : 's'} in
-          region
+          {chordToneName(chord, p)} ·{' '}
+          {voicings.length > 0 ? (
+            <>
+              {voicings.length} voicing{voicings.length === 1 ? '' : 's'} in region
+            </>
+          ) : (
+            <span class="no-fit" role="note">
+              No shape fits frets {formatWindow(win).replace('frets ', '')} on strings{' '}
+              {set.replace('-', '–')}
+              {nearest.length > 0 && <> — nearest at frets {nearest.join(' and ')} (faded)</>}
+            </span>
+          )}
         </div>
       </div>
       <div class="board-wrap">

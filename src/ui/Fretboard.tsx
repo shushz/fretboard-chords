@@ -21,7 +21,9 @@ export type MarkerKind =
   | 'correct'
   | 'wrong'
   /** Correct answer revealed after an error. */
-  | 'reveal';
+  | 'reveal'
+  /** Reference shape outside the active region (explorer), drawn faded. */
+  | 'outside';
 
 export interface Marker {
   string: StringNum;

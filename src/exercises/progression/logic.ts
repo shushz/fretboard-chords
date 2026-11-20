@@ -1,14 +1,16 @@
 /** Mode 5 — Progression walk (pure). */
 import { type DegreeIndex, type DiatonicChord, diatonicChord } from '../../theory/chords';
 import { type Mode, keyToAscii } from '../../theory/keys';
-import { type FretWindow, type Region, stringsOf } from '../../fretboard/regions';
+import { type Region, stringsOf } from '../../fretboard/regions';
 import type { StringNum } from '../../fretboard/tuning';
-import { type Voicing, fretted, matchVoicing, voicingsInRegion } from '../../fretboard/voicings';
+import { type Voicing, fretted, matchVoicing } from '../../fretboard/voicings';
 import { smoothestVoicings } from '../../fretboard/movement';
 import type { Item } from '../../progress/types';
 import { type PracticeConfig, stringSetWeight } from '../config';
 import type { GenerateOptions } from '../find/logic';
 import { weightedPick } from '../session';
+import { fittingRegion } from '../region';
+export { widenedWindows } from '../region';
 import type { Taps } from '../taps';
 
 export interface Progression {
@@ -70,15 +72,9 @@ export function generateProgressionQuestion(
       diatonicChord(cfg.key, d, cfg.sevenths, o.harmony),
     );
     for (const stringSet of cfg.stringSets) {
-      // A short window can miss a chord of the progression; widen it minimally (≤ 3 frets).
-      for (const window of widenedWindows(cfg.window, o.voicing.maxFret, 3)) {
-        const region: Region = { stringSet, window };
-        const valid = chords.map((c) => voicingsInRegion(c, region, o.voicing));
-        if (valid.every((v) => v.length > 0)) {
-          cands.push({ progression, chords, region, valid });
-          break;
-        }
-      }
+      // A short window can miss a chord of the progression; widen it minimally.
+      const fit = fittingRegion(chords, stringSet, cfg.window, o.voicing);
+      if (fit) cands.push({ progression, chords, region: fit.region, valid: fit.valid });
     }
   }
   if (!cands.length) return null;
@@ -92,20 +88,6 @@ export function generateProgressionQuestion(
     (c) => stringSetWeight(c.region.stringSet),
     o.rand,
   );
-}
-
-/** The window itself, then windows grown by 1..maxGrow frets (towards either side). */
-export function widenedWindows(w: FretWindow, maxFret: number, maxGrow: number): FretWindow[] {
-  const out: FretWindow[] = [w];
-  for (let g = 1; g <= maxGrow; g++) {
-    for (let left = 0; left <= g; left++) {
-      const start = w.start - left;
-      const width = w.width + g;
-      if (start < 0 || start + width - 1 > maxFret) continue;
-      out.push({ start, width });
-    }
-  }
-  return out;
 }
 
 export function stepStrings(q: ProgressionQuestion): StringNum[] {

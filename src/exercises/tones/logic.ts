@@ -4,12 +4,13 @@ import { keyToAscii } from '../../theory/keys';
 import type { Role } from '../../theory/roles';
 import { type FretWindow, type Region, stringsOf, windowEnd } from '../../fretboard/regions';
 import { type StringNum, fretsForPitchClass, pitchClassAt } from '../../fretboard/tuning';
-import { type Voicing, voicingsInRegion } from '../../fretboard/voicings';
+import { type Voicing } from '../../fretboard/voicings';
 import { pitchClass } from '../../theory/notes';
 import type { Item } from '../../progress/types';
 import { type PracticeConfig, stringSetWeight } from '../config';
 import type { GenerateOptions } from '../find/logic';
 import { weightedPick } from '../session';
+import { fittingRegion } from '../region';
 
 export interface LabelQuestion {
   kind: 'label';
@@ -84,8 +85,10 @@ export function generateTonesQuestion(
     for (const v of variants(cfg)) {
       if (v === 'label') {
         for (const stringSet of cfg.stringSets) {
-          const region: Region = { stringSet, window: cfg.window };
-          for (const voicing of voicingsInRegion(chord, region, o.voicing)) {
+          const fit = fittingRegion([chord], stringSet, cfg.window, o.voicing);
+          if (!fit) continue;
+          const region = fit.region;
+          for (const voicing of fit.valid[0]) {
             const q: LabelQuestion = { kind: 'label', chord, region, voicing };
             cands.push({ q, item: tonesItem(q), w: stringSetWeight(stringSet) });
           }
