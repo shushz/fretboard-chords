@@ -56,6 +56,11 @@ export interface Preferences {
     freshShare: number;
     tempoBpm: number;
     tempoBeats: number;
+    /** Quality-switch extensions (SPEC §5.7) and the "name the new chord" step. */
+    switchMinDim: boolean;
+    switchMajAug: boolean;
+    switchDom7: boolean;
+    switchNameChord: boolean;
   };
   sound: {
     volume: number;
@@ -102,6 +107,10 @@ export const DEFAULT_PREFERENCES: Preferences = {
     freshShare: 0.2,
     tempoBpm: 60,
     tempoBeats: 4,
+    switchMinDim: false,
+    switchMajAug: false,
+    switchDom7: false,
+    switchNameChord: false,
   },
   sound: { volume: 0.8, muted: false, strumMs: 30 },
   look: { theme: 'system', roleColors: { ...DEFAULT_ROLE_COLORS } },

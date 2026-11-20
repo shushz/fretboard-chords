@@ -107,3 +107,13 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   class counts (questions are only generated when such a fret exists in the window).
   Setup option: label / tap / both (both balances the two variants ~50/50).
   Tap-variant items use `stringSet: '*'` and record role + string in the variant.
+- **2026-11-20 — Mode 7 (Quality switch):** source chords are the selected diatonic
+  degrees; the target has the same root. One tap answers: tapping the note that must
+  move just selects it, tapping its destination is correct, tapping any other note (or a
+  wrong fret) is an error. Roles are hidden until answered. Extensions are preferences
+  (`practice.switchMinDim`, `switchMajAug`, `switchDom7`, all off): min ↔ dim, maj → aug
+  (aug → maj omitted: no diatonic augmented source), and V → V7 by moving the root down
+  a whole step to b7 (a rootless dominant shape on 3 strings; only from the V chord).
+  With sevenths on, the switches are maj7 ↔ 7 and m7 ↔ m7b5. The "name the new chord"
+  step (`practice.switchNameChord`) is practice feedback only and isn't scored.
+  Item variant records `from>to` and the string that carries the moving tone.
