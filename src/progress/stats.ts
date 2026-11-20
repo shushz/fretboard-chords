@@ -198,3 +198,22 @@ export function weakest(stats: Record<string, ItemStats>, n = 10, triadMs = 3000
     .slice(0, n)
     .map((x) => x.s);
 }
+
+/**
+ * Share of the key's core degrees with at least one mastered triad item (any mode or
+ * string set). Used to suggest moving on to sevenths (SPEC §5).
+ */
+export function triadMasteryForKey(
+  stats: Record<string, ItemStats>,
+  key: string,
+  coreDegrees: readonly number[],
+  t: MasteryThresholds,
+): number {
+  const mastered = new Set<number>();
+  for (const s of Object.values(stats)) {
+    const item = parseItemKey(s.key);
+    if (item.key !== key || isSeventhItem(item)) continue;
+    if (isMastered(s, t, false)) mastered.add(item.degree);
+  }
+  return coreDegrees.filter((d) => mastered.has(d)).length / coreDegrees.length;
+}

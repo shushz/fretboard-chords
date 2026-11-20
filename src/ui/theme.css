@@ -872,3 +872,16 @@ input {
 .weak + .btn {
   margin-top: 10px;
 }
+.suggest {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+  border: 1px solid var(--accent);
+}
+.suggest span {
+  flex: 1;
+}

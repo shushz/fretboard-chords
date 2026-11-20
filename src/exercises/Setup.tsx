@@ -11,6 +11,12 @@ import { KeyPicker, WindowPicker } from '../ui/pickers';
 import { Segmented } from '../ui/controls';
 import { type PracticeConfig, stringSetsFor } from './config';
 import { MODES } from './modes';
+import { stats } from '../progress/store';
+import { triadMasteryForKey } from '../progress/stats';
+import { formatKey, keyToAscii } from '../theory/keys';
+
+/** Suggest sevenths when this share of the key's core triads is mastered. */
+const SEVENTHS_SUGGESTION = 0.8;
 
 export function Setup(props: {
   config: PracticeConfig;
@@ -34,6 +40,13 @@ export function Setup(props: {
     set({ stringSets: on ? c.stringSets.filter((x) => x !== s) : [...c.stringSets, s] });
   };
   const sl = p.practice.sessionLength;
+  const triadMastery = c.sevenths
+    ? 0
+    : triadMasteryForKey(stats.value, keyToAscii(c.key), CORE_DEGREES[c.key.mode], {
+        accuracy: p.practice.masteryAccuracy,
+        triadMs: p.practice.masteryTimeTriadMs,
+        seventhMs: p.practice.masteryTimeSeventhMs,
+      });
 
   return (
     <div class="setup">
@@ -59,6 +72,21 @@ export function Setup(props: {
           return Extras ? <Extras config={c} onChange={props.onChange} /> : null;
         })()}
       </section>
+      {triadMastery >= SEVENTHS_SUGGESTION && (
+        <div class="suggest" role="note">
+          <span>
+            You've mastered the core triads in {formatKey(c.key, p.spelling.glyphs)} — ready for
+            sevenths?
+          </span>
+          <button
+            type="button"
+            class="btn"
+            onClick={() => set({ sevenths: true, stringSets: stringSetsFor(p, true) })}
+          >
+            Try sevenths
+          </button>
+        </div>
+      )}
       <section class="card">
         <h2>Key & chords</h2>
         <KeyPicker

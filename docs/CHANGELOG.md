@@ -15,3 +15,4 @@
 - M11 Mode 5 Progression walk: 10 built-in major/minor progressions, smooth-voicing badges, playback, tempo mode.
 - M12 Mode 6 Name the chord: degree → chord and chord → degree multiple choice with enharmonic and quality distractors.
 - M13 Spaced repetition & weak spots: SRS-weighted question selection with ~20 % fresh items, review of due items, "Drill these" for the weakest items.
+- M14 Sevenths: drop-2 voicings on 4-string sets, optional R–3–7 shells, sevenths in every mode, sevenths suggestion after triad mastery, explorer support.

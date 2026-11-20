@@ -6,6 +6,7 @@ import {
   adjacentShape,
   enumerateVoicings,
   fitsWindow,
+  isDrop2,
   fretsForPitchClass,
   fretted,
   matchVoicing,
@@ -87,6 +88,26 @@ describe('voicing enumeration', () => {
       expect(v.notes.some((n) => n.role === '5')).toBe(false);
     }
     expect(enumerateVoicings(fsm, '1-4', opts)).toEqual([]);
+  });
+  it('drop-2: four inversions per octave on every 4-string set, for every seventh quality', () => {
+    for (const q of ['maj7', '7', 'm7', 'm7b5'] as const) {
+      const c = buildChord(note('C'), q);
+      for (const set of ['1-4', '2-5', '3-6'] as const) {
+        const vs = enumerateVoicings(c, set, { maxFret: 27, maxSpan: 4 }).filter(
+          (v) => v.position < 12,
+        );
+        expect(vs.map((v) => v.inversion).sort()).toEqual(['first', 'root', 'second', 'third']);
+        for (const v of vs) expect(isDrop2(v.notes.map((n) => n.midi))).toBe(true);
+      }
+    }
+  });
+  it('isDrop2', () => {
+    // Cmaj7 drop-2 on D-G-B-E: C(D10) G(G12) B(B12) E(E12)
+    expect(isDrop2([60, 67, 71, 76])).toBe(true);
+    // close position C E G B
+    expect(isDrop2([60, 64, 67, 71])).toBe(false);
+    // drop-3: C B E G
+    expect(isDrop2([48, 59, 64, 67])).toBe(false);
   });
   it('fitsWindow with one note outside', () => {
     const v = enumerateVoicings(fsm, '1-3', opts).find((x) => voicingId(x) === '3:6,2:7,1:5')!;

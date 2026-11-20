@@ -38,6 +38,24 @@ export interface VoicingOptions {
   maxSpan: number;
   /** Seventh chords on 3-string sets: build R–3–7 shells (omit the 5th). */
   shells?: boolean;
+  /**
+   * Four-note chords on 4-string sets: only drop-2 voicings (default true), with one
+   * extra fret of span allowed (drop-2 shapes such as root-position maj7 need 5 frets).
+   */
+  drop2?: boolean;
+}
+
+/**
+ * Drop-2: take a close-position voicing and drop its second-highest note an octave.
+ * Equivalently, raising the lowest note an octave gives a close voicing (span < 12)
+ * in which that note is second from the top.
+ */
+export function isDrop2(midis: readonly number[]): boolean {
+  if (midis.length !== 4) return false;
+  const p = [...midis].sort((a, b) => a - b);
+  if (p[3] - p[0] < 12) return false; // already close
+  const raised = p[0] + 12;
+  return raised > p[2] && raised < p[3] && p[3] - p[1] < 12;
 }
 
 export const DEFAULT_VOICING_OPTIONS: VoicingOptions = { maxFret: 15, maxSpan: 4 };
@@ -98,7 +116,10 @@ export function enumerateVoicings(
       const frets = pick.map((p) => p.f);
       const lo = Math.min(...frets);
       const hi = Math.max(...frets);
-      if (hi - lo + 1 > opts.maxSpan) return;
+      const fourNote = required.length === 4;
+      const drop2 = fourNote && opts.drop2 !== false;
+      if (hi - lo + 1 > opts.maxSpan + (drop2 ? 1 : 0)) return;
+      if (drop2 && !isDrop2(pick.map((p) => midiAt(p.s, p.f)))) return;
       const notes = pick.map((p) => ({ ...fretted(p.s, p.f), tone: p.t, role: p.t.role }));
       out.push({
         stringSet,

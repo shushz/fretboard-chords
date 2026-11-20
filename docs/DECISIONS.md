@@ -144,3 +144,10 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   (inversion etc.). Progression-walk items are drilled with Find the chord. If an item
   has no question in the default window, up to 5 random windows are tried, then the item
   is skipped.
+- **2026-11-20 — Sevenths:** 4-string sets (1–4, 2–5, 3–6) use drop-2 voicings only (the
+  SPEC's choice; close/drop-3 shapes are filtered out) with one extra fret of span
+  (default max span 4 → 5 for drop-2, needed e.g. for root-position maj7 on 2–5); every
+  set then has exactly 4 inversions per octave. With `sevenths.shells`, 3-string sets
+  give R–3–7 shells. All seven modes accept sevenths; the quality switch uses maj7 ↔ 7
+  and m7 ↔ m7b5. The setup screen suggests sevenths once ≥ 80 % of the key's core degrees
+  have a mastered triad item. The Chord explorer gained a Triads/Sevenths switch.
