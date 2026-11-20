@@ -7,6 +7,7 @@ import { chordToneName } from '../../ui/markers';
 import { type PracticeConfig, voicingOptions } from '../config';
 import { Segmented } from '../../ui/controls';
 import type { RunnerProps } from '../types';
+import { GivenShapeHint } from '../GivenShapeHint';
 import { TapQuestion, inversionName } from '../TapQuestion';
 import {
   type TonicQuestion,
@@ -46,16 +47,18 @@ export function TonicRunner(props: RunnerProps) {
       prompt={{
         main: (
           <>
-            {formatKey(q.target.key, p.spelling.glyphs)} · {tonicNum} → {numeral}
+            {formatKey(q.target.key)} · {tonicNum} → {numeral}
           </>
         ),
         sub: `${formatStringSet(q.region.stringSet)} · ${formatWindow(q.region.window)}`,
-        hint: `Here's the ${tonicNum} (${inversionName(q.tonicVoicing.inversion)}). Find the ${numeral} nearby.`,
+        hint: p.practice.givenShapeRoles
+          ? `Here's the ${tonicNum} (${inversionName(q.tonicVoicing.inversion)}). Find the ${numeral} nearby.`
+          : `Here's the ${tonicNum}. Find the ${numeral} nearby.`,
       }}
       chord={q.target}
       region={q.region}
       shown={q.tonicVoicing.notes}
-      shownRoles={p.fretboard.showRoles}
+      shownRoles={p.practice.givenShapeRoles}
       playOnShow={q.tonicVoicing.notes.map((n) => n.midi)}
       requiredStrings={tonicRequiredStrings(q)}
       grade={(taps) => {
@@ -96,14 +99,17 @@ export function TonicSetup(props: {
   onChange: (c: PracticeConfig) => void;
 }) {
   return (
-    <Segmented
-      label="Tonic shape"
-      value={tonicPlacement(props.config)}
-      options={[
-        { value: 'neck', label: 'Anywhere on the neck' },
-        { value: 'window', label: 'Inside the fret window' },
-      ]}
-      onChange={(variant) => props.onChange({ ...props.config, variant })}
-    />
+    <>
+      <Segmented
+        label="Tonic shape"
+        value={tonicPlacement(props.config)}
+        options={[
+          { value: 'neck', label: 'Anywhere on the neck' },
+          { value: 'window', label: 'Inside the fret window' },
+        ]}
+        onChange={(variant) => props.onChange({ ...props.config, variant })}
+      />
+      <GivenShapeHint />
+    </>
   );
 }

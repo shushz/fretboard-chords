@@ -97,7 +97,7 @@ export function Explore() {
         <div class="prompt-main">
           {chordSymbol(chord, symbolOptions(p))}{' '}
           <span class="muted">
-            · {chordNumeral(chord, numeralOptions(p))} in {formatKey(k, p.spelling.glyphs)}
+            · {chordNumeral(chord, numeralOptions(p))} in {formatKey(k)}
           </span>
         </div>
         <button

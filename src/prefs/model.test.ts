@@ -3,6 +3,8 @@ import {
   DEFAULT_PREFERENCES,
   anchorStringList,
   mergePreferences,
+  numeralOptions,
+  symbolOptions,
   updatePreferences,
 } from './model';
 
@@ -42,6 +44,18 @@ describe('preferences model', () => {
     expect(
       mergePreferences({ practice: { sessionLength: { kind: 'x' } } }).practice.sessionLength,
     ).toEqual(DEFAULT_PREFERENCES.practice.sessionLength);
+  });
+  it('old notation settings are dropped; the given-shape hint defaults to on', () => {
+    const p = mergePreferences({
+      spelling: { glyphs: false, prefer: 'sharp' },
+      harmony: { dimStyle: 'text', roleLabels: 'interval', minorV: 'natural' },
+    });
+    expect('glyphs' in p.spelling).toBe(false);
+    expect(p.harmony).toEqual({ minorV: 'natural' });
+    expect(p.spelling.prefer).toBe('sharp');
+    expect(p.practice.givenShapeRoles).toBe(true);
+    expect(symbolOptions(p)).toEqual({ glyphs: true, dimStyle: 'symbol' });
+    expect(numeralOptions(p)).toEqual({ glyphs: true, dimStyle: 'symbol' });
   });
   it('update is immutable', () => {
     const p = updatePreferences(DEFAULT_PREFERENCES, (d) => {

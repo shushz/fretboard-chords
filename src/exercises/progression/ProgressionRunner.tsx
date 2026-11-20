@@ -103,7 +103,7 @@ export function ProgressionRunner(props: RunnerProps) {
       prompt={{
         main: (
           <>
-            {formatKey(chord.key, p.spelling.glyphs)} · {numerals[step]}
+            {formatKey(chord.key)} · {numerals[step]}
           </>
         ),
         sub: `${formatStringSet(q.region.stringSet)} · ${formatWindow(q.region.window)}`,

@@ -5,6 +5,7 @@ export function roleColor(role: Role, p: Preferences): string {
   return p.look.roleColors[memberOf(role)];
 }
 
-export function roleLabel(role: Role, p: Preferences): string {
-  return formatRole(role, p.harmony.roleLabels);
+/** Role label with proper symbols: ♭3, ♭5, ♭7. */
+export function roleLabel(role: Role, _p?: Preferences): string {
+  return formatRole(role, 'glyph');
 }

@@ -122,8 +122,9 @@ export function TapQuestion(props: TapQuestionProps) {
   for (const n of props.shown ?? []) {
     add(
       noteMarker(n, 'shown', p, {
+        // Before answering, roles *and* role colours are a hint: both follow `shownRoles`.
         showRoles: grade ? true : (props.shownRoles ?? false),
-        colored: true,
+        colored: grade ? true : (props.shownRoles ?? false),
       }),
     );
   }

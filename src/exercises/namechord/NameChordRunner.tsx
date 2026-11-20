@@ -32,7 +32,7 @@ export function NameChordRunner(props: RunnerProps) {
     else props.prev.current = q;
   }, []);
   if (!q) return null;
-  const keyName = formatKey(q.chord.key, p.spelling.glyphs);
+  const keyName = formatKey(q.chord.key);
   const numeral = chordNumeral(q.chord, numeralOptions(p));
   const symbol = chordSymbol(q.chord, symbolOptions(p));
 

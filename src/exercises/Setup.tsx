@@ -71,10 +71,7 @@ export function Setup(props: {
       </section>
       {triadMastery >= SEVENTHS_SUGGESTION && (
         <div class="suggest" role="note">
-          <span>
-            You've mastered the core triads in {formatKey(c.key, p.spelling.glyphs)} — ready for
-            sevenths?
-          </span>
+          <span>You've mastered the core triads in {formatKey(c.key)} — ready for sevenths?</span>
           <button
             type="button"
             class="btn"

@@ -7,7 +7,7 @@ test('explore shows F#m voicings with roles in the region', async ({ page }) => 
   // SPEC §4 example: s3 f6 = 5, s2 f7 = R, s1 f5 = b3
   await expect(page.getByTestId('note-3-6')).toContainText('5');
   await expect(page.getByTestId('note-2-7')).toContainText('R');
-  await expect(page.getByTestId('note-1-5')).toContainText('b3');
+  await expect(page.getByTestId('note-1-5')).toContainText('♭3');
   await shot(page, 'm04-explore-light');
 });
 

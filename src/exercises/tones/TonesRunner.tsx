@@ -109,7 +109,7 @@ function LabelView(props: RunnerProps & { q: LabelQuestion }) {
     <div class="runner">
       <div class="prompt">
         <div class="prompt-main">
-          Name the tones · {formatKey(q.chord.key, p.spelling.glyphs)} {numeral}
+          Name the tones · {formatKey(q.chord.key)} {numeral}
         </div>
         <div class="prompt-sub">
           {chordSymbol(q.chord, symbolOptions(p))} · {formatStringSet(q.region.stringSet)}
@@ -253,7 +253,7 @@ function TapRoleView(props: RunnerProps & { q: TapRoleQuestion }) {
           Tap the {roleLabel(q.role, p)} of {numeral}
         </div>
         <div class="prompt-sub">
-          {formatKey(q.chord.key, p.spelling.glyphs)} · on string {q.string}
+          {formatKey(q.chord.key)} · on string {q.string}
         </div>
       </div>
       <div class="board-wrap">

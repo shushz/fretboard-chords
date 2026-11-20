@@ -26,6 +26,6 @@ test('explorer shows seventh voicings with 7th roles', async ({ page }) => {
   await page.goto('./#/explore');
   await page.getByRole('radio', { name: 'Sevenths' }).click();
   await expect(page.locator('.prompt-main')).toContainText('F♯m7');
-  await expect(page.locator('.fretboard')).toContainText('b7');
+  await expect(page.locator('.fretboard')).toContainText('♭7');
   await shot(page, 'm14-explore');
 });

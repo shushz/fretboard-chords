@@ -169,11 +169,10 @@ export function SwitchRunner(props: RunnerProps) {
             <strong>{result.ok ? '✓ Correct' : '✕ Not quite'}</strong>{' '}
             <span>
               {result.reason === 'moved-wrong-note' && 'That note stays. '}
-              The {roleLabel(moved.role, p)} on string {moved.string} (
-              {formatNote(moved.tone.note, p.spelling.glyphs)}) moves{' '}
-              {q.def.delta < 0 ? 'down' : 'up'}{' '}
+              The {roleLabel(moved.role, p)} on string {moved.string} ({formatNote(moved.tone.note)}
+              ) moves {q.def.delta < 0 ? 'down' : 'up'}{' '}
               {Math.abs(q.def.delta) === 1 ? 'a fret' : `${Math.abs(q.def.delta)} frets`} to the{' '}
-              {roleLabel(movedTo.role, p)} ({formatNote(movedTo.tone.note, p.spelling.glyphs)})
+              {roleLabel(movedTo.role, p)} ({formatNote(movedTo.tone.note)})
               {!p.practice.switchNameChord && (
                 <>
                   {' '}

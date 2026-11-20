@@ -47,9 +47,9 @@ docs/          CHANGELOG.md, screenshots, design notes
 - Keep question generation and grading separate from rendering so they can be tested
   without a DOM.
 - Mobile-first: test at 412×915; touch targets ≥ 44 px; works in portrait and landscape.
-- Roles are labeled `R, b3, 3, b5, 5, b7, 7` by default; use the same role colors everywhere.
+- Roles are labeled `R, ♭3, 3, ♭5, 5, ♭7, 7` in the UI (ASCII `b3` internally); use the same role colors everywhere.
 - **No hard-coded musical choices.** If there is more than one valid option (enharmonic
-  spelling, minor-V variant, label style, string sets, anchors…), read it from the
+  spelling, minor-V variant, string sets, anchors…), read it from the
   preferences model (SPEC §7.1). Add new preferences there with a sensible default.
 - Avoid heavy dependencies; prefer small, well-maintained packages. Justify new ones
   in the PR description.
