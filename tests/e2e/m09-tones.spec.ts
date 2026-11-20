@@ -5,7 +5,7 @@ async function setup(page: Page, variant: string, keep: string) {
   await page.goto('./#/practice');
   await page.getByRole('radio', { name: /Name the tones/ }).click();
   await page.getByRole('radio', { name: variant }).click();
-  await page.getByLabel('Key').selectOption('F#m');
+  await page.getByRole('combobox', { name: 'Key', exact: true }).selectOption('F#m');
   for (const n of ['i', 'iv', 'V', 'ii°', '♭VI', '♭VII'].filter((x) => x !== keep)) {
     await page
       .getByRole('group', { name: 'Chords' })

@@ -1,7 +1,8 @@
 import { useMemo, useRef, useState } from 'preact/hooks';
 import { prefs } from '../../prefs/store';
 import { stats } from '../../progress/store';
-import { type PracticeConfig, defaultConfig } from '../../exercises/config';
+import { type PracticeConfig, concreteConfig, defaultConfig } from '../../exercises/config';
+import type { Key } from '../../theory/keys';
 import { Setup } from '../../exercises/Setup';
 import { modeDef } from '../../exercises/modes';
 import {
@@ -47,6 +48,7 @@ export function Practice() {
   const [notice, setNotice] = useState<string | null>(null);
   const [retry, setRetry] = useState(0);
   const prev = useRef<unknown>(null);
+  const prevKey = useRef<Key | null>(null);
 
   // Per-question config and selection weights
   const index = session?.index ?? 0;
@@ -58,8 +60,14 @@ export function Practice() {
         c.window = randomWindow(c.window.width, p.fretboard.fretRange, Math.random);
       return { config: c, itemWeight: drillWeight(item), item };
     }
+    // Random key: a new key per question (only once a session is running).
+    let qConfig = config;
+    if (session !== null && config.randomKey) {
+      qConfig = concreteConfig(config, p, prevKey.current, Math.random);
+      prevKey.current = qConfig.key;
+    }
     return {
-      config,
+      config: qConfig,
       item: null,
       itemWeight: makeItemWeight(
         stats.value,
@@ -88,6 +96,7 @@ export function Practice() {
           onStart={() => {
             saveSetup(config);
             prev.current = null;
+            prevKey.current = null;
             setNotice(null);
             setSession(startSession(p.practice.sessionLength, 0, Date.now()));
           }}
@@ -151,8 +160,8 @@ export function Practice() {
             advance();
           }}
           onImpossible={() => {
-            if (drill) {
-              // try other windows, then skip the item
+            if (drill || config.randomKey) {
+              // drills: try other windows; random keys: try other keys — then skip
               if (retry < 5) setRetry(retry + 1);
               else {
                 setRetry(0);

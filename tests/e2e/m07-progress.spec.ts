@@ -10,7 +10,7 @@ async function tap(page: Page, s: number, f: number) {
 
 test('attempts are recorded, persisted, exported, imported and reset', async ({ page }) => {
   await page.goto('./#/practice');
-  await page.getByLabel('Key').selectOption('F#m');
+  await page.getByRole('combobox', { name: 'Key', exact: true }).selectOption('F#m');
   for (const n of ['iv', 'V', 'ii°', '♭VI', '♭VII']) {
     await page
       .getByRole('group', { name: 'Chords' })

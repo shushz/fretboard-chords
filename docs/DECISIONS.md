@@ -159,3 +159,12 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   questions prefer a different tonic shape _and_ a different target; if that's
   impossible (e.g. one target selected) they still always differ in at least one of the
   two. Only a config with exactly one possible question can repeat.
+- **2026-11-20 — Random key** (owner request). Setup "Key choice": One key / Random key;
+  random keys come from major, minor or both, drawn from the keys selectable under the
+  spelling preferences (enharmonic choices respected; theoretical keys only when
+  allowed). A new key every question (every progression in the walk), never the same
+  key twice in a row. Chord selection is kept per mode (`degreesByMode`, default core
+  sets); with "both" the progression picker offers only "Random". If a drawn key has no
+  question for the setup, up to 5 other keys are tried before skipping. Stats stay per
+  key. The sevenths suggestion is hidden in random-key sessions. Config fields:
+  `randomKey`, `degreesByMode`.

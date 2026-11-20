@@ -137,7 +137,9 @@ A memory anchor ties an upper-string triad to the familiar root on string 6 or 5
 ## 5. Exercise modes
 
 All modes share: key, chord set, region, triads/sevenths toggle, and session length
-(N questions or T minutes). Each question records correctness, time-to-answer,
+(N questions or T minutes). The key is either fixed for the session or **random**: a new
+key from major, minor or both for every question (every progression in the walk), never
+the same key twice in a row, with the chord set chosen per mode. Each question records correctness, time-to-answer,
 and the item it tested (see §6).
 
 1. **Find the chord** — "E♭m · iv · strings 2–4 · frets 6–10". User taps the notes;
