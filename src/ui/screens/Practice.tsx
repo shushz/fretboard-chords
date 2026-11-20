@@ -155,7 +155,7 @@ export function Practice() {
   const progress =
     sl.kind === 'questions'
       ? byChords
-        ? `chord ${Math.min(session.attempts.length + 1, sl.count)} of ${sl.count}`
+        ? `${session.attempts.length} / ${sl.count} chords`
         : `${session.index + 1} / ${sl.count}`
       : `${Math.max(0, Math.ceil((sl.minutes * 60_000 - (Date.now() - session.startedAt)) / 60_000))} min left`;
 

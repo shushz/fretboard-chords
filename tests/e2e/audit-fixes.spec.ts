@@ -88,10 +88,10 @@ test('progression walk counts chords, not progressions', async ({ page }) => {
   await page.goto('./#/practice');
   await page.getByRole('radio', { name: /^Progression walk/ }).click();
   await page.getByRole('button', { name: /^Start/ }).click();
-  await expect(page.locator('.session-progress')).toHaveText('chord 1 of 20');
+  await expect(page.locator('.session-progress')).toHaveText('0 / 20 chords');
   await page.getByRole('button', { name: 'Show answer' }).click();
   await page.getByRole('button', { name: /^(Next chord|Finish)$/ }).click();
-  await expect(page.locator('.session-progress')).toHaveText('chord 2 of 20');
+  await expect(page.locator('.session-progress')).toHaveText('1 / 20 chords');
 });
 
 test('heat grid names every degree, including ones not practised yet', async ({ page }) => {
