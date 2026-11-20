@@ -41,6 +41,7 @@ non-diatonic harmony beyond the harmonic-minor V/V7.
 ## 3. Music theory model
 
 ### 3.1 Notes and spelling
+
 - A note = letter (A–G) + accidental (bb, b, natural, #, ##). Pitch class derived from it.
 - **Spelling is always correct for the key.** Chord tones are spelled by stacking
   letters (R–3–5–7 = every other letter). Double sharps/flats must be supported
@@ -48,6 +49,7 @@ non-diatonic harmony beyond the harmonic-minor V/V7.
 - Display ♯ ♭ 𝄪 𝄫 glyphs in the UI by default (ASCII is a preference); ASCII internally.
 
 ### 3.2 Keys
+
 - 12 major and 12 minor tonics. Wherever more than one spelling is valid, the
   choice is a **preference** (see §7.1), never hard-coded:
   - Enharmonic key pairs, each with its own toggle and a global "prefer ♯ / prefer ♭"
@@ -61,37 +63,40 @@ non-diatonic harmony beyond the harmonic-minor V/V7.
 
 ### 3.3 Diatonic chords
 
-| Major key | Triad | Seventh |
-|---|---|---|
-| I | major | maj7 |
-| ii | minor | m7 |
-| iii | minor | m7 |
-| IV | major | maj7 |
-| V | major | 7 |
-| vi | minor | m7 |
-| vii° | dim | m7b5 (ø7) |
+| Major key | Triad | Seventh   |
+| --------- | ----- | --------- |
+| I         | major | maj7      |
+| ii        | minor | m7        |
+| iii       | minor | m7        |
+| IV        | major | maj7      |
+| V         | major | 7         |
+| vi        | minor | m7        |
+| vii°      | dim   | m7b5 (ø7) |
 
-| Minor key | Triad | Seventh |
-|---|---|---|
-| i | minor | m7 |
-| ii° | dim | m7b5 (ø7) |
-| bIII | major | maj7 |
-| iv | minor | m7 |
+| Minor key | Triad                        | Seventh    |
+| --------- | ---------------------------- | ---------- |
+| i         | minor                        | m7         |
+| ii°       | dim                          | m7b5 (ø7)  |
+| bIII      | major                        | maj7       |
+| iv        | minor                        | m7         |
 | v / **V** | minor / **major (harmonic)** | m7 / **7** |
-| bVI | major | maj7 |
-| bVII | major | 7 |
+| bVI       | major                        | maj7       |
+| bVII      | major                        | 7          |
 
 Minor-key V defaults to the harmonic **V / V7** (raised 7th); natural v is a preference.
 
 **Default "core" sets** (the user's focus):
+
 - Minor: i, iv, V (V7), ii° (iiø7), bVI, bVII
 - Major: I, IV, V (V7), ii, vi (later iii, vii°)
 
 ### 3.4 Chord-tone roles
+
 Labels relative to the chord root: `R, b3, 3, b5, 5, b7, 7` (and `bb7` reserved).
 Each fretted note in a voicing carries its role.
 
 ### 3.5 Required test fixtures (non-exhaustive)
+
 - F#m: i F#–A–C#, ii° G#–B–D, bIII A, iv B–D–F#, V C#–E#–G#, bVI D, bVII E.
 - E♭m: i E♭–G♭–B♭, ii° F–A♭–C♭, bIII G♭, iv A♭–C♭–E♭, V B♭–D–F, bVI C♭–E♭–G♭, bVII D♭.
 - G#m: V = D#–F##–A#.
@@ -118,7 +123,9 @@ Each fretted note in a voicing carries its role.
   string 2 fret 7 = F# (**R**), string 1 fret 5 = A (**b3**).
 
 ### 4.1 Root anchors
+
 A memory anchor ties an upper-string triad to the familiar root on string 6 or 5.
+
 - **Anchored voicing** = a triad on 1–3 or 2–4 plus the chord root on string 6
   (or 5), within the fret window ± 2 frets. Typical: 2–4 triad + root on 6
   (strings 6, 4, 3, 2 with string 5 muted), or 1–3 triad + root on 5 or 6.
@@ -197,6 +204,7 @@ key reaches the threshold).
   no tiny controls).
 
 ### 7.1 Preferences
+
 **Principle:** wherever more than one musically valid choice exists, it becomes a
 preference with a sensible default. It is not hard-coded. Preferences are stored on the
 device and included in the export/import. The Preferences screen is grouped:
