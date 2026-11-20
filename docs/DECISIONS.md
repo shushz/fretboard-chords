@@ -49,3 +49,9 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   mode list; it's a reference/learning screen and stays useful.
 - **2026-11-20 — Hash routing** (`#/explore`, `#/prefs`) so deep links work on GitHub
   Pages without server rewrites.
+- **2026-11-20 — Audio: Karplus–Strong rendered to buffers in JS** (allpass-tuned, ~±20
+  cents verified in tests), cached per MIDI note, through a light compressor. Strum goes
+  low → high with `sound.strumMs` between strings. Wrong answers play a short damped
+  low-E "thunk". A mute button sits in the top bar (`sound.muted`). Couldn't listen to
+  the output in the cloud session — tone is tuned by numbers only; adjust
+  `DEFAULT_PLUCK` in `src/audio/synth.ts` if it sounds off.

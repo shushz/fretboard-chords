@@ -493,3 +493,7 @@ input {
   outline: none;
   fill: rgba(37, 99, 217, 0.18);
 }
+.prompt .play {
+  float: right;
+  min-height: 44px;
+}

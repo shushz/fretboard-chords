@@ -1,4 +1,5 @@
 import { route, navigate, type Route } from './router';
+import { prefs, editPreferences } from '../prefs/store';
 import { Home } from './screens/Home';
 import { Explore } from './screens/Explore';
 import { PreferencesScreen } from './screens/PreferencesScreen';
@@ -26,6 +27,15 @@ export function App() {
           </span>
         )}
         <h1>{TITLES[r]}</h1>
+        <button
+          type="button"
+          class="icon-btn"
+          aria-label={prefs.value.sound.muted ? 'Unmute' : 'Mute'}
+          aria-pressed={prefs.value.sound.muted}
+          onClick={() => editPreferences((d) => void (d.sound.muted = !d.sound.muted))}
+        >
+          {prefs.value.sound.muted ? '🔇' : '🔊'}
+        </button>
         {r !== 'prefs' && (
           <button
             type="button"
