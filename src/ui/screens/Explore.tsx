@@ -19,6 +19,8 @@ import { useViewportWidth } from '../useViewport';
 import { KeyPicker, StringSetPicker, WindowPicker, keyFromAscii } from '../pickers';
 import { chordToneName, noteMarker } from '../markers';
 import { formatKey } from '../../theory/keys';
+import { playNote, strum } from '../../audio/engine';
+import { midiAt } from '../../fretboard/tuning';
 
 export function Explore() {
   const p = prefs.value;
@@ -66,6 +68,14 @@ export function Explore() {
             · {chordNumeral(chord, numeralOptions(p))} in {formatKey(k, p.spelling.glyphs)}
           </span>
         </div>
+        <button
+          type="button"
+          class="btn secondary play"
+          disabled={voicings.length === 0}
+          onClick={() => voicings[0] && strum(voicings[0].notes.map((n) => n.midi))}
+        >
+          ▶ Play
+        </button>
         <div class="prompt-sub">
           {chordToneName(chord, p)} · {voicings.length} voicing{voicings.length === 1 ? '' : 's'} in
           region
@@ -79,13 +89,14 @@ export function Explore() {
           markers={markers}
           leftHanded={p.fretboard.leftHanded}
           showFretNumbers={p.fretboard.showFretNumbers}
-          onTap={(s, f) =>
+          onTap={(s, f) => {
+            playNote(midiAt(s, f));
             setTaps((ts) =>
               ts.some((t) => t.string === s && t.fret === f)
                 ? ts.filter((t) => !(t.string === s && t.fret === f))
                 : [...ts, { string: s, fret: f }],
-            )
-          }
+            );
+          }}
         />
       </div>
       <div class="chips" role="group" aria-label="Degree">
