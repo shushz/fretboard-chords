@@ -1,8 +1,47 @@
+import { route, navigate, type Route } from './router';
+import { Home } from './screens/Home';
+import { Explore } from './screens/Explore';
+import { PreferencesScreen } from './screens/PreferencesScreen';
+
+const TITLES: Record<Route, string> = {
+  home: 'Fretboard Chords',
+  explore: 'Chord explorer',
+  prefs: 'Preferences',
+  practice: 'Practice',
+  stats: 'Progress',
+};
+
 export function App() {
+  const r = route.value;
   return (
-    <main class="home">
-      <h1>Fretboard Chords</h1>
-      <p>Drill diatonic chord shapes, chord tones and relationships on the guitar neck.</p>
-    </main>
+    <div class="app">
+      <header class="topbar">
+        {r !== 'home' ? (
+          <button type="button" class="icon-btn" aria-label="Back" onClick={() => navigate('home')}>
+            ‹
+          </button>
+        ) : (
+          <span class="logo" aria-hidden="true">
+            ◉
+          </span>
+        )}
+        <h1>{TITLES[r]}</h1>
+        {r !== 'prefs' && (
+          <button
+            type="button"
+            class="icon-btn"
+            aria-label="Preferences"
+            onClick={() => navigate('prefs')}
+          >
+            ⚙
+          </button>
+        )}
+      </header>
+      <main class="screen">
+        {r === 'home' && <Home />}
+        {r === 'explore' && <Explore />}
+        {r === 'prefs' && <PreferencesScreen />}
+      </main>
+    </div>
   );
 }
