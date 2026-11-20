@@ -23,10 +23,18 @@ export function isCompactLandscape(w: number, h: number): boolean {
   return w > h && h < 600;
 }
 
+/**
+ * Question and controls sit in a side column next to the board: phones on their side and
+ * screens ≥ 700 px wide (tablets). Keep in sync with the media query in theme.css.
+ */
+export function usesSideColumn(w: number, h: number): boolean {
+  return isCompactLandscape(w, h) || w >= 700;
+}
+
 /** Horizontal space available to the fretboard, in CSS px. */
 export function boardWidthFor(w: number, h: number): number {
   const usable = Math.min(w, 1200) - 24;
-  return isCompactLandscape(w, h) ? usable - SIDE_COLUMN_PX - 16 : usable;
+  return usesSideColumn(w, h) ? usable - SIDE_COLUMN_PX - 16 : usable;
 }
 
 /** Like useViewportWidth, but returns the width the fretboard can use. */

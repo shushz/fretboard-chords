@@ -25,26 +25,16 @@ export function PreferencesScreen() {
   return (
     <div class="prefs">
       <Section title="Spelling">
-        <Segmented
-          label="Default accidental"
-          value={p.spelling.prefer}
-          options={[
-            { value: 'flat', label: '♭' },
-            { value: 'sharp', label: '♯' },
-          ]}
-          onChange={(v) => editPreferences((d) => void (d.spelling.prefer = v))}
-        />
         {ENHARMONIC_PAIRS.map((pair) => {
           const l = pairLabel(pair.id);
           return (
             <Segmented
               key={pair.id}
               label={`${l.flat} / ${l.sharp}`}
-              value={p.spelling.pairs[pair.id]}
+              value={p.spelling.pairs[pair.id] === 'sharp' ? 'sharp' : 'flat'}
               options={[
                 { value: 'flat', label: l.flat },
                 { value: 'sharp', label: l.sharp },
-                { value: 'auto', label: 'Default' },
               ]}
               onChange={(v) => editPreferences((d) => void (d.spelling.pairs[pair.id] = v))}
             />
@@ -139,20 +129,29 @@ export function PreferencesScreen() {
           checked={p.fretboard.leftHanded}
           onChange={(v) => editPreferences((d) => void (d.fretboard.leftHanded = v))}
         />
+      </Section>
+
+      <Section title="Labels & hints">
         <Toggle
-          label="Show roles"
+          label="Role labels in the chord explorer"
           checked={p.fretboard.showRoles}
           onChange={(v) => editPreferences((d) => void (d.fretboard.showRoles = v))}
         />
         <Toggle
-          label="Show note names"
+          label="Note names under role labels"
           checked={p.fretboard.showNoteNames}
           onChange={(v) => editPreferences((d) => void (d.fretboard.showNoteNames = v))}
         />
         <Toggle
-          label="Show fret numbers"
+          label="Fret numbers"
           checked={p.fretboard.showFretNumbers}
           onChange={(v) => editPreferences((d) => void (d.fretboard.showFretNumbers = v))}
+        />
+        <Toggle
+          label="Show roles on the given shape"
+          hint="Hint in From the tonic and Next / previous shape: role labels and colours on the shape you're shown, before you answer"
+          checked={p.practice.givenShapeRoles}
+          onChange={(v) => editPreferences((d) => void (d.practice.givenShapeRoles = v))}
         />
       </Section>
 
@@ -270,15 +269,6 @@ export function PreferencesScreen() {
           min={1}
           max={8}
           onChange={(v) => editPreferences((d) => void (d.practice.tempoBeats = v))}
-        />
-      </Section>
-
-      <Section title="Hints">
-        <Toggle
-          label="Show roles on the given shape"
-          hint="From the tonic, Next/previous shape: roles and colours of the shape you're shown, before you answer"
-          checked={p.practice.givenShapeRoles}
-          onChange={(v) => editPreferences((d) => void (d.practice.givenShapeRoles = v))}
         />
       </Section>
 

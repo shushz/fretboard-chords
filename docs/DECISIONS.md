@@ -217,3 +217,21 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   "End" is a full-size target; Quality switch gained "Show answer"; the session summary's
   median time counts correct answers only; Name the tones keeps role colours on wrong
   labels (red ring) and explains each string; landscape side-column buttons stack.
+- **2026-11-20 — Audit recommendations accepted by the owner (all nine):**
+  1. Practice setup: compact mode picker (2 columns on phones, 4 on wide screens), only
+     the selected mode's description shown — key and chords now on the first screen.
+  2. Preferences: "Labels & hints" section — "Role labels in the chord explorer", "Note
+     names under role labels", "Fret numbers", "Show roles on the given shape".
+  3. Spelling: global ♭/♯ default and the per-pair "Default" option removed; one ♭/♯
+     choice per pair. Stored "auto" pairs are pinned to what they resolved to.
+  4. From the tonic / Next shape: after answering, the given shape fades and a key names
+     it ("i (given)" vs "♭VII").
+  5. A board wider than the screen fades the edge with more frets and shows ‹ / › on the
+     fret-number row.
+  6. Screens ≥ 700 px wide (tablets) use the side-column layout of phone landscape. Notes
+     weren't enlarged: at that width the board column has no room to grow.
+  7. Sevenths: string sets shown as two labelled groups, "Drop-2 (4 notes)" and "Shells
+     (R–3–7)", in the explorer and in practice setup.
+  8. Progression walk: session length counts chords ("chord 3 of 20"), not progressions;
+     a session ends after the progression that reaches the count.
+  9. Progress heat grid: column headings 1–7 and each empty cell names its degree.

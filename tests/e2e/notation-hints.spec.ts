@@ -3,9 +3,9 @@ import { shot } from './helpers';
 
 test('notation settings are gone; music symbols are always used', async ({ page }) => {
   await page.goto('./#/prefs');
-  await expect(page.getByText('Accidental symbols')).toHaveCount(0);
-  await expect(page.getByText('Diminished labels')).toHaveCount(0);
-  await expect(page.getByText('Role labels')).toHaveCount(0);
+  await expect(page.getByText('Accidental symbols', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('Diminished labels', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('Role labels', { exact: true })).toHaveCount(0);
   await page.goto('./#/explore');
   await expect(page.getByTestId('note-1-5')).toHaveText('♭3');
   await page.getByRole('radio', { name: 'Sevenths' }).click();
@@ -37,7 +37,7 @@ test('From the tonic: roles and colours on the given shape can be hidden', async
   await shot(page, 'hint-off-question');
   await page.getByRole('button', { name: 'Show answer' }).click();
   // after answering, the given shape is labelled and coloured
-  await expect(page.locator('[data-kind=shown] text').first()).toBeVisible();
+  await expect(page.locator('[data-kind=given] text').first()).toBeVisible();
   await shot(page, 'hint-off-answered');
 
   // the setting persists and also shows in Preferences

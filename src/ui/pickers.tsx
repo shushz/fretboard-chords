@@ -7,6 +7,7 @@ import {
   selectableKeys,
 } from '../theory/keys';
 import {
+  SEVENTH_STRING_SETS,
   TRIAD_STRING_SETS,
   type FretWindow,
   type StringSetId,
@@ -34,17 +35,38 @@ export function KeyPicker(props: { value: Key; prefs: Preferences; onChange: (k:
 
 export function StringSetPicker(props: {
   value: StringSetId;
-  sets?: readonly StringSetId[];
+  /** Sevenths: show drop-2 sets and shell sets as two labelled groups. */
+  sevenths?: boolean;
   onChange: (s: StringSetId) => void;
 }) {
-  const sets = props.sets ?? TRIAD_STRING_SETS;
+  const opts = (sets: readonly StringSetId[]) =>
+    sets.map((s) => ({ value: s, label: s.replace('-', '–') }));
+  if (!props.sevenths) {
+    return (
+      <Segmented
+        label="Strings"
+        value={props.value}
+        options={opts(TRIAD_STRING_SETS)}
+        onChange={props.onChange}
+      />
+    );
+  }
+  // One choice across both groups: a group shows no selection when the value is in the other.
   return (
-    <Segmented
-      label="Strings"
-      value={props.value}
-      options={sets.map((s) => ({ value: s, label: s.replace('-', '–') }))}
-      onChange={props.onChange}
-    />
+    <>
+      <Segmented
+        label="Drop-2 strings (4 notes)"
+        value={props.value}
+        options={opts(SEVENTH_STRING_SETS)}
+        onChange={props.onChange}
+      />
+      <Segmented
+        label="Shell strings (R–3–7)"
+        value={props.value}
+        options={opts(TRIAD_STRING_SETS)}
+        onChange={props.onChange}
+      />
+    </>
   );
 }
 

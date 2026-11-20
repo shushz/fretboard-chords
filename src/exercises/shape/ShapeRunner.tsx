@@ -59,6 +59,7 @@ export function ShapeRunner(props: RunnerProps) {
       view={view}
       shown={q.shown.notes}
       shownRoles={p.practice.givenShapeRoles}
+      legend={{ given: 'this shape (given)', answer: up ? 'next shape' : 'previous shape' }}
       playOnShow={q.shown.notes.map((n) => n.midi)}
       requiredStrings={shapeRequiredStrings(q)}
       grade={(taps) => {

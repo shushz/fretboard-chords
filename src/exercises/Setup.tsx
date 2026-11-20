@@ -6,7 +6,12 @@ import {
   diatonicChord,
 } from '../theory/chords';
 import { numeralOptions, type Preferences } from '../prefs/model';
-import { TRIAD_STRING_SETS, SEVENTH_STRING_SETS, randomWindow } from '../fretboard/regions';
+import {
+  SEVENTH_STRING_SETS,
+  type StringSetId,
+  TRIAD_STRING_SETS,
+  randomWindow,
+} from '../fretboard/regions';
 import { KeyPicker, WindowPicker } from '../ui/pickers';
 import { Segmented } from '../ui/controls';
 import { type PracticeConfig, degreesForMode, stringSetsFor } from './config';
@@ -27,10 +32,7 @@ export function Setup(props: {
 }) {
   const { config: c, prefs: p } = props;
   const set = (patch: Partial<PracticeConfig>) => props.onChange({ ...c, ...patch });
-  const allSets = c.sevenths
-    ? [...SEVENTH_STRING_SETS, ...(p.sevenths.shells ? TRIAD_STRING_SETS : [])]
-    : TRIAD_STRING_SETS;
-  const toggleSet = (s: (typeof allSets)[number]) => {
+  const toggleSet = (s: StringSetId) => {
     const on = c.stringSets.includes(s);
     if (on && c.stringSets.length === 1) return;
     set({ stringSets: on ? c.stringSets.filter((x) => x !== s) : [...c.stringSets, s] });
@@ -59,11 +61,11 @@ export function Setup(props: {
               class={`mode-item${c.mode === m.id ? ' on' : ''}`}
               onClick={() => set({ mode: m.id })}
             >
-              <strong>{m.name}</strong>
-              <span>{m.description}</span>
+              {m.name}
             </button>
           ))}
         </div>
+        <p class="mode-desc">{MODES.find((m) => m.id === c.mode)?.description}</p>
         {(() => {
           const Extras = MODES.find((m) => m.id === c.mode)?.SetupExtras;
           return Extras ? <Extras config={c} onChange={props.onChange} /> : null;
@@ -174,25 +176,35 @@ export function Setup(props: {
       </section>
       <section class="card">
         <h2>Region</h2>
-        <div class="field">
-          <span class="field-label">Strings</span>
-          <div class="segmented multi" role="group" aria-label="Strings">
-            {allSets.map((s) => {
-              const on = c.stringSets.includes(s);
-              return (
-                <button
-                  type="button"
-                  key={s}
-                  aria-pressed={on}
-                  class={on ? 'on' : ''}
-                  onClick={() => toggleSet(s)}
-                >
-                  {s.replace('-', '–')}
-                </button>
-              );
-            })}
+        {(c.sevenths
+          ? [
+              { label: 'Strings', sub: 'Drop-2 (4 notes)', sets: SEVENTH_STRING_SETS },
+              ...(p.sevenths.shells
+                ? [{ label: 'Shell strings', sub: 'Shells (R–3–7)', sets: TRIAD_STRING_SETS }]
+                : []),
+            ]
+          : [{ label: 'Strings', sub: null, sets: TRIAD_STRING_SETS }]
+        ).map((g) => (
+          <div class="field" key={g.label}>
+            <span class="field-label">{g.sub ?? g.label}</span>
+            <div class="segmented multi" role="group" aria-label={g.label}>
+              {g.sets.map((s) => {
+                const on = c.stringSets.includes(s);
+                return (
+                  <button
+                    type="button"
+                    key={s}
+                    aria-pressed={on}
+                    class={on ? 'on' : ''}
+                    onClick={() => toggleSet(s)}
+                  >
+                    {s.replace('-', '–')}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        ))}
         <div class="window-row">
           <WindowPicker
             value={c.window}

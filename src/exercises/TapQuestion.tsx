@@ -1,3 +1,4 @@
+import { BoardFrame } from '../ui/BoardFrame';
 /** Shared UI for questions answered by tapping a voicing on the fretboard. */
 import type { ComponentChildren } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
@@ -49,6 +50,8 @@ export interface TapQuestionProps {
   label: string;
   /** Extra controls rendered next to Clear / Show answer. */
   extraActions?: ComponentChildren;
+  /** After answering: names for the faded given shape and the answer, shown as a key. */
+  legend?: { given: string; answer: string };
   /** Rendered above the prompt (e.g. a progression strip). */
   before?: ComponentChildren;
   /** Reference notes always shown dimmed (e.g. the previous chord). */
@@ -121,7 +124,8 @@ export function TapQuestion(props: TapQuestionProps) {
     add(noteMarker(n, 'ghost', p, { showRoles: false, colored: false }));
   for (const n of props.shown ?? []) {
     add(
-      noteMarker(n, 'shown', p, {
+      // After answering, the given shape fades so the answer stands out (key below the board).
+      noteMarker(n, grade ? 'given' : 'shown', p, {
         // Before answering, roles *and* role colours are a hint: both follow `shownRoles`.
         showRoles: grade ? true : (props.shownRoles ?? false),
         colored: grade ? true : (props.shownRoles ?? false),
@@ -171,7 +175,7 @@ export function TapQuestion(props: TapQuestionProps) {
         {props.prompt.sub && <div class="prompt-sub">{props.prompt.sub}</div>}
         {props.prompt.hint && <div class="prompt-hint">{props.prompt.hint}</div>}
       </div>
-      <div class="board-wrap">
+      <BoardFrame>
         <Fretboard
           fromFret={range.from}
           toFret={range.to}
@@ -182,7 +186,13 @@ export function TapQuestion(props: TapQuestionProps) {
           onTap={onTap}
           label={props.label}
         />
-      </div>
+      </BoardFrame>
+      {grade && props.legend && props.shown?.length ? (
+        <p class="board-legend">
+          <span class="legend-dot faded" /> {props.legend.given}
+          <span class="legend-dot" /> {props.legend.answer}
+        </p>
+      ) : null}
       {grade ? (
         <FeedbackBar
           state={grade.correct ? 'correct' : 'wrong'}

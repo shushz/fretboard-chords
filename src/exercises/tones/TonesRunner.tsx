@@ -1,3 +1,4 @@
+import { BoardFrame } from '../../ui/BoardFrame';
 import { formatNote } from '../../theory/notes';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { feedback, playNote, strum } from '../../audio/engine';
@@ -121,7 +122,7 @@ function LabelView(props: RunnerProps & { q: LabelQuestion }) {
           <div class="prompt-hint">What is the note on string {current.string}?</div>
         )}
       </div>
-      <div class="board-wrap">
+      <BoardFrame>
         <Fretboard
           fromFret={range.from}
           toFret={range.to}
@@ -134,7 +135,7 @@ function LabelView(props: RunnerProps & { q: LabelQuestion }) {
           }}
           label="Fretboard: name the tones"
         />
-      </div>
+      </BoardFrame>
       {done ? (
         <FeedbackBar state={done.correct ? 'correct' : 'wrong'} onNext={props.onNext}>
           <strong>{done.correct ? '✓ Correct' : '✕ Not quite'}</strong>{' '}
@@ -268,7 +269,7 @@ function TapRoleView(props: RunnerProps & { q: TapRoleQuestion }) {
           {formatKey(q.chord.key)} · on string {q.string}
         </div>
       </div>
-      <div class="board-wrap">
+      <BoardFrame>
         <Fretboard
           fromFret={range.from}
           toFret={range.to}
@@ -285,7 +286,7 @@ function TapRoleView(props: RunnerProps & { q: TapRoleQuestion }) {
           }}
           label={`Fretboard: tap the ${q.role} of ${numeral} on string ${q.string}`}
         />
-      </div>
+      </BoardFrame>
       {ok !== null ? (
         <FeedbackBar state={ok ? 'correct' : 'wrong'} onNext={props.onNext}>
           <strong>{ok ? '✓ Correct' : '✕ Not quite'}</strong>{' '}

@@ -28,7 +28,9 @@ export type MarkerKind =
   /** Reference shape outside the active region (explorer), drawn faded. */
   | 'outside'
   /** Correct note, but the user's answer for it was wrong (role colour + red ring). */
-  | 'missed';
+  | 'missed'
+  /** The shape a question gave you, faded after answering. */
+  | 'given';
 
 export interface Marker {
   string: StringNum;

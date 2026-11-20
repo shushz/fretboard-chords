@@ -57,6 +57,14 @@ describe('preferences model', () => {
     expect(symbolOptions(p)).toEqual({ glyphs: true, dimStyle: 'symbol' });
     expect(numeralOptions(p)).toEqual({ glyphs: true, dimStyle: 'symbol' });
   });
+  it('a pair left on the removed "Default" option keeps the spelling it had', () => {
+    const p = mergePreferences({
+      spelling: { prefer: 'sharp', pairs: { 'Db/C#': 'auto', 'Gb/F#': 'flat' } },
+    });
+    expect(p.spelling.pairs['Db/C#']).toBe('sharp');
+    expect(p.spelling.pairs['Gb/F#']).toBe('flat');
+    expect(Object.values(p.spelling.pairs)).not.toContain('auto');
+  });
   it('update is immutable', () => {
     const p = updatePreferences(DEFAULT_PREFERENCES, (d) => {
       d.fretboard.anchorStrings = '5';

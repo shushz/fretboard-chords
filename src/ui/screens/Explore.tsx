@@ -1,3 +1,4 @@
+import { BoardFrame } from '../BoardFrame';
 import { useMemo, useState } from 'preact/hooks';
 import { prefs } from '../../prefs/store';
 import { anchorStringList, numeralOptions, symbolOptions } from '../../prefs/model';
@@ -10,12 +11,7 @@ import {
   diatonicChord,
 } from '../../theory/chords';
 import type { StringNum } from '../../fretboard/tuning';
-import {
-  SEVENTH_STRING_SETS,
-  type StringSetId,
-  TRIAD_STRING_SETS,
-  formatWindow,
-} from '../../fretboard/regions';
+import { type StringSetId, formatWindow } from '../../fretboard/regions';
 import { Segmented } from '../controls';
 import { enumerateVoicings, nearestOutside, voicingsInRegion } from '../../fretboard/voicings';
 import { pairAnchors } from '../../fretboard/anchors';
@@ -60,7 +56,6 @@ export function Explore() {
     .map((v) =>
       v.position === v.highestFret ? `${v.position}` : `${v.position}–${v.highestFret}`,
     );
-  const sets = sevenths ? [...SEVENTH_STRING_SETS, ...TRIAD_STRING_SETS] : TRIAD_STRING_SETS;
   // Play a shape in the region, or the nearest one when none fits.
   const playable = voicings[0] ?? outside[0] ?? null;
   const markers: Marker[] = [];
@@ -123,7 +118,7 @@ export function Explore() {
           )}
         </div>
       </div>
-      <div class="board-wrap">
+      <BoardFrame>
         <Fretboard
           fromFret={range.from}
           toFret={range.to}
@@ -140,7 +135,7 @@ export function Explore() {
             );
           }}
         />
-      </div>
+      </BoardFrame>
       <div class="chips" role="group" aria-label="Degree">
         {ordered.map((d) => {
           const c = diatonicChord(k, d, sevenths, p.harmony);
@@ -172,7 +167,7 @@ export function Explore() {
             setSet(on ? '2-5' : '1-3');
           }}
         />
-        <StringSetPicker value={set} sets={sets} onChange={setSet} />
+        <StringSetPicker value={set} sevenths={sevenths} onChange={setSet} />
         <WindowPicker value={win} maxFret={maxFret} onChange={setWin} />
       </div>
     </div>
