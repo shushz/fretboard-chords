@@ -37,6 +37,8 @@ export interface FretboardProps {
   fromFret: number;
   toFret: number;
   region?: Region;
+  /** Highlight these strings instead of the region's string set. */
+  regionStrings?: readonly StringNum[];
   markers?: readonly Marker[];
   leftHanded?: boolean;
   showFretNumbers?: boolean;
@@ -58,7 +60,7 @@ export function Fretboard(props: FretboardProps) {
   // Region rectangle (in board coordinates)
   let regionRect: { x: number; y: number; w: number; h: number } | null = null;
   if (region) {
-    const ss = stringsOf(region.stringSet);
+    const ss = props.regionStrings ?? stringsOf(region.stringSet);
     const lo = Math.max(region.window.start, fromFret);
     const hi = Math.min(windowEnd(region.window), toFret);
     if (lo <= hi) {

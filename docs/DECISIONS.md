@@ -100,3 +100,10 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   answer is the adjacent shape on the whole neck (may lie outside the window, so the
   board widens to include both). Direction up/down/both is a setup option
   (`config.variant`). Item = shown inversion + direction.
+- **2026-11-20 — Mode 4 (Name the tones):** "Label" variant asks string by string from
+  the bass up, with big role buttons (R, b3, 3, b5, 5; + b7, 7 for sevenths) coloured by
+  role, plus Undo; graded when every note is labelled (all must be right). "Tap"
+  variant asks for a role on one string; any fret on that string with the right pitch
+  class counts (questions are only generated when such a fret exists in the window).
+  Setup option: label / tap / both (both balances the two variants ~50/50).
+  Tap-variant items use `stringSet: '*'` and record role + string in the variant.

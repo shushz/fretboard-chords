@@ -10,3 +10,4 @@
 - M7 Progress store: IndexedDB item stats (rolling accuracy, median time, Leitner box), daily log, stats screen v1 (streak, minutes, 14-day trend, key × degree heat grid, by string set/mode, weakest items), JSON export/import, reset per key or all.
 - M15 PWA & deploy: service worker precaching all assets, web manifest and icons, offline e2e test, GitHub Pages deploy workflow.
 - M8 Modes 2 & 3: From the tonic (smooth-voicing badge) and Next/previous shape; shared tap-question component.
+- M9 Mode 4 Name the tones: label each note's role, and the reverse "tap the b3 of V on string 2".

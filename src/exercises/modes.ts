@@ -3,6 +3,7 @@ import type { ModeDef } from './types';
 import { FindRunner } from './find/FindRunner';
 import { TonicRunner } from './tonic/TonicRunner';
 import { ShapeRunner, ShapeSetup } from './shape/ShapeRunner';
+import { TonesRunner, TonesSetup } from './tones/TonesRunner';
 
 export const MODES: ModeDef[] = [
   {
@@ -23,6 +24,13 @@ export const MODES: ModeDef[] = [
     description: 'Find the next inversion of the same chord up or down the neck',
     Runner: ShapeRunner,
     SetupExtras: ShapeSetup,
+  },
+  {
+    id: 'nameTones',
+    name: 'Name the tones',
+    description: 'Label each note of a shape R / 3 / 5 / 7 — or tap a given chord tone',
+    Runner: TonesRunner,
+    SetupExtras: TonesSetup,
   },
 ];
 
