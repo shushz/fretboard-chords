@@ -203,3 +203,17 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   Next/previous shape setup). Off: the shape a question shows has no role labels, no role
   colours and the prompt doesn't name its inversion until you answer. Quality switch and
   Name the tones already hide roles before answering.
+- **2026-11-20 — Automated checks** (owner request). `src/exercises/properties.test.ts`
+  checks every mode against generated setups (all keys, chords, string sets, windows):
+  every chord is askable, grading is exact, no identical consecutive questions, setup
+  lists never empty, random keys never repeat. `npm run audit` (also in CI) walks every
+  screen and mode at 4 sizes × light/dark and fails on page errors, horizontal overflow,
+  off-screen controls, tap targets < 44 px and low contrast (WCAG 4.5:1 text, 3:1 bold
+  note labels). The written critique pass runs only when the owner asks.
+- **2026-11-20 — Fixes from the first audit:** the board no longer shrinks below 44 px tap
+  cells (it scrolls sideways, centred on the region; the explorer's Play button no longer
+  squeezes it); the open-string column is wider; labels on role colours pick dark or white
+  text for contrast; light-theme muted/green/red text and dark-theme red fills darkened;
+  "End" is a full-size target; Quality switch gained "Show answer"; the session summary's
+  median time counts correct answers only; Name the tones keeps role colours on wrong
+  labels (red ring) and explains each string; landscape side-column buttons stack.

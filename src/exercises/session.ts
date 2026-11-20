@@ -64,7 +64,9 @@ export function summarize(attempts: readonly Attempt[], durationMs: number): Ses
     total: attempts.length,
     correct,
     accuracy: attempts.length ? correct / attempts.length : 0,
-    medianMs: median(attempts.map((a) => a.timeMs)),
+    // Time of correct answers only (a skipped or wrong answer isn't a measure of speed),
+    // consistent with the Progress screen.
+    medianMs: median(attempts.filter((a) => a.correct).map((a) => a.timeMs)),
     durationMs,
   };
 }

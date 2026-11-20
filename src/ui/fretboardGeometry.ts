@@ -23,13 +23,16 @@ export interface BoardGeometry {
 
 export const STRING_GAP = 46;
 export const FRET_WIDTH = 50;
-export const OPEN_WIDTH = 40;
+/** Wide enough to stay ≥ 44 px when the board is scaled to its minimum. */
+export const OPEN_WIDTH = 46;
 /**
  * Vertical half-extent of the region highlight around its outer strings. Kept under
  * half a string gap so the dashed border never crosses the fret dots, which sit midway
  * between strings.
  */
 export const REGION_PAD = Math.round(STRING_GAP * 0.32);
+/** Smallest scale at which every tap cell is still ≥ 44 px (the string gap is the limit). */
+export const MIN_SCALE = 44 / STRING_GAP;
 const PAD_TOP = 26;
 /** Below the board: room for the fret numbers, clear of the board edge and fret wires. */
 const PAD_BOTTOM = STRING_GAP / 2 + 24;

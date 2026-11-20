@@ -70,3 +70,14 @@ merge each milestone PR yourself once checks pass.
 - Add a line to `docs/CHANGELOG.md` for each PR.
 - If you find a spec gap or ambiguity, make a reasonable choice, document it in the PR,
   and propose a SPEC.md edit in the same PR.
+
+## Audits
+
+- `npm test` includes property tests (`src/exercises/properties.test.ts`) that check every
+  mode against many generated setups; keep them green and extend them with new modes/options.
+- `npm run audit` runs the automated walkthrough (`tests/e2e/audit.spec.ts`): every screen
+  and mode at phone portrait/landscape and tablet sizes, light and dark, checking for page
+  errors, horizontal overflow, off-screen elements, small tap targets and low contrast.
+- A written **critique pass** (reviewing the walkthrough screenshots and flows against the
+  spec and UX sense, reported as findings) runs **only when the owner asks**. Don't
+  schedule it; do suggest it after significant changes (new modes, layout or flow changes).

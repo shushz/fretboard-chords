@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'preact/hooks';
+import { readableTextOn } from './contrast';
 import type { Region } from '../fretboard/regions';
 import { stringsOf, windowEnd } from '../fretboard/regions';
 import { FRET_MARKERS, STRINGS, type StringNum, isDoubleMarker } from '../fretboard/tuning';
@@ -5,6 +7,7 @@ import {
   boardGeometry,
   fretCell,
   fretCenterX,
+  MIN_SCALE,
   REGION_PAD,
   fretWireX,
   stringY,
@@ -23,7 +26,9 @@ export type MarkerKind =
   /** Correct answer revealed after an error. */
   | 'reveal'
   /** Reference shape outside the active region (explorer), drawn faded. */
-  | 'outside';
+  | 'outside'
+  /** Correct note, but the user's answer for it was wrong (role colour + red ring). */
+  | 'missed';
 
 export interface Marker {
   string: StringNum;
@@ -34,6 +39,8 @@ export interface Marker {
   sublabel?: string;
   /** Fill colour (role colour). Neutral if omitted. */
   color?: string;
+  /** Label colour (defaults to a readable dark/white on `color`). */
+  textColor?: string;
 }
 
 export interface FretboardProps {
@@ -77,10 +84,24 @@ export function Fretboard(props: FretboardProps) {
     }
   }
 
+  // When the board needs more room than the screen has, it keeps touch-size cells and
+  // scrolls sideways (instead of shrinking); bring the active region into view.
+  const svgRef = useRef<SVGSVGElement>(null);
+  const regionCenter = regionRect ? regionRect.x + regionRect.w / 2 : null;
+  useEffect(() => {
+    const svg = svgRef.current;
+    const wrap = svg?.parentElement;
+    if (!svg || !wrap || regionCenter === null || wrap.scrollWidth <= wrap.clientWidth) return;
+    const scale = svg.getBoundingClientRect().width / g.width;
+    wrap.scrollLeft = regionCenter * scale - wrap.clientWidth / 2;
+  }, [regionCenter, g.width]);
+
   const markerAt = new Map(markers.map((m) => [`${m.string}:${m.fret}`, m]));
 
   return (
     <svg
+      ref={svgRef}
+      style={{ minWidth: `${Math.round(g.width * MIN_SCALE)}px` }}
       class="fretboard"
       viewBox={`0 0 ${g.width} ${g.height}`}
       width={g.width}
@@ -200,7 +221,15 @@ export function Fretboard(props: FretboardProps) {
           >
             <circle r="17" style={m.color ? { fill: m.color } : undefined} />
             {m.label && (
-              <text class="fb-label" dy="0.35em">
+              <text
+                class="fb-label"
+                dy="0.35em"
+                style={
+                  m.color && m.kind !== 'wrong'
+                    ? { fill: m.textColor ?? readableTextOn(m.color) }
+                    : undefined
+                }
+              >
                 {m.label}
               </text>
             )}

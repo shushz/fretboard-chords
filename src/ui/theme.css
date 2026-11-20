@@ -5,12 +5,14 @@
   --surface: #ffffff;
   --surface-2: #ebe8e2;
   --text: #1c2129;
-  --muted: #646b76;
+  --muted: #5a606a;
   --border: #d8d3ca;
   --accent: #2563d9;
   --accent-text: #ffffff;
-  --good: #1f9d55;
-  --bad: #d64545;
+  --good: #167a43;
+  --bad: #c02a2a;
+  --bad-fill: #c02a2a;
+  --on-good: #ffffff;
   --board: #d9b98c;
   --board-2: #c9a676;
   --fret: #9b9fa6;
@@ -43,6 +45,8 @@
     --accent-text: #0b1020;
     --good: #3ccf7a;
     --bad: #ff6b6b;
+    --bad-fill: #d93b3b;
+    --on-good: #0b1020;
     --board: #4a3527;
     --board-2: #3b2a1f;
     --fret: #b9bec7;
@@ -68,6 +72,8 @@
   --accent-text: #0b1020;
   --good: #3ccf7a;
   --bad: #ff6b6b;
+  --bad-fill: #d93b3b;
+  --on-good: #0b1020;
   --board: #4a3527;
   --board-2: #3b2a1f;
   --fret: #b9bec7;
@@ -354,6 +360,8 @@ input {
 /* Prompt / explore */
 .prompt {
   padding: 4px 4px 10px;
+  /* contain the floated Play button so it doesn't squeeze the board below */
+  display: flow-root;
 }
 .prompt-main {
   font-size: 1.5rem;
@@ -391,7 +399,8 @@ input {
 .board-wrap {
   overflow-x: auto;
   display: flex;
-  justify-content: center;
+  /* 'safe' keeps the left edge reachable when the board is wider than the screen */
+  justify-content: safe center;
   touch-action: manipulation;
 }
 .fretboard {
@@ -462,8 +471,11 @@ input {
   stroke-width: 4;
 }
 .fb-note.wrong circle {
-  fill: var(--bad) !important;
-  stroke: var(--bad);
+  fill: var(--bad-fill) !important;
+  stroke: var(--bad-fill);
+}
+.fb-note.wrong .fb-label {
+  fill: #fff;
 }
 .fb-note.reveal circle {
   stroke: var(--good);
@@ -475,9 +487,6 @@ input {
   font-size: 14px;
   font-weight: 700;
   text-anchor: middle;
-}
-.fb-note circle[style] + .fb-label {
-  fill: #fff;
 }
 .fb-sublabel {
   fill: var(--text);
@@ -530,6 +539,7 @@ input {
   gap: 16px;
 }
 .link {
+  min-width: 44px;
   background: none;
   border: 0;
   color: var(--accent);
@@ -662,7 +672,6 @@ input {
   font-size: 0.7rem;
   border-radius: 8px;
   text-align: center;
-  color: #fff;
   vertical-align: middle;
 }
 .heat td span,
@@ -729,6 +738,7 @@ input {
 }
 .btn.danger {
   color: var(--bad);
+  font-weight: 700;
   margin-top: 4px;
 }
 .badge {
@@ -736,7 +746,7 @@ input {
   padding: 2px 8px;
   border-radius: 999px;
   background: var(--good);
-  color: #fff;
+  color: var(--on-good);
   font-weight: 700;
   font-size: 0.85rem;
 }
@@ -757,7 +767,6 @@ input {
   min-height: 56px;
   border: 0;
   border-radius: 12px;
-  color: #fff;
   font-size: 1.2rem;
   font-weight: 700;
   cursor: pointer;
@@ -775,7 +784,7 @@ input {
   margin-top: 12px;
 }
 .segmented button.bad {
-  background: var(--bad);
+  background: var(--bad-fill);
   color: #fff;
 }
 .actions {
@@ -846,11 +855,11 @@ input {
 }
 .choice.right {
   background: var(--good);
-  color: #fff;
+  color: var(--on-good);
   border-color: transparent;
 }
 .choice.wrong {
-  background: var(--bad);
+  background: var(--bad-fill);
   color: #fff;
   border-color: transparent;
 }
@@ -935,6 +944,7 @@ input {
   }
   .actions {
     margin-top: 8px;
+    flex-direction: column;
   }
   .explore .controls {
     grid-template-columns: 1fr;
@@ -943,6 +953,10 @@ input {
   .session-bar {
     min-height: 0;
   }
+}
+.fb-note.missed circle {
+  stroke: var(--bad-fill);
+  stroke-width: 4;
 }
 .fb-note.outside {
   opacity: 0.38;

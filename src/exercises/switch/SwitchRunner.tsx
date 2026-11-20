@@ -63,16 +63,8 @@ export function SwitchRunner(props: RunnerProps) {
   const dst = chordSymbol(q.target, so);
   const after = resultNotes(q);
 
-  const onTap = (s: StringNum, f: number) => {
-    if (result) return;
-    const r = tapSwitch(q, s, f);
-    playNote(midiAt(s, f));
-    if (r.kind === 'select') {
-      setSelected(true);
-      return;
-    }
-    const ok = r.kind === 'correct';
-    setResult({ ok, reason: r.kind === 'wrong' ? r.reason : undefined, tap: { s, f } });
+  const grade = (ok: boolean, reason?: string, tap?: { s: StringNum; f: number }) => {
+    setResult({ ok, reason, tap });
     feedback(
       ok,
       after.map((n) => n.midi),
@@ -88,6 +80,17 @@ export function SwitchRunner(props: RunnerProps) {
         sevenths: config.sevenths,
       },
     ]);
+  };
+
+  const onTap = (s: StringNum, f: number) => {
+    if (result) return;
+    const r = tapSwitch(q, s, f);
+    playNote(midiAt(s, f));
+    if (r.kind === 'select') {
+      setSelected(true);
+      return;
+    }
+    grade(r.kind === 'correct', r.kind === 'wrong' ? r.reason : undefined, { s, f });
   };
 
   const markers: Marker[] = [];
@@ -206,7 +209,13 @@ export function SwitchRunner(props: RunnerProps) {
             </div>
           )}
         </>
-      ) : null}
+      ) : (
+        <div class="actions">
+          <button type="button" class="btn secondary" onClick={() => grade(false)}>
+            Show answer
+          </button>
+        </div>
+      )}
     </div>
   );
 }

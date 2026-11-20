@@ -38,7 +38,7 @@ describe('session flow', () => {
     s = nextQuestion(s, 'q3', 20);
     expect(s.phase).toBe('done');
     const sum = summarize(s.attempts, 20);
-    expect(sum).toMatchObject({ total: 2, correct: 1, accuracy: 0.5, medianMs: 2000 });
+    expect(sum).toMatchObject({ total: 2, correct: 1, accuracy: 0.5, medianMs: 1000 }); // correct answers only;
   });
   it('timed sessions', () => {
     const s = startSession({ kind: 'minutes', minutes: 1 }, 'q', 0);
