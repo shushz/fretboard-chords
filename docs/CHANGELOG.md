@@ -12,3 +12,4 @@
 - M8 Modes 2 & 3: From the tonic (smooth-voicing badge) and Next/previous shape; shared tap-question component.
 - M9 Mode 4 Name the tones: label each note's role, and the reverse "tap the b3 of V on string 2".
 - M10 Mode 7 Quality switch: major ↔ minor by moving the 3rd; dim/aug/V→V7 and seventh-chord switches behind preferences; optional name-the-new-chord step.
+- M11 Mode 5 Progression walk: 10 built-in major/minor progressions, smooth-voicing badges, playback, tempo mode.

@@ -44,11 +44,20 @@ export interface TapQuestionProps {
   playOnShow?: readonly number[];
   requiredStrings: readonly StringNum[];
   grade: (taps: Taps) => TapGrade;
-  onGraded: (correct: boolean, timeMs: number) => void;
+  onGraded: (correct: boolean, timeMs: number, matched: Voicing | null) => void;
   onNext: () => void;
   label: string;
   /** Extra controls rendered next to Clear / Show answer. */
   extraActions?: ComponentChildren;
+  /** Rendered above the prompt (e.g. a progression strip). */
+  before?: ComponentChildren;
+  /** Reference notes always shown dimmed (e.g. the previous chord). */
+  context?: readonly VoicingNote[];
+  /** Tempo mode: time allowed before the question counts as missed. */
+  timeLimitMs?: number;
+  /** Advance automatically this long after a correct answer. */
+  autoNextMs?: number;
+  nextLabel?: string;
 }
 
 export function TapQuestion(props: TapQuestionProps) {
@@ -56,22 +65,41 @@ export function TapQuestion(props: TapQuestionProps) {
   const started = useRef(performance.now());
   const [taps, setTaps] = useState<Taps>(new Map());
   const [grade, setGrade] = useState<TapGrade | null>(null);
+  const [timedOut, setTimedOut] = useState(false);
+  const tapsRef = useRef<Taps>(taps);
+  tapsRef.current = taps;
+  const gradedRef = useRef(false);
   const vw = useViewportWidth();
   const maxFret = p.fretboard.fretRange;
 
   useEffect(() => {
     if (props.playOnShow?.length) strum(props.playOnShow);
+    if (!props.timeLimitMs) return;
+    const id = setTimeout(() => {
+      if (gradedRef.current) return;
+      setTimedOut(true);
+      submit(tapsRef.current, true);
+    }, props.timeLimitMs);
+    return () => clearTimeout(id);
     // once per question
   }, []);
 
+  useEffect(() => {
+    if (!grade?.correct || !props.autoNextMs) return;
+    const id = setTimeout(props.onNext, props.autoNextMs);
+    return () => clearTimeout(id);
+  }, [grade]);
+
   const submit = (t: Taps, gaveUp: boolean) => {
+    if (gradedRef.current) return;
+    gradedRef.current = true;
     const g0 = props.grade(t);
     const g: TapGrade = gaveUp ? { ...g0, correct: false, matched: null } : g0;
     setGrade(g);
     const timeMs = performance.now() - started.current;
     const v = g.matched ?? g.reveal[0];
     feedback(g.correct, v ? v.notes.map((n) => n.midi) : []);
-    props.onGraded(g.correct, timeMs);
+    props.onGraded(g.correct, timeMs, g.matched);
   };
 
   const onTap = (s: StringNum, f: number) => {
@@ -89,6 +117,8 @@ export function TapQuestion(props: TapQuestionProps) {
     if (i >= 0) markers[i] = m;
     else markers.push(m);
   };
+  for (const n of props.context ?? [])
+    add(noteMarker(n, 'ghost', p, { showRoles: false, colored: false }));
   for (const n of props.shown ?? []) {
     add(
       noteMarker(n, 'shown', p, {
@@ -134,6 +164,7 @@ export function TapQuestion(props: TapQuestionProps) {
 
   return (
     <div class="runner">
+      {props.before}
       <div class="prompt">
         <div class="prompt-main">{props.prompt.main}</div>
         {props.prompt.sub && <div class="prompt-sub">{props.prompt.sub}</div>}
@@ -152,12 +183,21 @@ export function TapQuestion(props: TapQuestionProps) {
         />
       </div>
       {grade ? (
-        <FeedbackBar state={grade.correct ? 'correct' : 'wrong'} onNext={props.onNext}>
-          <strong>{grade.correct ? '✓ Correct' : '✕ Not quite'}</strong>{' '}
+        <FeedbackBar
+          state={grade.correct ? 'correct' : 'wrong'}
+          onNext={props.onNext}
+          nextLabel={props.nextLabel}
+        >
+          <strong>{grade.correct ? '✓ Correct' : timedOut ? "⏱ Time's up" : '✕ Not quite'}</strong>{' '}
           <span>{grade.message}</span>
         </FeedbackBar>
       ) : (
         <div class="actions">
+          {props.timeLimitMs ? (
+            <div class="tempo-bar" aria-hidden="true">
+              <span style={{ animationDuration: `${props.timeLimitMs}ms` }} />
+            </div>
+          ) : null}
           <button
             type="button"
             class="btn secondary"

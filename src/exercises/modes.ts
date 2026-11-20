@@ -5,6 +5,7 @@ import { TonicRunner } from './tonic/TonicRunner';
 import { ShapeRunner, ShapeSetup } from './shape/ShapeRunner';
 import { TonesRunner, TonesSetup } from './tones/TonesRunner';
 import { SwitchRunner } from './switch/SwitchRunner';
+import { ProgressionRunner, ProgressionSetup } from './progression/ProgressionRunner';
 
 export const MODES: ModeDef[] = [
   {
@@ -38,6 +39,13 @@ export const MODES: ModeDef[] = [
     name: 'Quality switch',
     description: 'Turn major into minor (and back) by moving just the 3rd',
     Runner: SwitchRunner,
+  },
+  {
+    id: 'progression',
+    name: 'Progression walk',
+    description: 'Find each chord of a real progression, staying close to the last one',
+    Runner: ProgressionRunner,
+    SetupExtras: ProgressionSetup,
   },
 ];
 
