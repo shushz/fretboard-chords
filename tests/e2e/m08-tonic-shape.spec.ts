@@ -10,7 +10,7 @@ async function tap(page: Page, s: number, f: number) {
 async function setup(page: Page, mode: string, keep: string) {
   await page.goto('./#/practice');
   await page.getByRole('radio', { name: new RegExp(mode) }).click();
-  await page.getByLabel('Key', { exact: true }).selectOption('F#m');
+  await page.getByRole('combobox', { name: 'Key', exact: true }).selectOption('F#m');
   for (const n of ['i', 'iv', 'V', 'ii°', '♭VI', '♭VII'].filter((x) => x !== keep)) {
     await page
       .getByRole('group', { name: 'Chords' })

@@ -11,7 +11,7 @@ test('weak items can be drilled from the stats screen; due items offered on home
   page,
 }) => {
   await page.goto('./#/practice');
-  await page.getByLabel('Key', { exact: true }).selectOption('F#m');
+  await page.getByRole('combobox', { name: 'Key', exact: true }).selectOption('F#m');
   for (const n of ['iv', 'V', 'ii°', '♭VI', '♭VII']) {
     await page
       .getByRole('group', { name: 'Chords' })

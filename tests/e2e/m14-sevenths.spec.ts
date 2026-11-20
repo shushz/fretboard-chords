@@ -3,7 +3,7 @@ import { shot } from './helpers';
 
 test('find a drop-2 V7 in C', async ({ page }) => {
   await page.goto('./#/practice');
-  await page.getByLabel('Key', { exact: true }).selectOption('C');
+  await page.getByRole('combobox', { name: 'Key', exact: true }).selectOption('C');
   await page.getByRole('radio', { name: 'Sevenths' }).click();
   for (const n of ['Imaj7', 'IVmaj7', 'ii7', 'vi7']) {
     await page

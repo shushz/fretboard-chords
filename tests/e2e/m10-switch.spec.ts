@@ -10,7 +10,7 @@ async function tap(page: Page, s: number, f: number) {
 async function setup(page: Page) {
   await page.goto('./#/practice');
   await page.getByRole('radio', { name: /Quality switch/ }).click();
-  await page.getByLabel('Key', { exact: true }).selectOption('D');
+  await page.getByRole('combobox', { name: 'Key', exact: true }).selectOption('D');
   for (const n of ['IV', 'V', 'ii', 'vi']) {
     await page
       .getByRole('group', { name: 'Chords' })
