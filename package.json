@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "description": "Offline-first PWA for learning diatonic chord shapes, chord tones and chord relationships on the guitar neck.",
   "license": "MIT",
+  "author": "Alexander Dvinsky",
   "homepage": "https://shushz.github.io/fretboard-chords/",
   "repository": {
     "type": "git",
