@@ -43,7 +43,7 @@ export function FindRunner(props: RunnerProps) {
       prefs={p}
       label={`Fretboard: find ${numeral}`}
       prompt={{
-        main: `${formatKey(q.chord.key, p.spelling.glyphs)} · ${numeral}`,
+        main: `${formatKey(q.chord.key)} · ${numeral}`,
         sub: `${formatStringSet(q.region.stringSet)} · ${formatWindow(q.region.window)}`,
         hint: q.anchorString
           ? `Tap the root on string ${q.anchorString}, then the chord on ${q.region.stringSet.replace('-', '–')}`

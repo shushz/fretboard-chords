@@ -14,7 +14,7 @@ export function noteMarker(
 ): Marker {
   const showRoles = opts.showRoles ?? p.fretboard.showRoles;
   const showNames = opts.showNames ?? p.fretboard.showNoteNames;
-  const name = formatNote(n.tone.note, p.spelling.glyphs);
+  const name = formatNote(n.tone.note);
   const colored = opts.colored ?? showRoles;
   return {
     string: n.string,
@@ -26,6 +26,6 @@ export function noteMarker(
   };
 }
 
-export function chordToneName(chord: Chord, p: Preferences): string {
-  return chord.tones.map((t) => formatNote(t.note, p.spelling.glyphs)).join('–');
+export function chordToneName(chord: Chord, _p?: Preferences): string {
+  return chord.tones.map((t) => formatNote(t.note)).join('–');
 }

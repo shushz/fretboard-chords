@@ -13,9 +13,9 @@ export const MODE_NAMES: Record<ModeId, string> = {
   qualitySwitch: 'Quality switch',
 };
 
-export function keyLabel(ascii: string, p: Preferences): string {
+export function keyLabel(ascii: string, _p?: Preferences): string {
   const k = parseKeyName(ascii);
-  return k ? formatKey(k, p.spelling.glyphs) : ascii;
+  return k ? formatKey(k) : ascii;
 }
 
 export function degreeLabel(item: Item, p: Preferences): string {

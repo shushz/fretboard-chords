@@ -21,3 +21,4 @@
 - Fix: fret numbers no longer clipped, region border clears the fret dots, landscape layout puts the question beside the board.
 - Fix: chords with no shape inside the fret window are no longer skipped — practice widens the window minimally; the explorer shows the nearest shapes faded.
 - Fix: progression picker lists every progression with random keys from both modes; review/drill sessions don't repeat the same question back to back.
+- Change: always use ♯ ♭ ° ø and ♭3 (notation preferences removed); optional hiding of roles/colours on the shape given in From the tonic and Next/previous shape.

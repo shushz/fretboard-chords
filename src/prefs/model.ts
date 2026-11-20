@@ -4,7 +4,6 @@
  */
 import type { HarmonyOptions, NumeralOptions, SymbolOptions } from '../theory/chords';
 import { DEFAULT_SPELLING, type SpellingOptions } from '../theory/keys';
-import type { RoleLabelStyle } from '../theory/roles';
 import type { FretWindow, StringSetId } from '../fretboard/regions';
 import type { FretRange } from '../fretboard/tuning';
 import type { ChordMember } from '../theory/roles';
@@ -17,16 +16,8 @@ export type SessionLength =
 
 export interface Preferences {
   version: 1;
-  spelling: SpellingOptions & {
-    /** ♯ ♭ 𝄪 𝄫 glyphs (true) vs ASCII # b (false). */
-    glyphs: boolean;
-  };
-  harmony: HarmonyOptions & {
-    /** ° / ø vs dim / 7♭5. */
-    dimStyle: 'symbol' | 'text';
-    /** b3 / ♭3 / m3 role labels. */
-    roleLabels: RoleLabelStyle;
-  };
+  spelling: SpellingOptions;
+  harmony: HarmonyOptions;
   fretboard: {
     /** Enabled triad string sets. */
     stringSets: StringSetId[];
@@ -61,6 +52,11 @@ export interface Preferences {
     switchMajAug: boolean;
     switchDom7: boolean;
     switchNameChord: boolean;
+    /**
+     * Show roles and role colours on the shape a question gives you (From the tonic,
+     * Next/previous shape) before you answer. Off = neutral notes; they're a hint.
+     */
+    givenShapeRoles: boolean;
   };
   sound: {
     volume: number;
@@ -82,8 +78,8 @@ export const DEFAULT_ROLE_COLORS: Record<ChordMember, string> = {
 
 export const DEFAULT_PREFERENCES: Preferences = {
   version: 1,
-  spelling: { ...DEFAULT_SPELLING, pairs: { ...DEFAULT_SPELLING.pairs }, glyphs: true },
-  harmony: { minorV: 'harmonic', dimStyle: 'symbol', roleLabels: 'ascii' },
+  spelling: { ...DEFAULT_SPELLING, pairs: { ...DEFAULT_SPELLING.pairs } },
+  harmony: { minorV: 'harmonic' },
   fretboard: {
     stringSets: ['1-3', '2-4'],
     fretRange: 15,
@@ -111,6 +107,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
     switchMajAug: false,
     switchDom7: false,
     switchNameChord: false,
+    givenShapeRoles: true,
   },
   sound: { volume: 0.8, muted: false, strumMs: 30 },
   look: { theme: 'system', roleColors: { ...DEFAULT_ROLE_COLORS } },
@@ -162,13 +159,16 @@ function clone<T>(v: T): T {
   return JSON.parse(JSON.stringify(v)) as T;
 }
 
-/** Derived option bundles for the theory layer. */
-export function symbolOptions(p: Preferences): SymbolOptions {
-  return { glyphs: p.spelling.glyphs, dimStyle: p.harmony.dimStyle };
+/**
+ * Notation is always proper music symbols (owner decision): ♯ ♭ 𝄪 𝄫, ° and ø7, ♭3.
+ * The theory layer still supports ASCII (used internally for keys and item ids).
+ */
+export function symbolOptions(_p?: Preferences): SymbolOptions {
+  return { glyphs: true, dimStyle: 'symbol' };
 }
 
-export function numeralOptions(p: Preferences): NumeralOptions {
-  return { glyphs: p.spelling.glyphs, dimStyle: p.harmony.dimStyle };
+export function numeralOptions(_p?: Preferences): NumeralOptions {
+  return { glyphs: true, dimStyle: 'symbol' };
 }
 
 export function anchorStringList(p: Preferences): (5 | 6)[] {

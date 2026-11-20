@@ -4,6 +4,7 @@ import { formatStringSet } from '../../fretboard/regions';
 import { numeralOptions, symbolOptions } from '../../prefs/model';
 import { voicingOptions } from '../config';
 import type { RunnerProps } from '../types';
+import { GivenShapeHint } from '../GivenShapeHint';
 import { TapQuestion, inversionName } from '../TapQuestion';
 import { Segmented } from '../../ui/controls';
 import type { PracticeConfig } from '../config';
@@ -50,14 +51,14 @@ export function ShapeRunner(props: RunnerProps) {
             {symbol} · {up ? 'next shape ↑' : 'previous shape ↓'}
           </>
         ),
-        sub: `${formatStringSet(q.stringSet)} · ${numeral} in ${formatKey(q.chord.key, p.spelling.glyphs)}`,
-        hint: `This is ${inversionName(q.shown.inversion)}. Find the ${up ? 'next' : 'previous'} shape ${up ? 'up' : 'down'} the neck.`,
+        sub: `${formatStringSet(q.stringSet)} · ${numeral} in ${formatKey(q.chord.key)}`,
+        hint: `${p.practice.givenShapeRoles ? `This is ${inversionName(q.shown.inversion)}. ` : ''}Find the ${up ? 'next' : 'previous'} shape ${up ? 'up' : 'down'} the neck.`,
       }}
       chord={q.chord}
       region={{ stringSet: q.stringSet, window: view }}
       view={view}
       shown={q.shown.notes}
-      shownRoles={p.fretboard.showRoles}
+      shownRoles={p.practice.givenShapeRoles}
       playOnShow={q.shown.notes.map((n) => n.midi)}
       requiredStrings={shapeRequiredStrings(q)}
       grade={(taps) => {
@@ -93,15 +94,18 @@ export function ShapeSetup(props: {
       ? props.config.variant
       : 'both';
   return (
-    <Segmented
-      label="Direction"
-      value={v}
-      options={[
-        { value: 'up', label: 'Up ↑' },
-        { value: 'down', label: 'Down ↓' },
-        { value: 'both', label: 'Both' },
-      ]}
-      onChange={(variant) => props.onChange({ ...props.config, variant })}
-    />
+    <>
+      <Segmented
+        label="Direction"
+        value={v}
+        options={[
+          { value: 'up', label: 'Up ↑' },
+          { value: 'down', label: 'Down ↓' },
+          { value: 'both', label: 'Both' },
+        ]}
+        onChange={(variant) => props.onChange({ ...props.config, variant })}
+      />
+      <GivenShapeHint />
+    </>
   );
 }

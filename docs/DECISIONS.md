@@ -193,3 +193,13 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
 - **2026-11-20 — Progression list with random keys from both modes** shows all ten
   progressions, labelled "(major)" / "(minor)" (it previously offered only "Random");
   choosing one limits the random keys to that progression's mode.
+- **2026-11-20 — Notation is always music symbols** (owner decision). The "Accidental
+  symbols", "Diminished labels" and "Role labels" preferences are removed: the app always
+  shows ♯ ♭ 𝄪 𝄫, ° / ø7 (vii°, iiø7) and ♭3 / ♭5 / ♭7. ASCII stays internal (key and item
+  ids). This deliberately narrows SPEC §7.1 and the CLAUDE.md "label style" example;
+  stored values of the old settings are ignored.
+- **2026-11-20 — Optional hint on given shapes** (owner request). New preference
+  `practice.givenShapeRoles` (default on, also a toggle in the From the tonic and
+  Next/previous shape setup). Off: the shape a question shows has no role labels, no role
+  colours and the prompt doesn't name its inversion until you answer. Quality switch and
+  Name the tones already hide roles before answering.

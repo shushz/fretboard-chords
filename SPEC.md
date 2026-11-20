@@ -46,7 +46,7 @@ non-diatonic harmony beyond the harmonic-minor V/V7.
 - **Spelling is always correct for the key.** Chord tones are spelled by stacking
   letters (R–3–5–7 = every other letter). Double sharps/flats must be supported
   (e.g. G#m harmonic V = D#–F##–A#).
-- Display ♯ ♭ 𝄪 𝄫 glyphs in the UI by default (ASCII is a preference); ASCII internally.
+- Display ♯ ♭ 𝄪 𝄫 glyphs in the UI (always); ASCII internally.
 
 ### 3.2 Keys
 
@@ -92,7 +92,8 @@ Minor-key V defaults to the harmonic **V / V7** (raised 7th); natural v is a pre
 
 ### 3.4 Chord-tone roles
 
-Labels relative to the chord root: `R, b3, 3, b5, 5, b7, 7` (and `bb7` reserved).
+Labels relative to the chord root: `R, b3, 3, b5, 5, b7, 7` (and `bb7` reserved), displayed
+with music symbols: R, ♭3, 3, ♭5, 5, ♭7, 7.
 Each fretted note in a voicing carries its role.
 
 ### 3.5 Required test fixtures (non-exhaustive)
@@ -218,16 +219,16 @@ preference with a sensible default. It is not hard-coded. Preferences are stored
 device and included in the export/import. The Preferences screen is grouped:
 
 - **Spelling:** global prefer ♯/♭; per-pair toggles D♭/C♯, G♭/F♯, C♭/B, B♭m/A♯m, E♭m/D♯m,
-  A♭m/G♯m (defaults D♭, G♭, B, B♭m, E♭m, G♯m); allow theoretical keys (off);
-  accidental glyphs ♯♭ vs. ASCII #b.
-- **Harmony:** minor-key V as V/V7 (harmonic, default) or v/m7 (natural); vii° vs. viiø7
-  label style; Roman-numeral style (iiø7 vs. ii7♭5; ° vs. dim); role labels
-  b3/♭3 vs. m3.
+  A♭m/G♯m (defaults D♭, G♭, B, B♭m, E♭m, G♯m); allow theoretical keys (off).
+  Accidentals are always shown as ♯ ♭ 𝄪 𝄫 (not a preference).
+- **Harmony:** minor-key V as V/V7 (harmonic, default) or v/m7 (natural). Labels are
+  always vii°, iiø7 and ♭3 (not preferences).
 - **Fretboard:** enabled string sets (default 1–3, 2–4); fret range (15/17/19/22);
   default window and width; allow one note outside the window; max span; root anchor
   off/ghost/required, on string 6/5/both; left-handed; show note names / roles / fret numbers.
 - **Sevenths:** drop-2 4-string sets and/or 3-note shells.
-- **Practice:** session length, mastery thresholds, share of fresh items, tempo for the
+- **Practice:** show roles/colours on the shape a question gives you (hint, on);
+  session length, mastery thresholds, share of fresh items, tempo for the
   progression walk.
 - **Sound & look:** volume/mute, strum speed, theme (light/dark/system), role colors.
 

@@ -15,11 +15,10 @@ const MEMBER_LABEL: Record<ChordMember, string> = {
 
 export function PreferencesScreen() {
   const p = prefs.value;
-  const g = p.spelling.glyphs;
   const pairLabel = (id: EnharmonicPairId) => {
     const d = ENHARMONIC_PAIRS.find((x) => x.id === id)!;
     const m = d.mode === 'minor' ? 'm' : '';
-    return { flat: formatNote(d.flat, g) + m, sharp: formatNote(d.sharp, g) + m };
+    return { flat: formatNote(d.flat) + m, sharp: formatNote(d.sharp) + m };
   };
   const sl = p.practice.sessionLength;
 
@@ -30,8 +29,8 @@ export function PreferencesScreen() {
           label="Default accidental"
           value={p.spelling.prefer}
           options={[
-            { value: 'flat', label: g ? '♭' : 'b' },
-            { value: 'sharp', label: g ? '♯' : '#' },
+            { value: 'flat', label: '♭' },
+            { value: 'sharp', label: '♯' },
           ]}
           onChange={(v) => editPreferences((d) => void (d.spelling.prefer = v))}
         />
@@ -57,15 +56,6 @@ export function PreferencesScreen() {
           checked={p.spelling.allowTheoretical}
           onChange={(v) => editPreferences((d) => void (d.spelling.allowTheoretical = v))}
         />
-        <Segmented
-          label="Accidental symbols"
-          value={g ? 'glyph' : 'ascii'}
-          options={[
-            { value: 'glyph', label: '♯ ♭' },
-            { value: 'ascii', label: '# b' },
-          ]}
-          onChange={(v) => editPreferences((d) => void (d.spelling.glyphs = v === 'glyph'))}
-        />
       </Section>
 
       <Section title="Harmony">
@@ -77,25 +67,6 @@ export function PreferencesScreen() {
             { value: 'natural', label: 'v / v7 (natural)' },
           ]}
           onChange={(v) => editPreferences((d) => void (d.harmony.minorV = v))}
-        />
-        <Segmented
-          label="Diminished labels"
-          value={p.harmony.dimStyle}
-          options={[
-            { value: 'symbol', label: 'vii° · iiø7' },
-            { value: 'text', label: 'viidim · ii7♭5' },
-          ]}
-          onChange={(v) => editPreferences((d) => void (d.harmony.dimStyle = v))}
-        />
-        <Segmented
-          label="Role labels"
-          value={p.harmony.roleLabels}
-          options={[
-            { value: 'ascii', label: 'b3' },
-            { value: 'glyph', label: '♭3' },
-            { value: 'interval', label: 'm3' },
-          ]}
-          onChange={(v) => editPreferences((d) => void (d.harmony.roleLabels = v))}
         />
       </Section>
 
@@ -299,6 +270,15 @@ export function PreferencesScreen() {
           min={1}
           max={8}
           onChange={(v) => editPreferences((d) => void (d.practice.tempoBeats = v))}
+        />
+      </Section>
+
+      <Section title="Hints">
+        <Toggle
+          label="Show roles on the given shape"
+          hint="From the tonic, Next/previous shape: roles and colours of the shape you're shown, before you answer"
+          checked={p.practice.givenShapeRoles}
+          onChange={(v) => editPreferences((d) => void (d.practice.givenShapeRoles = v))}
         />
       </Section>
 

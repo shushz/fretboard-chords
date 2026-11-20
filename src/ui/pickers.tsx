@@ -22,12 +22,11 @@ export function keyFromAscii(s: string, p: Preferences): Key {
 
 export function KeyPicker(props: { value: Key; prefs: Preferences; onChange: (k: Key) => void }) {
   const keys = selectableKeys(props.prefs.spelling);
-  const g = props.prefs.spelling.glyphs;
   return (
     <Select
       label="Key"
       value={keyToAscii(props.value)}
-      options={keys.map((k) => ({ value: keyToAscii(k), label: formatKey(k, g, true) }))}
+      options={keys.map((k) => ({ value: keyToAscii(k), label: formatKey(k, true, true) }))}
       onChange={(v) => props.onChange(keyFromAscii(v, props.prefs))}
     />
   );
