@@ -132,3 +132,15 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   relative key. Reverse distractors include the case-flipped numeral (IV for iv) plus
   other diatonic numerals. The chord is played after answering. The typed-answer
   variant is left for later (SPEC says "later").
+- **2026-11-20 — Question selection weights (SPEC §6):** for each question, with
+  probability `practice.freshShare` (20 %) all candidates weigh the same; otherwise
+  unseen items weigh 1 and seen items 1 + 4 × error rate + slowness (0–2) + 1.5 if due,
+  while mastered items that aren't due weigh 0.25. These multiply the string-set tier
+  weights (primary sets ×3).
+- **2026-11-20 — Weak-spot drilling and reviews** run as targeted sessions: "Drill these"
+  (stats, weakest 10) and "Review due items" (home, up to 20 most overdue). Each question
+  targets one item via a config built from the item (mode, key, degree, string set,
+  anchor, variant) and a selection weight that strongly prefers the exact item
+  (inversion etc.). Progression-walk items are drilled with Find the chord. If an item
+  has no question in the default window, up to 5 random windows are tried, then the item
+  is skipped.

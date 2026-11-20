@@ -1,5 +1,6 @@
-import { useRef, useState } from 'preact/hooks';
+import { useMemo, useRef, useState } from 'preact/hooks';
 import { prefs } from '../../prefs/store';
+import { stats } from '../../progress/store';
 import { type PracticeConfig, defaultConfig } from '../../exercises/config';
 import { Setup } from '../../exercises/Setup';
 import { modeDef } from '../../exercises/modes';
@@ -12,20 +13,69 @@ import {
   startSession,
   summarize,
 } from '../../exercises/session';
+import { drillConfig, drillWeight } from '../../exercises/drill';
+import { pendingDrill } from '../../exercises/drillState';
+import { makeItemWeight } from '../../progress/srs';
 import { recordAttempts } from '../../progress/record';
-import type { Attempt } from '../../progress/types';
+import type { Attempt, Item } from '../../progress/types';
+import { randomWindow } from '../../fretboard/regions';
 import { keyFromAscii } from '../pickers';
 import { navigate } from '../router';
 import { loadSetup, saveSetup } from '../../exercises/lastSetup';
+import { itemLabel } from '../../progress/labels';
+
+interface Drill {
+  title: string;
+  items: Item[];
+}
 
 export function Practice() {
   const p = prefs.value;
   const [config, setConfig] = useState<PracticeConfig>(
     () => loadSetup(p) ?? defaultConfig('find', keyFromAscii('F#m', p), p),
   );
-  const [session, setSession] = useState<SessionState<number> | null>(null);
+  const [drill, setDrill] = useState<Drill | null>(() => {
+    const d = pendingDrill.value;
+    pendingDrill.value = null;
+    return d && d.items.length ? { ...d, items: shuffle(d.items) } : null;
+  });
+  const [session, setSession] = useState<SessionState<number> | null>(() =>
+    drill
+      ? startSession({ kind: 'questions', count: Math.max(drill.items.length, 10) }, 0, Date.now())
+      : null,
+  );
   const [notice, setNotice] = useState<string | null>(null);
+  const [retry, setRetry] = useState(0);
   const prev = useRef<unknown>(null);
+
+  // Per-question config and selection weights
+  const index = session?.index ?? 0;
+  const current = useMemo(() => {
+    if (drill) {
+      const item = drill.items[index % drill.items.length];
+      const c = drillConfig(item, p);
+      if (c && retry > 0)
+        c.window = randomWindow(c.window.width, p.fretboard.fretRange, Math.random);
+      return { config: c, itemWeight: drillWeight(item), item };
+    }
+    return {
+      config,
+      item: null,
+      itemWeight: makeItemWeight(
+        stats.value,
+        {
+          now: Date.now(),
+          thresholds: {
+            accuracy: p.practice.masteryAccuracy,
+            triadMs: p.practice.masteryTimeTriadMs,
+            seventhMs: p.practice.masteryTimeSeventhMs,
+          },
+          freshShare: p.practice.freshShare,
+        },
+        Math.random,
+      ),
+    };
+  }, [index, retry, drill, session === null]);
 
   if (!session) {
     return (
@@ -51,12 +101,23 @@ export function Practice() {
       <Summary
         attempts={session.attempts}
         durationMs={Date.now() - session.startedAt}
-        onAgain={() => setSession(null)}
+        onAgain={() => {
+          setDrill(null);
+          setSession(null);
+        }}
       />
     );
   }
 
-  const mode = modeDef(config.mode)!;
+  const advance = () =>
+    setSession((s) => {
+      if (!s) return s;
+      const now = Date.now();
+      return isSessionOver(s, now) ? finishSession(s) : nextQuestion(s, s.index + 1, now);
+    });
+
+  const cfg = current.config;
+  const mode = cfg ? modeDef(cfg.mode) : undefined;
   const sl = session.length;
   const progress =
     sl.kind === 'questions'
@@ -67,36 +128,56 @@ export function Practice() {
     <div class="practice">
       <div class="session-bar">
         <span class="session-progress">{progress}</span>
+        {drill && <span class="drill-tag">{drill.title}</span>}
         <span class="session-score">{session.attempts.filter((a) => a.correct).length} ✓</span>
         <button type="button" class="link" onClick={() => setSession(finishSession(session))}>
           End
         </button>
       </div>
-      <mode.Runner
-        key={session.index}
-        config={config}
-        prefs={p}
-        prev={prev}
-        onGraded={(a: Attempt[]) => {
-          recordAttempts(a);
-          setSession((s) => (s ? recordAttempt(s, a) : s));
-        }}
-        onNext={() =>
-          setSession((s) => {
-            if (!s) return s;
-            const now = Date.now();
-            return isSessionOver(s, now) ? finishSession(s) : nextQuestion(s, s.index + 1, now);
-          })
-        }
-        onImpossible={() => {
-          setNotice(
-            'No questions are possible with this setup — try a wider fret window or other string sets.',
-          );
-          setSession(null);
-        }}
-      />
+      {drill && current.item && <div class="drill-item muted">{itemLabel(current.item, p)}</div>}
+      {mode && cfg && (
+        <mode.Runner
+          key={`${session.index}:${retry}`}
+          config={cfg}
+          prefs={p}
+          prev={prev}
+          itemWeight={current.itemWeight}
+          onGraded={(a: Attempt[]) => {
+            recordAttempts(a);
+            setSession((s) => (s ? recordAttempt(s, a) : s));
+          }}
+          onNext={() => {
+            setRetry(0);
+            advance();
+          }}
+          onImpossible={() => {
+            if (drill) {
+              // try other windows, then skip the item
+              if (retry < 5) setRetry(retry + 1);
+              else {
+                setRetry(0);
+                advance();
+              }
+              return;
+            }
+            setNotice(
+              'No questions are possible with this setup — try a wider fret window or other string sets.',
+            );
+            setSession(null);
+          }}
+        />
+      )}
     </div>
   );
+}
+
+function shuffle<T>(xs: T[]): T[] {
+  const a = [...xs];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 function Summary(props: { attempts: Attempt[]; durationMs: number; onAgain: () => void }) {
@@ -126,8 +207,8 @@ function Summary(props: { attempts: Attempt[]; durationMs: number; onAgain: () =
         <button type="button" class="btn" onClick={props.onAgain}>
           Practice again
         </button>
-        <button type="button" class="btn secondary" onClick={() => navigate('home')}>
-          Home
+        <button type="button" class="btn secondary" onClick={() => navigate('stats')}>
+          Progress
         </button>
       </div>
     </div>

@@ -857,3 +857,18 @@ input {
 .choice.dim {
   opacity: 0.45;
 }
+.drill-tag {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.drill-item {
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+.weak + .btn {
+  margin-top: 10px;
+}

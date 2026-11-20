@@ -14,3 +14,4 @@
 - M10 Mode 7 Quality switch: major ↔ minor by moving the 3rd; dim/aug/V→V7 and seventh-chord switches behind preferences; optional name-the-new-chord step.
 - M11 Mode 5 Progression walk: 10 built-in major/minor progressions, smooth-voicing badges, playback, tempo mode.
 - M12 Mode 6 Name the chord: degree → chord and chord → degree multiple choice with enharmonic and quality distractors.
+- M13 Spaced repetition & weak spots: SRS-weighted question selection with ~20 % fresh items, review of due items, "Drill these" for the weakest items.
