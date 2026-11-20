@@ -1,7 +1,7 @@
 import type { ModeId } from '../progress/types';
 import type { ModeDef } from './types';
 import { FindRunner } from './find/FindRunner';
-import { TonicRunner } from './tonic/TonicRunner';
+import { TonicRunner, TonicSetup } from './tonic/TonicRunner';
 import { ShapeRunner, ShapeSetup } from './shape/ShapeRunner';
 import { TonesRunner, TonesSetup } from './tones/TonesRunner';
 import { SwitchRunner } from './switch/SwitchRunner';
@@ -20,6 +20,7 @@ export const MODES: ModeDef[] = [
     name: 'From the tonic',
     description: 'From a shown I/i shape, find IV, V, vi… nearby',
     Runner: TonicRunner,
+    SetupExtras: TonicSetup,
   },
   {
     id: 'nextShape',

@@ -4,7 +4,16 @@ import { parseKeyName } from '../theory/keys';
 import { voicingId } from '../fretboard/voicings';
 import { movement } from '../fretboard/movement';
 import { defaultConfig, voicingOptions } from './config';
-import { generateTonicQuestion, gradeTonic, targetDegrees, tonicItem } from './tonic/logic';
+import {
+  generateTonicQuestion,
+  gradeTonic,
+  sameTonicQuestion,
+  targetDegrees,
+  tonicItem,
+  tonicPlacement,
+  windowAround,
+} from './tonic/logic';
+import { fitsWindow } from '../fretboard/voicings';
 import { generateShapeQuestion, gradeShape, shapeItem, shapeView } from './shape/logic';
 import type { StringNum } from '../fretboard/tuning';
 
@@ -54,10 +63,62 @@ describe('mode 2: from the tonic', () => {
       degrees: [3 as const],
       stringSets: ['1-3' as const],
       window: { start: 5, width: 4 },
+      variant: 'window',
     };
     const q = generateTonicQuestion(cfg, opts())!;
     expect(voicingId(q.tonicVoicing)).toBe('3:6,2:7,1:5');
     expect(q.smooth.map(voicingId)).toEqual(['3:7,2:7,1:7']);
+  });
+  it('by default the tonic shape is random across the neck, with the region around it', () => {
+    const cfg = defaultConfig('fromTonic', fsm, p);
+    expect(tonicPlacement(cfg)).toBe('neck');
+    const rand = seeded(3);
+    const shapes = new Set<string>();
+    for (let i = 0; i < 60; i++) {
+      const q = generateTonicQuestion(cfg, opts(rand))!;
+      shapes.add(`${q.region.stringSet} ${voicingId(q.tonicVoicing)}`);
+      expect(fitsWindow(q.tonicVoicing, q.region.window)).toBe(true);
+      expect(q.region.window.width).toBeGreaterThanOrEqual(cfg.window.width);
+    }
+    // both string sets, several positions/inversions
+    expect(shapes.size).toBeGreaterThanOrEqual(6);
+    expect([...shapes].some((s) => s.startsWith('1-3'))).toBe(true);
+    expect([...shapes].some((s) => s.startsWith('2-4'))).toBe(true);
+  });
+  it('windowAround keeps the window on the neck', () => {
+    const all = generateTonicQuestion(
+      { ...defaultConfig('fromTonic', fsm, p), stringSets: ['1-3' as const] },
+      opts(),
+    )!;
+    const w = windowAround(all.tonicVoicing, 5, 15);
+    expect(w.start).toBeGreaterThanOrEqual(0);
+    expect(w.start + w.width - 1).toBeLessThanOrEqual(15);
+    expect(fitsWindow(all.tonicVoicing, w)).toBe(true);
+  });
+  it('two consecutive questions never repeat (same tonic shape and same target)', () => {
+    for (const variant of ['neck', 'window']) {
+      for (const degrees of [[3], [3, 4], [0, 3, 4, 1, 5, 6]] as const) {
+        const cfg = { ...defaultConfig('fromTonic', fsm, p), variant, degrees: [...degrees] };
+        const rand = seeded(7);
+        let prev = generateTonicQuestion(cfg, opts(rand))!;
+        for (let i = 0; i < 40; i++) {
+          const q = generateTonicQuestion(cfg, { ...opts(rand), previous: prev })!;
+          expect(sameTonicQuestion(q, prev)).toBe(false);
+          prev = q;
+        }
+      }
+    }
+  });
+  it('with several targets, both the tonic shape and the target change', () => {
+    const cfg = defaultConfig('fromTonic', fsm, p);
+    const rand = seeded(11);
+    let prev = generateTonicQuestion(cfg, opts(rand))!;
+    for (let i = 0; i < 40; i++) {
+      const q = generateTonicQuestion(cfg, { ...opts(rand), previous: prev })!;
+      expect(q.target.degree).not.toBe(prev.target.degree);
+      expect(voicingId(q.tonicVoicing)).not.toBe(voicingId(prev.tonicVoicing));
+      prev = q;
+    }
   });
 });
 

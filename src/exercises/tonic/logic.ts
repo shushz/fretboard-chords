@@ -6,9 +6,16 @@ import {
   diatonicChord,
 } from '../../theory/chords';
 import { keyToAscii } from '../../theory/keys';
-import { type Region, stringsOf } from '../../fretboard/regions';
+import { type FretWindow, type Region, stringsOf } from '../../fretboard/regions';
 import type { StringNum } from '../../fretboard/tuning';
-import { type Voicing, fretted, matchVoicing, voicingsInRegion } from '../../fretboard/voicings';
+import {
+  type Voicing,
+  enumerateVoicings,
+  fretted,
+  matchVoicing,
+  voicingId,
+  voicingsInRegion,
+} from '../../fretboard/voicings';
 import { smoothestVoicings } from '../../fretboard/movement';
 import type { Item } from '../../progress/types';
 import { type PracticeConfig, stringSetWeight } from '../config';
@@ -43,22 +50,51 @@ export function targetDegrees(cfg: PracticeConfig): DegreeIndex[] {
   return d.length ? d : CORE_DEGREES[cfg.key.mode].filter((x) => x !== 0);
 }
 
+/** Where the shown tonic shape comes from (`cfg.variant`). Default: anywhere on the neck. */
+export type TonicPlacement = 'neck' | 'window';
+
+export function tonicPlacement(cfg: PracticeConfig): TonicPlacement {
+  return cfg.variant === 'window' ? 'window' : 'neck';
+}
+
+/** A window of `width` frets around a voicing (widened to fit it), kept on the neck. */
+export function windowAround(v: Voicing, width: number, maxFret: number): FretWindow {
+  const w = Math.max(width, v.span);
+  const start = v.position - Math.floor((w - v.span) / 2);
+  return { start: Math.max(0, Math.min(maxFret - w + 1, start)), width: w };
+}
+
+/** Two questions are the same when they show the same tonic shape and ask for the same chord. */
+export function sameTonicQuestion(a: TonicQuestion, b: TonicQuestion): boolean {
+  return (
+    a.target.degree === b.target.degree && voicingId(a.tonicVoicing) === voicingId(b.tonicVoicing)
+  );
+}
+
 export function generateTonicQuestion(
   cfg: PracticeConfig,
   o: GenerateOptions,
 ): TonicQuestion | null {
   const tonic = diatonicChord(cfg.key, 0, cfg.sevenths, o.harmony);
+  const targets = targetDegrees(cfg).map((d) => diatonicChord(cfg.key, d, cfg.sevenths, o.harmony));
+  const placement = tonicPlacement(cfg);
   const cands: { q: TonicQuestion; item: Item }[] = [];
-  const prev = o.previous as TonicQuestion | null | undefined;
   for (const stringSet of cfg.stringSets) {
-    const region: Region = { stringSet, window: cfg.window };
-    const tonics = voicingsInRegion(tonic, region, o.voicing);
-    if (!tonics.length) continue;
-    for (const degree of targetDegrees(cfg)) {
-      const target = diatonicChord(cfg.key, degree, cfg.sevenths, o.harmony);
-      const valid = voicingsInRegion(target, region, o.voicing);
-      if (!valid.length) continue;
-      for (const tv of tonics) {
+    // Tonic shapes with the region each question uses.
+    const shapes: { tv: Voicing; region: Region }[] =
+      placement === 'window'
+        ? voicingsInRegion(tonic, { stringSet, window: cfg.window }, o.voicing).map((tv) => ({
+            tv,
+            region: { stringSet, window: cfg.window },
+          }))
+        : enumerateVoicings(tonic, stringSet, o.voicing).map((tv) => ({
+            tv,
+            region: { stringSet, window: windowAround(tv, cfg.window.width, o.voicing.maxFret) },
+          }));
+    for (const { tv, region } of shapes) {
+      for (const target of targets) {
+        const valid = voicingsInRegion(target, region, o.voicing);
+        if (!valid.length) continue;
         const q: TonicQuestion = {
           tonic,
           tonicVoicing: tv,
@@ -72,18 +108,20 @@ export function generateTonicQuestion(
     }
   }
   if (!cands.length) return null;
-  const pool =
-    prev && cands.length > 1
-      ? cands.filter(
-          (c) =>
-            !(
-              c.q.target.degree === prev.target?.degree &&
-              c.q.region.stringSet === prev.region?.stringSet
-            ),
-        )
-      : cands;
+  const prev = o.previous as TonicQuestion | null | undefined;
+  let pool = cands;
+  if (prev?.tonicVoicing && prev.target) {
+    // Prefer a new tonic shape *and* a new target; at minimum never repeat the question.
+    const fresh = cands.filter(
+      (c) =>
+        c.q.target.degree !== prev.target.degree &&
+        voicingId(c.q.tonicVoicing) !== voicingId(prev.tonicVoicing),
+    );
+    const different = cands.filter((c) => !sameTonicQuestion(c.q, prev));
+    pool = fresh.length ? fresh : different.length ? different : cands;
+  }
   return weightedPick(
-    pool.length ? pool : cands,
+    pool,
     (c) => stringSetWeight(c.q.region.stringSet) * (o.itemWeight ? o.itemWeight(c.item) : 1),
     o.rand,
   ).q;

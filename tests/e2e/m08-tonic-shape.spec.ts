@@ -22,6 +22,7 @@ async function setup(page: Page, mode: string, keep: string) {
 
 test('mode 2: from the tonic, smooth badge', async ({ page }) => {
   await setup(page, 'From the tonic', 'iv');
+  await page.getByRole('radio', { name: 'Inside the fret window' }).click();
   await page.getByRole('button', { name: /^Start/ }).click();
   await expect(page.locator('.prompt-main')).toHaveText('F♯m · i → iv');
   await expect(page.getByTestId('note-3-6')).toHaveAttribute('data-kind', 'shown');
@@ -32,6 +33,31 @@ test('mode 2: from the tonic, smooth badge', async ({ page }) => {
   await expect(page.getByRole('status')).toContainText('Correct');
   await expect(page.getByRole('status')).toContainText('Smooth');
   await shot(page, 'm08-tonic-smooth');
+});
+
+test('mode 2: tonic shape anywhere on the neck by default; consecutive questions differ', async ({
+  page,
+}) => {
+  await setup(page, 'From the tonic', 'iv');
+  await expect(page.getByRole('radio', { name: 'Anywhere on the neck' })).toHaveAttribute(
+    'aria-checked',
+    'true',
+  );
+  await page.getByRole('button', { name: /^Start/ }).click();
+  const seen: string[] = [];
+  for (let i = 0; i < 4; i++) {
+    const shown = await page.locator('[data-kind=shown]').evaluateAll((els) =>
+      els
+        .map((e) => e.getAttribute('data-testid'))
+        .sort()
+        .join(','),
+    );
+    seen.push(shown);
+    await page.getByRole('button', { name: 'Show answer' }).click();
+    await page.getByRole('button', { name: 'Next' }).click();
+  }
+  // only one target (iv) is selected, so the tonic shape must change every time
+  for (let i = 1; i < seen.length; i++) expect(seen[i]).not.toBe(seen[i - 1]);
 });
 
 test('mode 3: next shape up', async ({ page }) => {
