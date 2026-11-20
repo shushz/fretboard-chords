@@ -54,9 +54,13 @@ export function concreteConfig(
   p: Preferences,
   previousKey: Key | null,
   rand: () => number,
+  /** Restrict random keys to one mode (e.g. a chosen major-key progression). */
+  onlyMode?: Mode,
 ): PracticeConfig {
   if (!cfg.randomKey) return cfg;
-  const pool = randomKeyPool(cfg.randomKey, p.spelling);
+  const modes =
+    onlyMode && (cfg.randomKey === 'both' || cfg.randomKey === onlyMode) ? onlyMode : cfg.randomKey;
+  const pool = randomKeyPool(modes, p.spelling);
   const choices =
     previousKey && pool.length > 1 ? pool.filter((k) => !sameKey(k, previousKey)) : pool;
   const key = choices[Math.floor(rand() * choices.length)] ?? cfg.key;

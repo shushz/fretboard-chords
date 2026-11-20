@@ -25,6 +25,7 @@ export function Home() {
               pendingDrill.value = {
                 title: 'Review',
                 items: due.slice(0, 20).map((s) => parseItemKey(s.key)),
+                passes: 1,
               };
               navigate('practice');
             }}

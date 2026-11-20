@@ -184,3 +184,12 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   walk (which already did this, limit raised from 3 to 5). The Chord explorer keeps the
   user's window but shows shapes outside it faded, and when none fits says so and names
   the nearest frets; ▶ Play then plays the nearest shape.
+- **2026-11-20 — Review/drill sessions no longer repeat one question** (owner report: after
+  a progression walk, "Review" asked the same IV again and again). Review and drill sessions
+  used to be padded to ≥ 10 questions by cycling the items. Now "Review due items" asks
+  each due item once and "Drill these" asks each weak item twice, never back to back when
+  there is more than one item; a repeated item gets a different random fret window, so it
+  is never the identical question.
+- **2026-11-20 — Progression list with random keys from both modes** shows all ten
+  progressions, labelled "(major)" / "(minor)" (it previously offered only "Random");
+  choosing one limits the random keys to that progression's mode.

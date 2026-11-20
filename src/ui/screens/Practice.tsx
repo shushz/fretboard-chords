@@ -14,12 +14,18 @@ import {
   startSession,
   summarize,
 } from '../../exercises/session';
-import { drillConfig, drillWeight } from '../../exercises/drill';
+import {
+  drillConfig,
+  drillQueue,
+  drillWeight,
+  drillWindow,
+  occurrence,
+} from '../../exercises/drill';
 import { pendingDrill } from '../../exercises/drillState';
+import { PROGRESSIONS } from '../../exercises/progression/logic';
 import { makeItemWeight } from '../../progress/srs';
 import { recordAttempts } from '../../progress/record';
 import type { Attempt, Item } from '../../progress/types';
-import { randomWindow } from '../../fretboard/regions';
 import { keyFromAscii } from '../pickers';
 import { navigate } from '../router';
 import { loadSetup, saveSetup } from '../../exercises/lastSetup';
@@ -38,17 +44,19 @@ export function Practice() {
   const [drill, setDrill] = useState<Drill | null>(() => {
     const d = pendingDrill.value;
     pendingDrill.value = null;
-    return d && d.items.length ? { ...d, items: shuffle(d.items) } : null;
+    // Each item `passes` times, never back to back (review: once each; drill: twice).
+    return d && d.items.length
+      ? { title: d.title, items: drillQueue(d.items, d.passes, Math.random) }
+      : null;
   });
   const [session, setSession] = useState<SessionState<number> | null>(() =>
-    drill
-      ? startSession({ kind: 'questions', count: Math.max(drill.items.length, 10) }, 0, Date.now())
-      : null,
+    drill ? startSession({ kind: 'questions', count: drill.items.length }, 0, Date.now()) : null,
   );
   const [notice, setNotice] = useState<string | null>(null);
   const [retry, setRetry] = useState(0);
   const prev = useRef<unknown>(null);
   const prevKey = useRef<Key | null>(null);
+  const lastWindow = useRef<number | undefined>(undefined);
 
   // Per-question config and selection weights
   const index = session?.index ?? 0;
@@ -56,14 +64,28 @@ export function Practice() {
     if (drill) {
       const item = drill.items[index % drill.items.length];
       const c = drillConfig(item, p);
-      if (c && retry > 0)
-        c.window = randomWindow(c.window.width, p.fretboard.fretRange, Math.random);
+      if (c) {
+        // A repeated item gets a different fret window, so it's never the identical question.
+        const occ = occurrence(drill.items, index % drill.items.length) + retry;
+        c.window = drillWindow(
+          c.window,
+          occ,
+          p.fretboard.fretRange,
+          Math.random,
+          lastWindow.current,
+        );
+        lastWindow.current = c.window.start;
+      }
       return { config: c, itemWeight: drillWeight(item), item };
     }
     // Random key: a new key per question (only once a session is running).
     let qConfig = config;
     if (session !== null && config.randomKey) {
-      qConfig = concreteConfig(config, p, prevKey.current, Math.random);
+      const onlyMode =
+        config.mode === 'progression'
+          ? PROGRESSIONS.find((x) => x.id === config.variant)?.mode
+          : undefined;
+      qConfig = concreteConfig(config, p, prevKey.current, Math.random, onlyMode);
       prevKey.current = qConfig.key;
     }
     return {
@@ -178,15 +200,6 @@ export function Practice() {
       )}
     </div>
   );
-}
-
-function shuffle<T>(xs: T[]): T[] {
-  const a = [...xs];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
 }
 
 function Summary(props: { attempts: Attempt[]; durationMs: number; onAgain: () => void }) {

@@ -223,7 +223,11 @@ function Weakest(props: { stats: Record<string, ItemStats>; p: Preferences }) {
         type="button"
         class="btn wide"
         onClick={() => {
-          pendingDrill.value = { title: 'Weak spots', items: w.map((x) => parseItemKey(x.key)) };
+          pendingDrill.value = {
+            title: 'Weak spots',
+            items: w.map((x) => parseItemKey(x.key)),
+            passes: 2,
+          };
           navigate('practice');
         }}
       >

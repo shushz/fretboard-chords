@@ -68,4 +68,18 @@ describe('random key', () => {
       ).toEqual(c.key);
     }
   });
+  it('a chosen progression limits random keys from both modes to its mode', () => {
+    const cfg = {
+      ...defaultConfig('progression', parseKeyName('C')!, p),
+      randomKey: 'both' as const,
+    };
+    const rand = seeded(9);
+    for (let i = 0; i < 30; i++) {
+      expect(concreteConfig(cfg, p, null, rand, 'major').key.mode).toBe('major');
+      expect(concreteConfig(cfg, p, null, rand, 'minor').key.mode).toBe('minor');
+    }
+    // a single-mode random setup isn't overridden by a mismatching progression
+    const minorOnly = { ...cfg, randomKey: 'minor' as const };
+    expect(concreteConfig(minorOnly, p, null, rand, 'major').key.mode).toBe('minor');
+  });
 });
