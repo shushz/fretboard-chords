@@ -5,8 +5,11 @@ import { note, noteToAscii, parseNote, pitchClass } from '../../theory/notes';
 import { CORE_DEGREES, DEGREES } from '../../theory/chords';
 import { defaultConfig } from '../config';
 import {
+  alternateQuality,
   askableDegrees,
   enharmonic,
+  nameChordDirections,
+  ordinal,
   forwardRootCandidates,
   generateNameChordQuestion,
   nameChordItem,
@@ -113,7 +116,7 @@ describe('mode 6: name the chord', () => {
       for (const k of keys) {
         const doubles = scale(k).some((n) => Math.abs(n.acc) === 2);
         for (const d of DEGREES.filter((x) => x !== 0)) {
-          for (const variant of ['forward', 'reverse']) {
+          for (const variant of ['forward', 'reverse', 'degree']) {
             const cfg = { ...defaultConfig('nameChord', k, p), degrees: [d], sevenths, variant };
             for (let i = 0; i < 4; i++) {
               const q = generateNameChordQuestion(cfg, opts(rand))!;
@@ -121,7 +124,19 @@ describe('mode 6: name the chord', () => {
               expect(q.options, where).toHaveLength(4);
               expect(new Set(q.options).size, where).toBe(4);
               expect(q.options, where).toContain(q.answer);
-              if (variant === 'forward') {
+              if (variant === 'degree') {
+                // you need both root and quality: two roots, each in two qualities
+                const parsed = q.options.map(splitSymbol);
+                const roots = new Set(parsed.map((o) => noteToAscii(o.root)));
+                const suffixes = new Set(parsed.map((o) => o.suffix));
+                expect(roots.size, where).toBe(2);
+                expect(suffixes.size, where).toBe(2);
+                for (const r of roots) {
+                  expect(parsed.filter((o) => noteToAscii(o.root) === r).length, where).toBe(2);
+                }
+                if (!doubles)
+                  for (const o of parsed) expect(Math.abs(o.root.acc), where).toBeLessThan(2);
+              } else if (variant === 'forward') {
                 const a = splitSymbol(q.answer);
                 const parsed = q.options.map(splitSymbol);
                 for (const o of parsed) {
@@ -143,6 +158,45 @@ describe('mode 6: name the chord', () => {
       }
     });
   }
+
+  it('"In E♭m, what chord is on the 4th degree?": a 2 × 2 grid of root × quality', () => {
+    const cfg = {
+      ...defaultConfig('nameChord', parseKeyName('Ebm')!, p),
+      degrees: [3 as const],
+      variant: 'degree',
+    };
+    const rand = seeded(5);
+    for (let i = 0; i < 20; i++) {
+      const q = generateNameChordQuestion(cfg, opts(rand))!;
+      expect(q.direction).toBe('degree');
+      expect(q.answer).toBe('A♭m');
+      expect(q.options).toContain('A♭'); // right root, wrong quality
+      const parsed = q.options.map(splitSymbol);
+      expect(new Set(parsed.map((o) => noteToAscii(o.root))).size).toBe(2);
+      expect(new Set(parsed.map((o) => o.suffix))).toEqual(new Set(['m', '']));
+    }
+    expect(ordinal(0)).toBe('1st');
+    expect(ordinal(1)).toBe('2nd');
+    expect(ordinal(2)).toBe('3rd');
+    expect(ordinal(3)).toBe('4th');
+  });
+
+  it('minor-key V: the wrong quality is never the other V (natural v / harmonic V)', () => {
+    const fsm = parseKeyName('F#m')!;
+    expect(alternateQuality(diatonicChord(fsm, 4))).toBe('dim');
+    expect(alternateQuality(diatonicChord(fsm, 4, false, { minorV: 'natural' }))).toBe('dim');
+    expect(alternateQuality(diatonicChord(fsm, 4, true))).toBe('m7b5');
+    expect(alternateQuality(diatonicChord(parseKeyName('C')!, 4))).toBe('min');
+  });
+
+  it('mix uses all three question types', () => {
+    const cfg = defaultConfig('nameChord', parseKeyName('Bb')!, p);
+    expect(nameChordDirections(cfg)).toEqual(['forward', 'reverse', 'degree']);
+    const rand = seeded(12);
+    const seen = new Set<string>();
+    for (let i = 0; i < 60; i++) seen.add(generateNameChordQuestion(cfg, opts(rand))!.direction);
+    expect(seen).toEqual(new Set(['forward', 'reverse', 'degree']));
+  });
 
   it('no chord asked twice in a row', () => {
     const cfg = defaultConfig('nameChord', parseKeyName('Bb')!, p);

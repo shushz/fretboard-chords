@@ -31,7 +31,7 @@ Pick a key, the chords you care about (the core set by default, e.g. i, iv, V, i
 | **Name the tones**        | Label each note of a shown shape as R, ♭3, 3, 5, ♭7…, or the reverse: “tap the ♭3 of V on string 2”.                                                                                                           |
 | **Quality switch**        | Turn a major chord minor (or back) by moving the one note that has to move. Extensions: minor ↔ diminished, major → augmented, V → V7, maj7 ↔ 7, m7 ↔ m7♭5.                                                    |
 | **Progression walk**      | Walk real progressions (I–vi–ii–V, i–♭VI–♭VII–i, ii°–V–i, …) chord by chord, staying close to the last shape. Optional tempo mode.                                                                             |
-| **Name the chord**        | “In E♭m, what is iv?” → A♭m (not G♯m), and the reverse.                                                                                                                                                        |
+| **Name the chord**        | “In E♭m, what is iv?” → A♭m (not G♯m); “what chord is on the 4th degree?”, where the quality counts too (A♭m or A♭?); and the reverse.                                                                         |
 
 Every mode works with **triads or seventh chords** (drop-2 voicings on four strings, or
 R–3–7 shells), in **one key or a random key** per question.

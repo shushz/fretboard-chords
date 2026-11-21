@@ -248,3 +248,11 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   chord, all ° for a diminished one); the old case-flipped distractor ("IV" for A♭m, and
   nonsense like "II°") is gone. The tonic is never asked (it's always the key's name), and
   the same chord is never asked twice in a row in either direction.
+- **2026-11-21 — Name the chord: "scale degree → chord" question type** (owner request).
+  "In E♭m, what chord is on the 4th degree?" states no quality, so options form a 2 × 2
+  grid: {right root, a plausible wrong root} × {right quality, its common mix-up}
+  (major ↔ minor, dim → minor, maj7 ↔ 7, m7 ↔ 7, m7♭5 → m7). Knowing only the root or only
+  the quality leaves a coin flip. In a minor key the V chord's mix-up is never the other V
+  (natural v / harmonic V), which would be arguable rather than wrong; it uses ° / ø7.
+  Setup "Question type": Numeral → chord, Scale degree → chord, Chord → numeral, Mix
+  (default). Degrees are counted on the natural-minor scale in minor keys.

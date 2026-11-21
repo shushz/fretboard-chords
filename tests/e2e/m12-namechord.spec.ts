@@ -4,7 +4,7 @@ import { shot } from './helpers';
 test('In E♭m, what is iv? → A♭m', async ({ page }) => {
   await page.goto('./#/practice');
   await page.getByRole('radio', { name: /^Name the chord/ }).click();
-  await page.getByRole('radio', { name: 'Degree → chord' }).click();
+  await page.getByRole('radio', { name: 'Numeral → chord' }).click();
   await page.getByRole('combobox', { name: 'Key', exact: true }).selectOption('Ebm');
   for (const n of ['i', 'V', 'ii°', '♭VI', '♭VII']) {
     await page
@@ -32,7 +32,7 @@ test('reverse: every numeral matches the chord quality; the tonic is never asked
 }) => {
   await page.goto('./#/practice');
   await page.getByRole('radio', { name: /^Name the chord/ }).click();
-  await page.getByRole('radio', { name: 'Chord → degree' }).click();
+  await page.getByRole('radio', { name: 'Chord → numeral' }).click();
   await page.getByRole('combobox', { name: 'Key', exact: true }).selectOption('G');
   await page.getByRole('button', { name: /^Start/ }).click();
   for (let i = 0; i < 5; i++) {
@@ -50,4 +50,28 @@ test('reverse: every numeral matches the chord quality; the tonic is never asked
     await page.getByRole('group', { name: 'Answers' }).getByRole('button').first().click();
     await page.getByRole('button', { name: 'Next' }).click();
   }
+});
+
+test('scale degree → chord: quality is part of the question', async ({ page }) => {
+  await page.goto('./#/practice');
+  await page.getByRole('radio', { name: /^Name the chord/ }).click();
+  await page.getByRole('radio', { name: 'Scale degree → chord' }).click();
+  await page.getByRole('combobox', { name: 'Key', exact: true }).selectOption('Ebm');
+  for (const n of ['i', 'V', 'ii°', '♭VI', '♭VII']) {
+    await page
+      .getByRole('group', { name: 'Chords' })
+      .getByRole('button', { name: n, exact: true })
+      .click();
+  }
+  await page.getByRole('button', { name: /^Start/ }).click();
+  await expect(page.locator('.prompt-main')).toHaveText('In E♭m, what chord is on the 4th degree?');
+  const options = await page
+    .getByRole('group', { name: 'Answers' })
+    .getByRole('button')
+    .allTextContents();
+  expect(options).toContain('A♭m');
+  expect(options).toContain('A♭');
+  await page.getByRole('button', { name: 'A♭', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('4th degree = iv in E♭m = A♭m (A♭–C♭–E♭)');
+  await shot(page, 'm12-scale-degree');
 });

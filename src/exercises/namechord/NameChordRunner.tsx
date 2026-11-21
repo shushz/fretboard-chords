@@ -9,7 +9,13 @@ import { Segmented } from '../../ui/controls';
 import { chordToneName } from '../../ui/markers';
 import type { PracticeConfig } from '../config';
 import type { RunnerProps } from '../types';
-import { type NameChordQuestion, generateNameChordQuestion, nameChordItem } from './logic';
+import {
+  type NameChordQuestion,
+  generateNameChordQuestion,
+  nameChordDirections,
+  nameChordItem,
+  ordinal,
+} from './logic';
 
 export function NameChordRunner(props: RunnerProps) {
   const { config, prefs: p } = props;
@@ -65,6 +71,10 @@ export function NameChordRunner(props: RunnerProps) {
             <>
               In {keyName}, what is {numeral}?
             </>
+          ) : q.direction === 'degree' ? (
+            <>
+              In {keyName}, what chord is on the {ordinal(q.chord.degree)} degree?
+            </>
           ) : (
             <>
               {symbol} is which degree in {keyName}?
@@ -89,6 +99,7 @@ export function NameChordRunner(props: RunnerProps) {
         <FeedbackBar state={picked === q.answer ? 'correct' : 'wrong'} onNext={props.onNext}>
           <strong>{picked === q.answer ? '✓ Correct' : '✕ Not quite'}</strong>{' '}
           <span>
+            {q.direction === 'degree' && <>{ordinal(q.chord.degree)} degree = </>}
             {numeral} in {keyName} = {symbol} ({chordToneName(q.chord, p)})
           </span>
         </FeedbackBar>
@@ -101,18 +112,17 @@ export function NameChordSetup(props: {
   config: PracticeConfig;
   onChange: (c: PracticeConfig) => void;
 }) {
-  const v =
-    props.config.variant === 'forward' || props.config.variant === 'reverse'
-      ? props.config.variant
-      : 'both';
+  const d = nameChordDirections(props.config);
+  const v = d.length === 1 ? d[0] : 'mix';
   return (
     <Segmented
-      label="Direction"
+      label="Question type"
       value={v}
       options={[
-        { value: 'forward', label: 'Degree → chord' },
-        { value: 'reverse', label: 'Chord → degree' },
-        { value: 'both', label: 'Both' },
+        { value: 'forward', label: 'Numeral → chord' },
+        { value: 'degree', label: 'Scale degree → chord' },
+        { value: 'reverse', label: 'Chord → numeral' },
+        { value: 'mix', label: 'Mix' },
       ]}
       onChange={(variant) => props.onChange({ ...props.config, variant })}
     />
