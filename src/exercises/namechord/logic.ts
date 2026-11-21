@@ -2,17 +2,17 @@
 import {
   type DegreeIndex,
   type DiatonicChord,
-  DEGREES,
   type NumeralOptions,
   type SymbolOptions,
+  CORE_DEGREES,
   buildChord,
   chordNumeral,
   chordSymbol,
   diatonicChord,
-  triadOf,
+  romanNumeral,
 } from '../../theory/chords';
 import type { HarmonyOptions } from '../../theory/chords';
-import { keyToAscii, relativeKey } from '../../theory/keys';
+import { keyToAscii, scale } from '../../theory/keys';
 import { type Note, note, pitchClass } from '../../theory/notes';
 import type { Item } from '../../progress/types';
 import type { PracticeConfig } from '../config';
@@ -71,40 +71,81 @@ export interface NameChordOptions {
   previous?: unknown;
 }
 
-/** Plausible wrong chord names for "what is degree d?". */
-export function forwardDistractors(
+/**
+ * Design rule: every option must look plausible at first glance. The Roman numeral already
+ * says the chord's quality (iv = minor, ii° = diminished, V7 = dominant), so all forward
+ * options share the answer's quality and the question tests the root and its spelling.
+ * In reverse, all numerals share the chord's quality (case and symbols), so the chord
+ * name doesn't rule any out. The tonic (I/i) is never asked: it's always the key's name.
+ */
+
+/** Degrees that may be asked: the selection without the tonic (or the core set if only I/i). */
+export function askableDegrees(cfg: PracticeConfig): DegreeIndex[] {
+  const d = cfg.degrees.filter((x) => x !== 0);
+  return d.length ? d : CORE_DEGREES[cfg.key.mode].filter((x) => x !== 0);
+}
+
+function noteKey(n: Note): string {
+  return `${n.letter}${n.acc}`;
+}
+
+/**
+ * Wrong roots for "what is <numeral>?", all to be shown with the answer's quality:
+ * the same letter with the wrong accidental (A for A♭), neighbouring and 4th/5th-related
+ * scale degrees (counting slips), and the enharmonic misspelling (G♯ for A♭). Double
+ * accidentals only appear when the key itself uses them.
+ */
+export function forwardRootCandidates(
   c: DiatonicChord,
-  sevenths: boolean,
-  o: Pick<NameChordOptions, 'harmony' | 'symbol'>,
-): string[] {
-  const sym = (x: Parameters<typeof chordSymbol>[0]) => chordSymbol(x, o.symbol);
-  const out: string[] = [];
-  const enh = enharmonic(c.root);
-  if (enh) out.push(sym(buildChord(enh, c.quality))); // enharmonic misspelling, e.g. G♯m for A♭m
-  const tri = triadOf(c.quality);
-  const flipped = sevenths
-    ? c.quality === 'm7'
-      ? '7'
-      : c.quality === '7'
-        ? 'm7'
-        : c.quality === 'maj7'
-          ? 'm7'
-          : 'm7'
-    : tri === 'maj'
-      ? 'min'
-      : 'maj';
-  out.push(sym(buildChord(c.root, flipped))); // right root, wrong quality
-  for (const d of [1, -1, 2] as const) {
-    const n = diatonicChord(
-      c.key,
-      ((((c.degree + d) % 7) + 7) % 7) as DegreeIndex,
-      sevenths,
-      o.harmony,
-    );
-    out.push(sym(n)); // a neighbouring degree
+): { root: Note; enharmonicOfAnswer: boolean }[] {
+  const sc = scale(c.key);
+  const allowDouble = sc.some((n) => Math.abs(n.acc) === 2);
+  const ok = (n: Note) => allowDouble || Math.abs(n.acc) < 2;
+  const out = new Map<string, { root: Note; enharmonicOfAnswer: boolean }>();
+  const add = (n: Note | null, enh = false) => {
+    if (!n || !ok(n) || noteKey(n) === noteKey(c.root)) return;
+    if (!out.has(noteKey(n))) out.set(noteKey(n), { root: n, enharmonicOfAnswer: enh });
+  };
+  for (const delta of [-1, 1] as const) {
+    const acc = c.root.acc + delta;
+    if (acc >= -2 && acc <= 2) add(note(c.root.letter, acc as Note['acc']));
   }
-  // relative-key confusion: same degree in the relative major/minor
-  out.push(sym(diatonicChord(relativeKey(c.key), c.degree, sevenths, o.harmony)));
+  for (const step of [1, -1, 3, 4, 2, -2]) add(sc[(((c.degree + step) % 7) + 7) % 7]);
+  add(enharmonic(c.root), true);
+  return [...out.values()];
+}
+
+/**
+ * Pick 3 forward distractors. The answer's own misspelling (G♯m for A♭m) is only offered
+ * together with a second same-pitch pair (e.g. A♭/G♯ *and* D♭/C♯), so a pair never
+ * reveals the answer; when no second pair is possible it isn't offered.
+ */
+function pickForward(c: DiatonicChord, rand: () => number): Note[] {
+  const cands = shuffle(forwardRootCandidates(c), rand);
+  const twinOf = (n: Note) => {
+    const e = enharmonic(n);
+    return e && Math.abs(e.acc) < 2 && noteKey(e) !== noteKey(c.root) ? e : null;
+  };
+  const enh = cands.find((x) => x.enharmonicOfAnswer);
+  const plain = cands.filter((x) => !x.enharmonicOfAnswer);
+  const paired = plain.find((x) => twinOf(x.root));
+  // Use the misspelling in about half the questions where a second pair is possible.
+  if (enh && paired && rand() < 0.5) return [enh.root, paired.root, twinOf(paired.root)!];
+  return plain.slice(0, 3).map((x) => x.root);
+}
+
+/** Numerals for "X is which degree?": other degrees, written with X's quality. */
+function pickReverse(c: DiatonicChord, numeral: NumeralOptions, rand: () => number): string[] {
+  const sc = scale(c.key);
+  const steps = shuffle([1, -1, 3, 4, 2, -2], rand);
+  const out: string[] = [];
+  const answer = chordNumeral(c, numeral);
+  for (const step of steps) {
+    const d = ((((c.degree + step) % 7) + 7) % 7) as DegreeIndex;
+    const n = romanNumeral(c.key, d, sc[d], c.quality, numeral);
+    if (n !== answer && !out.includes(n)) out.push(n);
+    if (out.length === 3) break;
+  }
   return out;
 }
 
@@ -119,7 +160,7 @@ export function generateNameChordQuestion(
         ? ['reverse']
         : ['forward', 'reverse'];
   const cands: NameChordQuestion[] = [];
-  for (const degree of cfg.degrees) {
+  for (const degree of askableDegrees(cfg)) {
     const chord = diatonicChord(cfg.key, degree, cfg.sevenths, o.harmony);
     for (const direction of dirs) {
       cands.push({ direction, chord, options: [], answer: '' });
@@ -127,12 +168,9 @@ export function generateNameChordQuestion(
   }
   if (!cands.length) return null;
   const prev = o.previous as NameChordQuestion | null | undefined;
+  // Never the same chord twice in a row (in either direction) when there's a choice.
   const pool =
-    prev && cands.length > 1
-      ? cands.filter(
-          (c) => !(c.chord.degree === prev.chord?.degree && c.direction === prev.direction),
-        )
-      : cands;
+    prev && cands.length > 1 ? cands.filter((c) => c.chord.degree !== prev.chord?.degree) : cands;
   const pick = weightedPick(
     pool.length ? pool : cands,
     (c) => (o.itemWeight ? o.itemWeight(nameChordItem(c)) : 1),
@@ -143,23 +181,15 @@ export function generateNameChordQuestion(
   let wrong: string[];
   if (pick.direction === 'forward') {
     answer = chordSymbol(c, o.symbol);
-    wrong = forwardDistractors(c, cfg.sevenths, o);
+    wrong = pickForward(c, o.rand).map((r) => chordSymbol(buildChord(r, c.quality), o.symbol));
   } else {
     answer = chordNumeral(c, o.numeral);
-    const others = DEGREES.filter((d) => d !== c.degree).map((d) =>
-      chordNumeral(diatonicChord(c.key, d, cfg.sevenths, o.harmony), o.numeral),
-    );
-    // case-flipped numeral (iv ↔ IV) is a classic mistake
-    const flipped = answer === answer.toLowerCase() ? answer.toUpperCase() : answer.toLowerCase();
-    wrong = [flipped, ...shuffle(others, o.rand)];
+    wrong = pickReverse(c, o.numeral, o.rand);
   }
-  const uniq = [...new Set(wrong.filter((w) => w !== answer))];
-  // keep the first (most instructive) distractor, then fill randomly up to 3
-  const chosen = [uniq[0], ...shuffle(uniq.slice(1), o.rand)].filter(Boolean).slice(0, 3);
   return {
     direction: pick.direction,
     chord: c,
     answer,
-    options: shuffle([answer, ...chosen], o.rand),
+    options: shuffle([answer, ...wrong], o.rand),
   };
 }

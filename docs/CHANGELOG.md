@@ -25,3 +25,4 @@
 - Audit: property tests across all modes/setups, automated walkthrough (npm run audit, in CI), and the fixes it found (tap-target sizes, contrast, Quality switch Show answer, summary median, Name the tones feedback, landscape buttons).
 - Audit recommendations: compact mode picker, Labels & hints prefs, simpler spelling prefs, faded given shape with key, scroll cue, tablet side column, grouped seventh string sets, progression sessions count chords, heat-grid headings.
 - Docs: README with screenshots, MIT license, package metadata; README screenshots regenerate with README_SHOTS=1. Fix: progression-walk counter shows chords done ("2 / 20 chords").
+- Fix: Name the chord options all share the answer's quality, the tonic isn't asked, misspelling pairs don't reveal the answer.

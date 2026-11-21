@@ -170,6 +170,9 @@ and the item it tested (see §6).
 6. **Name the chord** (secondary) — "In E♭m, what is iv?" → multiple choice (A♭m among
    plausible distractors, including enharmonic mis-spellings like G#m). Reverse:
    "A♭m is which degree in E♭m?" Typed answer variant later.
+   Every option must look plausible at first glance: forward options all have the quality
+   the numeral states, reverse numerals all match the chord's quality, a misspelling pair
+   never singles out the answer, and the tonic (always the key's name) is never asked.
 7. **Quality switch (major ↔ minor)** — a voicing is shown and played (roles hidden by
    default). The user changes its quality by moving only the tone that has to move,
    keeping every other note in place. Then the new chord plays.
