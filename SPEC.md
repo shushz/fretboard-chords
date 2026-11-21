@@ -170,6 +170,8 @@ and the item it tested (see §6).
 6. **Name the chord** (secondary) — "In E♭m, what is iv?" → multiple choice (A♭m among
    plausible distractors, including enharmonic mis-spellings like G#m). Reverse:
    "A♭m is which degree in E♭m?" Typed answer variant later.
+   Third type: "In E♭m, what chord is on the 4th degree?" — the quality isn't given, so
+   options are a 2 × 2 grid of right/wrong root × right/wrong quality.
    Every option must look plausible at first glance: forward options all have the quality
    the numeral states, reverse numerals all match the chord's quality, a misspelling pair
    never singles out the answer, and the tonic (always the key's name) is never asked.

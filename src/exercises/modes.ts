@@ -52,7 +52,7 @@ export const MODES: ModeDef[] = [
   {
     id: 'nameChord',
     name: 'Name the chord',
-    description: '"In E♭m, what is iv?" — and the reverse',
+    description: '"In E♭m, what is iv?", "what chord is on the 4th degree?" and the reverse',
     Runner: NameChordRunner,
     SetupExtras: NameChordSetup,
   },

@@ -1,7 +1,9 @@
 /** Mode 6 — Name the chord (multiple choice, both directions). Pure. */
 import {
   type DegreeIndex,
+  type Chord,
   type DiatonicChord,
+  type Quality,
   type NumeralOptions,
   type SymbolOptions,
   CORE_DEGREES,
@@ -19,7 +21,11 @@ import type { PracticeConfig } from '../config';
 import { weightedPick } from '../session';
 
 export interface NameChordQuestion {
-  direction: 'forward' | 'reverse';
+  /**
+   * forward: "In E♭m, what is iv?" · reverse: "A♭m is which degree?" ·
+   * degree: "In E♭m, what chord is on the 4th degree?" (quality not given away)
+   */
+  direction: NameChordDirection;
   chord: DiatonicChord;
   /** Displayed options; `answer` is one of them. */
   options: string[];
@@ -149,16 +155,69 @@ function pickReverse(c: DiatonicChord, numeral: NumeralOptions, rand: () => numb
   return out;
 }
 
+export type NameChordDirection = 'forward' | 'reverse' | 'degree';
+
+/** `cfg.variant`: one direction, or anything else for a mix of all three. */
+export function nameChordDirections(cfg: PracticeConfig): NameChordDirection[] {
+  const v = cfg.variant;
+  return v === 'forward' || v === 'reverse' || v === 'degree'
+    ? [v]
+    : ['forward', 'reverse', 'degree'];
+}
+
+/** "4th", "2nd" … for scale-degree questions (degree index 0..6). */
+export function ordinal(degree: number): string {
+  const n = degree + 1;
+  return `${n}${n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'}`;
+}
+
+/**
+ * The plausible wrong quality for a chord when the question doesn't state it: the
+ * common mix-ups (major ↔ minor, diminished → minor, maj7 ↔ 7, m7 ↔ m7♭5). In a minor
+ * key the V chord avoids the other V (natural v / harmonic V), which would be
+ * arguable rather than wrong.
+ */
+export function alternateQuality(c: DiatonicChord): Quality {
+  const minorV = c.key.mode === 'minor' && c.degree === 4;
+  switch (c.quality) {
+    case 'maj':
+      return minorV ? 'dim' : 'min';
+    case 'min':
+      return minorV ? 'dim' : 'maj';
+    case 'dim':
+      return 'min';
+    case 'aug':
+      return 'maj';
+    case 'maj7':
+      return '7';
+    case '7':
+      return minorV ? 'm7b5' : 'maj7';
+    case 'm7':
+      return minorV ? 'm7b5' : '7';
+    case 'm7b5':
+      return 'm7';
+    case 'dim7':
+      return 'm7b5';
+  }
+}
+
+/**
+ * Options for "what chord is on the Nth degree?": a 2 × 2 grid of {right root, a
+ * plausible wrong root} × {right quality, a plausible wrong quality}. Knowing only the
+ * root, or only the quality, leaves two candidates; you need both.
+ */
+export function pickDegreeGrid(c: DiatonicChord, rand: () => number): Chord[] {
+  const roots = shuffle(forwardRootCandidates(c), rand);
+  const wrongRoot = roots[0].root;
+  const q2 = alternateQuality(c);
+  return [buildChord(c.root, q2), buildChord(wrongRoot, c.quality), buildChord(wrongRoot, q2)];
+}
+
 export function generateNameChordQuestion(
   cfg: PracticeConfig,
   o: NameChordOptions,
 ): NameChordQuestion | null {
-  const dirs: ('forward' | 'reverse')[] =
-    cfg.variant === 'forward'
-      ? ['forward']
-      : cfg.variant === 'reverse'
-        ? ['reverse']
-        : ['forward', 'reverse'];
+  const dirs = nameChordDirections(cfg);
   const cands: NameChordQuestion[] = [];
   for (const degree of askableDegrees(cfg)) {
     const chord = diatonicChord(cfg.key, degree, cfg.sevenths, o.harmony);
@@ -182,6 +241,9 @@ export function generateNameChordQuestion(
   if (pick.direction === 'forward') {
     answer = chordSymbol(c, o.symbol);
     wrong = pickForward(c, o.rand).map((r) => chordSymbol(buildChord(r, c.quality), o.symbol));
+  } else if (pick.direction === 'degree') {
+    answer = chordSymbol(c, o.symbol);
+    wrong = pickDegreeGrid(c, o.rand).map((x) => chordSymbol(x, o.symbol));
   } else {
     answer = chordNumeral(c, o.numeral);
     wrong = pickReverse(c, o.numeral, o.rand);
