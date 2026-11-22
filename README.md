@@ -23,15 +23,15 @@ fully offline.
 Pick a key, the chords you care about (the core set by default, e.g. i, iv, V, ii°, ♭VI,
 ♭VII in minor), a group of strings and a fret window. Then choose a mode:
 
-| Mode                      | What you do                                                                                                                                                                                                    |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Find the chord**        | “F♯m · iv · strings 2–4 · frets 6–10”: tap the chord. Any valid shape counts; a miss shows every right shape with its roles. Optional _anchored_ variant: tap the root on string 6 or 5 first, then the chord. |
-| **From the tonic**        | You're shown the I/i chord; find the IV, V, vi… nearby. A **Smooth ✦** badge marks the shape with the least movement.                                                                                          |
-| **Next / previous shape** | You're shown one shape; find the next one up (or down) the neck on the same strings.                                                                                                                           |
-| **Name the tones**        | Label each note of a shown shape as R, ♭3, 3, 5, ♭7…, or the reverse: “tap the ♭3 of V on string 2”.                                                                                                           |
-| **Quality switch**        | Turn a major chord minor (or back) by moving the one note that has to move. Extensions: minor ↔ diminished, major → augmented, V → V7, maj7 ↔ 7, m7 ↔ m7♭5.                                                    |
-| **Progression walk**      | Walk real progressions (I–vi–ii–V, i–♭VI–♭VII–i, ii°–V–i, …) chord by chord, staying close to the last shape. Optional tempo mode.                                                                             |
-| **Name the chord**        | “In E♭m, what is iv?” → A♭m (not G♯m); “what chord is on the 4th degree?”, where the quality counts too (A♭m or A♭?); and the reverse.                                                                         |
+| Mode                      | What you do                                                                                                                                                                                                                  |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Find the chord**        | “F♯m · iv · strings 2–4 · frets 6–10”: tap the chord. Any valid shape in the window counts; a miss shows every right shape with its roles. Optional _anchored_ variant: tap the root on string 6 or 5 first, then the chord. |
+| **From the tonic**        | You're shown the I/i chord; find the IV, V, vi… nearby (within 2 frets of the window counts). A **Smooth ✦** badge marks the shape with the least movement.                                                                  |
+| **Next / previous shape** | You're shown one shape; find the next one up (or down) the neck on the same strings.                                                                                                                                         |
+| **Name the tones**        | Label each note of a shown shape as R, ♭3, 3, 5, ♭7…, or the reverse: “tap the ♭3 of V on string 2”.                                                                                                                         |
+| **Quality switch**        | Turn a major chord minor (or back) by moving the one note that has to move. Extensions: minor ↔ diminished, major → augmented, V → V7, maj7 ↔ 7, m7 ↔ m7♭5.                                                                  |
+| **Progression walk**      | Walk real progressions (I–vi–ii–V, i–♭VI–♭VII–i, ii°–V–i, …) chord by chord, staying close to the last shape. Optional tempo mode.                                                                                           |
+| **Name the chord**        | “In E♭m, what is iv?” → A♭m (not G♯m); “what chord is on the 4th degree?”, where the quality counts too (A♭m or A♭?); and the reverse.                                                                                       |
 
 Every mode works with **triads or seventh chords** (drop-2 voicings on four strings, or
 R–3–7 shells), in **one key or a random key** per question.

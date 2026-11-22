@@ -4,9 +4,15 @@ import type { ComponentChildren } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { feedback, playNote, revealSound, strum } from '../audio/engine';
 import { type Chord, toneForPitchClass } from '../theory/chords';
-import type { FretWindow, Region } from '../fretboard/regions';
+import { type FretWindow, type Region, formatWindow } from '../fretboard/regions';
 import { type StringNum, midiAt, pitchClassAt } from '../fretboard/tuning';
-import { type Voicing, type VoicingNote, fretted, voicingId } from '../fretboard/voicings';
+import {
+  type Voicing,
+  type VoicingNote,
+  fitsWindow,
+  fretted,
+  voicingId,
+} from '../fretboard/voicings';
 import type { Preferences } from '../prefs/model';
 import { Fretboard, type Marker } from '../ui/Fretboard';
 import { FeedbackBar } from '../ui/Feedback';
@@ -14,6 +20,8 @@ import { chooseVisibleRange } from '../ui/fretboardGeometry';
 import { noteMarker } from '../ui/markers';
 import { useBoardWidth } from '../ui/useViewport';
 import { type Taps, applyTapTo } from './taps';
+import { voicingOptions } from './config';
+import { shapeAnywhere } from './region';
 
 export type { Taps };
 
@@ -56,6 +64,11 @@ export interface TapQuestionProps {
   before?: ComponentChildren;
   /** Reference notes always shown dimmed (e.g. the previous chord). */
   context?: readonly VoicingNote[];
+  /**
+   * The mode accepts shapes near the window, not only inside it (From the tonic, Progression
+   * walk): a right chord that still isn't accepted is "too far", not "outside".
+   */
+  nearby?: boolean;
   /** Tempo mode: time allowed before the question counts as missed. */
   timeLimitMs?: number;
   /** Advance automatically this long after a correct answer. */
@@ -70,6 +83,8 @@ export function TapQuestion(props: TapQuestionProps) {
   const [grade, setGrade] = useState<TapGrade | null>(null);
   const [timedOut, setTimedOut] = useState(false);
   const [shown, setShown] = useState(false);
+  // The right chord, played somewhere the question doesn't accept: told apart from a mistake.
+  const [elsewhere, setElsewhere] = useState(false);
   const tapsRef = useRef<Taps>(taps);
   tapsRef.current = taps;
   const gradedRef = useRef(false);
@@ -104,9 +119,17 @@ export function TapQuestion(props: TapQuestionProps) {
     const timeMs = performance.now() - started.current;
     const v = g.matched ?? g.reveal[0];
     const midis = v ? v.notes.map((n) => n.midi) : [];
+    const vo = voicingOptions(p);
+    const found =
+      !g.correct && !gaveUp ? shapeAnywhere(props.chord, props.region.stringSet, t, vo) : null;
+    // Inside the window but still wrong (e.g. a wrong anchor) isn't "elsewhere".
+    const away = found && !fitsWindow(found, props.region.window, vo.allowOutside) ? found : null;
     if (reveal) {
       setShown(true);
       revealSound(midis);
+    } else if (away) {
+      setElsewhere(true);
+      revealSound(away.notes.map((n) => n.midi));
     } else feedback(g.correct, midis);
     props.onGraded(g.correct, timeMs, g.matched);
   };
@@ -156,11 +179,11 @@ export function TapQuestion(props: TapQuestionProps) {
         add(
           noteMarker(
             { ...fretted(s, f), tone, role: tone.role },
-            ok ? 'correct' : inAnswer ? 'reveal' : 'wrong',
+            ok ? 'correct' : inAnswer ? 'reveal' : elsewhere ? 'shown' : 'wrong',
             p,
             {
               showRoles: true,
-              colored: !!ok || inAnswer,
+              colored: !!ok || inAnswer || elsewhere,
             },
           ),
         );
@@ -201,7 +224,7 @@ export function TapQuestion(props: TapQuestionProps) {
       ) : null}
       {grade ? (
         <FeedbackBar
-          state={grade.correct ? 'correct' : shown ? 'shown' : 'wrong'}
+          state={grade.correct ? 'correct' : shown || elsewhere ? 'shown' : 'wrong'}
           onNext={props.onNext}
           nextLabel={props.nextLabel}
         >
@@ -210,9 +233,11 @@ export function TapQuestion(props: TapQuestionProps) {
               ? '✓ Correct'
               : shown
                 ? 'Answer:'
-                : timedOut
-                  ? "⏱ Time's up"
-                  : '✕ Not quite'}
+                : elsewhere
+                  ? `Right chord, but ${props.nearby ? 'too far from' : 'outside'} ${formatWindow(props.region.window)}.`
+                  : timedOut
+                    ? "⏱ Time's up"
+                    : '✕ Not quite'}
           </strong>{' '}
           <span>{grade.message}</span>
         </FeedbackBar>

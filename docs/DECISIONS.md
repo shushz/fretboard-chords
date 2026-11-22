@@ -300,3 +300,15 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
 - The session row merged into the top bar. On narrow screens (< 480 px) the plain
   "Practice" title is hidden to make room; a drill's title is kept and ellipsised.
 - "End" renamed "End session" (clearer, and distinct from the progression walk's "Finish").
+
+## The fret window in grading (fix-window-grading)
+
+- Owner report: open Em (0-0-0) for iv in B minor, window frets 1–5, was marked "Not quite".
+- Fret 0 counts as inside a window starting at fret 1 ("frets 1–5" = first position).
+- From the tonic and Progression walk ask for a chord _near_ a shape, so they accept any
+  shape within the window ± 2 frets (`NEARBY_SLACK`). Smooth ✦ = movement no larger than
+  the smoothest in-window shape, so a smoother nearby shape also earns it.
+- Other modes keep the window strict (it's what's being drilled), but a right chord outside
+  it gets neutral feedback and the notes keep their role colours. It still counts as not
+  right for review.
+- Open strings still count towards the 4-fret span limit (unchanged).

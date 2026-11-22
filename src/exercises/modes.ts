@@ -14,14 +14,14 @@ export const MODES: ModeDef[] = [
     name: 'Find the chord',
     description: 'Tap a diatonic chord in a region of the neck',
     Runner: FindRunner,
-    help: 'You get a chord (e.g. “F♯m · iv · strings 2–4 · frets 5–9”). Tap its notes, one per string, inside the dashed region. Any correct shape counts; a miss shows every right shape with its roles. With the root anchor set to Required, tap the root on string 6 or 5 as well.',
+    help: 'You get a chord (e.g. “F♯m · iv · strings 2–4 · frets 5–9”). Tap its notes, one per string, inside the dashed region. Any correct shape inside it counts; the right chord somewhere else is pointed out but doesn’t count. A miss shows every right shape with its roles. With the root anchor set to Required, tap the root on string 6 or 5 as well.',
   },
   {
     id: 'fromTonic',
     name: 'From the tonic',
     description: 'From a shown I/i shape, find IV, V, vi… nearby',
     Runner: TonicRunner,
-    help: "You're shown and played the key's home chord (I or i). Find another chord of the key, e.g. the iv, close to it. Any correct shape counts; the one with the least movement earns Smooth ✦. This trains moving between chords instead of jumping around the neck.",
+    help: "You're shown and played the key's home chord (I or i). Find another chord of the key, e.g. the iv, close to it. Any correct shape in or within 2 frets of the dashed region counts; the one with the least movement earns Smooth ✦. This trains moving between chords instead of jumping around the neck.",
     SetupExtras: TonicSetup,
   },
   {
@@ -52,7 +52,7 @@ export const MODES: ModeDef[] = [
     name: 'Progression walk',
     description: 'Find each chord of a real progression, staying close to the last one',
     Runner: ProgressionRunner,
-    help: 'A real progression (e.g. i–iv–V–i) is played chord by chord: find each one, ideally close to the one before (it stays dimmed on the board). At the end you hear the progression as you played it. Tempo mode gives you a few beats per chord.',
+    help: 'A real progression (e.g. i–iv–V–i) is played chord by chord: find each one, ideally close to the one before (it stays dimmed on the board). Shapes in or within 2 frets of the dashed region count. At the end you hear the progression as you played it. Tempo mode gives you a few beats per chord.',
     SetupExtras: ProgressionSetup,
   },
   {

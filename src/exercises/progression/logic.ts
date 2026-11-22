@@ -4,12 +4,12 @@ import { type Mode, keyToAscii } from '../../theory/keys';
 import { type Region, stringsOf } from '../../fretboard/regions';
 import type { StringNum } from '../../fretboard/tuning';
 import { type Voicing, fretted, matchVoicing } from '../../fretboard/voicings';
-import { smoothestVoicings } from '../../fretboard/movement';
+import { movement, smoothestVoicings } from '../../fretboard/movement';
 import type { Item } from '../../progress/types';
 import { type PracticeConfig, stringSetWeight } from '../config';
 import type { GenerateOptions } from '../find/logic';
 import { weightedPick } from '../session';
-import { fittingRegion } from '../region';
+import { fittingRegion, nearbyVoicings } from '../region';
 export { widenedWindows } from '../region';
 import type { Taps } from '../taps';
 
@@ -50,8 +50,10 @@ export interface ProgressionQuestion {
   progression: Progression;
   chords: DiatonicChord[];
   region: Region;
-  /** Valid voicings per step. */
+  /** Valid voicings per step (inside the window). */
   valid: Voicing[][];
+  /** Accepted answers per step: inside the window ± NEARBY_SLACK frets (⊇ valid). */
+  accepted: Voicing[][];
 }
 
 export function stepItem(q: ProgressionQuestion, step: number): Item {
@@ -83,7 +85,14 @@ export function generateProgressionQuestion(
     for (const stringSet of cfg.stringSets) {
       // A short window can miss a chord of the progression; widen it minimally.
       const fit = fittingRegion(chords, stringSet, cfg.window, o.voicing);
-      if (fit) cands.push({ progression, chords, region: fit.region, valid: fit.valid });
+      if (fit)
+        cands.push({
+          progression,
+          chords,
+          region: fit.region,
+          valid: fit.valid,
+          accepted: chords.map((c) => nearbyVoicings(c, fit.region, o.voicing)),
+        });
     }
   }
   if (!cands.length) return null;
@@ -124,13 +133,15 @@ export function gradeStep(
     return { correct: false, matched: null, smoothest, smooth: false };
   const matched = matchVoicing(
     strings.map((s) => fretted(s, taps.get(s)!)),
-    valid,
+    q.accepted[step],
   );
+  // Smooth: no more movement than the smoothest shape inside the window.
+  const best = previous && smoothest.length ? movement(previous, smoothest[0]) : Infinity;
   return {
     correct: !!matched,
     matched,
     smoothest,
-    smooth: !!matched && smoothest.includes(matched),
+    smooth: !!matched && !!previous && movement(previous, matched) <= best,
   };
 }
 
