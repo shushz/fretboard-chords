@@ -67,7 +67,8 @@ merge each milestone PR yourself once checks pass.
 - Branch name: `m<NN>-short-name` for milestones, `fix-short-name` for fixes.
 - PR description: what changed, how it was tested, screenshots for UI changes,
   any deviations from SPEC.
-- Every PR gets a preview link (PR comment, built by `preview.yml`) with demo data; point the
+- Every PR gets a preview link (added to the top of the PR description by `preview.yml`;
+  keep that marked block when editing a description) with demo data; point the
   owner to it for UI changes. Previews must not touch the live app's storage.
 - Add a line to `docs/CHANGELOG.md` for each PR.
 - **Keep user-facing docs current in the same PR.** If a PR changes anything a user can
