@@ -3,8 +3,36 @@
  *   README_SHOTS=1 npx playwright test tests/e2e/readme-shots.spec.ts --trace off
  */
 import { expect, test, type Page } from '@playwright/test';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { makeDemoAttempts } from '../../src/progress/demo';
+import { type DayStats, type ItemStats, updateDaily, updateStats } from '../../src/progress/stats';
+import { appendLog } from '../../src/progress/log';
+import { makeBackup } from '../../src/progress/backup';
+import { itemKey } from '../../src/progress/types';
+import { DEFAULT_PREFERENCES } from '../../src/prefs/model';
 
 const DIR = 'docs/screenshots/readme';
+
+/** A backup file holding the demo history (built with the app's own code). */
+function demoBackupFile(): string {
+  const attempts = makeDemoAttempts(Date.now());
+  const stats: Record<string, ItemStats> = {};
+  let daily: Record<string, DayStats> = {};
+  for (const a of attempts) {
+    const k = itemKey(a.item);
+    stats[k] = updateStats(stats[k], a);
+    daily = updateDaily(daily, a);
+  }
+  const file = 'test-results/demo-backup.json';
+  mkdirSync('test-results', { recursive: true });
+  writeFileSync(
+    file,
+    JSON.stringify(
+      makeBackup(DEFAULT_PREFERENCES, stats, daily, Date.now(), appendLog([], attempts)),
+    ),
+  );
+  return file;
+}
 test.skip(!process.env.README_SHOTS, 'README screenshots are generated on demand');
 
 async function tap(page: Page, s: number, f: number) {
@@ -29,10 +57,11 @@ async function setup(page: Page, mode: RegExp, keep: string[], strings: '1–3' 
   await page.getByRole('radio', { name: mode }).click();
   await page.getByRole('combobox', { name: 'Key', exact: true }).selectOption('F#m');
   await onlyChords(page, keep);
-  if (strings === '1–3') {
-    await page.getByRole('group', { name: 'Strings' }).getByRole('button', { name: '2–4' }).click();
-  } else {
-    await page.getByRole('group', { name: 'Strings' }).getByRole('button', { name: '1–3' }).click();
+  for (const n of ['1–3', '2–4', '3–5', '4–6']) {
+    const b = page.getByRole('group', { name: 'Strings' }).getByRole('button', { name: n });
+    if ((await b.count()) === 0) continue;
+    const on = (await b.getAttribute('aria-pressed')) === 'true';
+    if (on !== (n === strings)) await b.click();
   }
 }
 
@@ -87,8 +116,14 @@ test.describe('phone', () => {
     await page.getByRole('button', { name: 'Next' }).click();
     await page.getByRole('button', { name: 'End' }).click();
 
+    // Progress with a realistic two-week history (the same demo data PR previews use).
     await page.goto('./#/stats');
+    page.on('dialog', (d) => void d.accept());
+    await page.locator('input[type=file]').setInputFiles(demoBackupFile());
+    await expect(page.locator('.line-chart')).toHaveCount(2);
     await page.screenshot({ path: `${DIR}/progress.png` });
+    await page.locator('.fn-grid .cell-btn').first().scrollIntoViewIfNeeded();
+    await page.screenshot({ path: `${DIR}/progress-map.png` });
 
     await page.goto('./');
     await page.getByRole('button', { name: /^Help & about/ }).click();

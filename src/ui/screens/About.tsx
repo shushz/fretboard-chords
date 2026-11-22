@@ -117,6 +117,19 @@ export function About() {
         </dl>
       </Section>
 
+      <Section title="Your progress">
+        <p>
+          <b>Progress</b> answers two questions. <i>Getting better?</i> charts each day you
+          practised: how often you were right and how long your right answers took, with a one-line
+          comparison of your recent days against earlier ones. Use the buttons at the top to look at
+          one mode. <i>What to practise</i> is a map: each row is a chord by its numeral across all
+          keys (iv in minor keys…), each column a group of strings, coloured by how often you've
+          been right lately. Tap a cell to see that chord's trend, then <b>Practise this</b> to
+          drill it. <i>Weakest items</i> and <b>Drill these</b> do the same for your ten weakest
+          items overall.
+        </p>
+      </Section>
+
       <Section title="Tips">
         <ul class="tips">
           <li>Turn the phone sideways for a bigger board with the question beside it.</li>
