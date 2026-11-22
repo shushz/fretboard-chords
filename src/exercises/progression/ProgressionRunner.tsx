@@ -113,6 +113,7 @@ export function ProgressionRunner(props: RunnerProps) {
       chord={chord}
       region={q.region}
       context={prevVoicing?.notes}
+      nearby
       requiredStrings={stepStrings(q)}
       timeLimitMs={limit}
       autoNextMs={last ? undefined : 700}

@@ -38,8 +38,12 @@ export function windowEnd(w: FretWindow): number {
   return w.start + w.width - 1;
 }
 
+/**
+ * Is `fret` inside the window? Open strings (fret 0) count as inside a window that starts at
+ * fret 1: "frets 1–5" is first position, open strings included.
+ */
 export function inWindow(fret: number, w: FretWindow): boolean {
-  return fret >= w.start && fret <= windowEnd(w);
+  return (fret >= w.start || (fret === 0 && w.start === 1)) && fret <= windowEnd(w);
 }
 
 export function formatWindow(w: FretWindow): string {

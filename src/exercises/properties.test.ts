@@ -102,7 +102,8 @@ function opts(p: Preferences, seed = 7) {
 function expectValidVoicings(vs: readonly Voicing[], windowStart: number, windowEndFret: number) {
   for (const v of vs) {
     for (const n of v.notes) {
-      expect(n.fret).toBeGreaterThanOrEqual(windowStart);
+      // Open strings count as inside a window starting at fret 1 (first position).
+      expect(n.fret).toBeGreaterThanOrEqual(windowStart === 1 ? 0 : windowStart);
       expect(n.fret).toBeLessThanOrEqual(windowEndFret);
     }
     expect(new Set(v.notes.map((n) => n.role)).size).toBe(v.notes.length);

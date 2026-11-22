@@ -2,7 +2,7 @@
 import { type Chord, type DiatonicChord, diatonicChord, isSeventh } from '../../theory/chords';
 import { keyToAscii } from '../../theory/keys';
 import type { Role } from '../../theory/roles';
-import { type FretWindow, type Region, stringsOf, windowEnd } from '../../fretboard/regions';
+import { type FretWindow, type Region, inWindow, stringsOf } from '../../fretboard/regions';
 import { type StringNum, fretsForPitchClass, pitchClassAt } from '../../fretboard/tuning';
 import { type Voicing } from '../../fretboard/voicings';
 import { pitchClass } from '../../theory/notes';
@@ -69,9 +69,7 @@ export function roleFrets(
 ): number[] {
   const tone = chord.tones.find((t) => t.role === role);
   if (!tone) return [];
-  return fretsForPitchClass(s, pitchClass(tone.note), maxFret).filter(
-    (f) => f >= w.start && f <= windowEnd(w),
-  );
+  return fretsForPitchClass(s, pitchClass(tone.note), maxFret).filter((f) => inWindow(f, w));
 }
 
 export function generateTonesQuestion(

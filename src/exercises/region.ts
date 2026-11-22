@@ -4,8 +4,22 @@
  * silently never asking for that chord, the window is widened minimally for that question.
  */
 import type { Chord } from '../theory/chords';
-import type { FretWindow, Region, StringSetId } from '../fretboard/regions';
-import { type Voicing, type VoicingOptions, voicingsInRegion } from '../fretboard/voicings';
+import {
+  type FretWindow,
+  type Region,
+  type StringSetId,
+  stringsOf,
+  windowEnd,
+} from '../fretboard/regions';
+import type { StringNum } from '../fretboard/tuning';
+import {
+  type Voicing,
+  type VoicingOptions,
+  enumerateVoicings,
+  fretted,
+  matchVoicing,
+  voicingsInRegion,
+} from '../fretboard/voicings';
 
 /**
  * Widen by at most this many frets. One fret is usually enough; five covers every diatonic
@@ -54,4 +68,49 @@ export function fittingRegion(
     if (valid.every((v) => v.length > 0)) return { region, valid, widened: w !== window };
   }
   return null;
+}
+
+/**
+ * Modes that ask for a chord *near* a given shape (From the tonic, Progression walk) also
+ * accept shapes up to this many frets outside the window: the point there is staying close,
+ * not the exact window.
+ */
+export const NEARBY_SLACK = 2;
+
+/** `w` grown by `slack` frets on each side, kept on the neck. */
+export function nearbyWindow(w: FretWindow, maxFret: number, slack = NEARBY_SLACK): FretWindow {
+  const start = Math.max(0, w.start - slack);
+  const end = Math.min(maxFret, windowEnd(w) + slack);
+  return { start, width: end - start + 1 };
+}
+
+/** Every shape of `chord` on the region's strings within the window ± NEARBY_SLACK frets. */
+export function nearbyVoicings(
+  chord: Chord,
+  region: Region,
+  voicing: VoicingOptions & { allowOutside?: boolean },
+): Voicing[] {
+  return voicingsInRegion(
+    chord,
+    { stringSet: region.stringSet, window: nearbyWindow(region.window, voicing.maxFret) },
+    { ...voicing, allowOutside: false },
+  );
+}
+
+/**
+ * The shape of `chord` the taps form on `stringSet`, anywhere on the neck, or null. Used to
+ * tell "right chord, wrong place" apart from a wrong chord.
+ */
+export function shapeAnywhere(
+  chord: Chord,
+  stringSet: StringSetId,
+  taps: ReadonlyMap<StringNum, number>,
+  voicing: VoicingOptions,
+): Voicing | null {
+  const strings = stringsOf(stringSet);
+  if (!strings.every((s) => taps.has(s))) return null;
+  return matchVoicing(
+    strings.map((s) => fretted(s, taps.get(s)!)),
+    enumerateVoicings(chord, stringSet, voicing),
+  );
 }

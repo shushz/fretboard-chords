@@ -15,12 +15,12 @@ import {
   matchVoicing,
   voicingId,
 } from '../../fretboard/voicings';
-import { smoothestVoicings } from '../../fretboard/movement';
+import { movement, smoothestVoicings } from '../../fretboard/movement';
 import type { Item } from '../../progress/types';
 import { type PracticeConfig, stringSetWeight } from '../config';
 import type { GenerateOptions } from '../find/logic';
 import { weightedPick } from '../session';
-import { fittingRegion } from '../region';
+import { fittingRegion, nearbyVoicings } from '../region';
 import type { Taps } from '../taps';
 
 export interface TonicQuestion {
@@ -28,7 +28,10 @@ export interface TonicQuestion {
   tonicVoicing: Voicing;
   target: DiatonicChord;
   region: Region;
+  /** Shapes inside the window. */
   valid: Voicing[];
+  /** Shapes accepted as answers: inside the window ± NEARBY_SLACK frets (⊇ valid). */
+  accepted: Voicing[];
   /** Valid voicings with minimal total movement from the tonic voicing. */
   smooth: Voicing[];
 }
@@ -106,6 +109,7 @@ export function generateTonicQuestion(
           target,
           region,
           valid,
+          accepted: nearbyVoicings(target, region, o.voicing),
           smooth: smoothestVoicings(tv, valid),
         };
         cands.push({ q, item: tonicItem(q) });
@@ -144,7 +148,14 @@ export function gradeTonic(
   if (!strings.every((s) => taps.has(s))) return { correct: false, matched: null, smooth: false };
   const matched = matchVoicing(
     strings.map((s) => fretted(s, taps.get(s)!)),
-    q.valid,
+    q.accepted,
   );
-  return { correct: !!matched, matched, smooth: !!matched && q.smooth.includes(matched) };
+  // Smooth: no more movement than the smoothest shape inside the window (a nearby shape
+  // just outside it can be as smooth, or smoother).
+  const best = q.smooth.length ? movement(q.tonicVoicing, q.smooth[0]) : Infinity;
+  return {
+    correct: !!matched,
+    matched,
+    smooth: !!matched && movement(q.tonicVoicing, matched) <= best,
+  };
 }

@@ -1,7 +1,14 @@
 import { type Chord, type ChordTone, isSeventh, toneForPitchClass } from '../theory/chords';
 import { pitchClass } from '../theory/notes';
 import { type Role, memberOf } from '../theory/roles';
-import { type FretWindow, type Region, type StringSetId, inWindow, stringsOf } from './regions';
+import {
+  type FretWindow,
+  type Region,
+  type StringSetId,
+  inWindow,
+  stringsOf,
+  windowEnd,
+} from './regions';
 import { type StringNum, fretsForPitchClass, midiAt, pitchClassAt } from './tuning';
 
 export interface FrettedNote {
@@ -155,7 +162,7 @@ export function fitsWindow(v: Voicing, w: FretWindow, allowOutside = false): boo
   for (const n of v.notes) {
     if (inWindow(n.fret, w)) continue;
     if (!allowOutside) return false;
-    const off = n.fret < w.start ? w.start - n.fret : n.fret - (w.start + w.width - 1);
+    const off = n.fret < w.start ? w.start - n.fret : n.fret - windowEnd(w);
     if (off > 1) return false;
     outside++;
   }

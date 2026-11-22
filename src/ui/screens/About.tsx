@@ -83,8 +83,11 @@ export function About() {
           </dd>
           <dt>Fret window</dt>
           <dd>
-            The frets you practise in, e.g. 5–9. If a chord has no shape fully inside the window,
-            the question widens it by a fret or two and says so.
+            The frets you practise in, e.g. 5–9. Open strings count as inside a window that starts
+            at fret 1. If a chord has no shape fully inside the window, the question widens it by a
+            fret or two and says so. Modes about staying close (From the tonic, Progression walk)
+            also accept shapes up to 2 frets outside it; elsewhere, the right chord played outside
+            the window is pointed out but doesn't count.
           </dd>
           <dt>Shapes and inversions</dt>
           <dd>

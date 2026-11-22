@@ -118,6 +118,11 @@ Each fretted note in a voicing carries its role.
 - **Voicing** = exactly one note per string of the set, containing every required
   chord tone, span ≤ 4 frets (configurable), all frets inside the window
   (optionally allow a note one fret outside the window, setting).
+  Open strings (fret 0) count as inside a window that starts at fret 1. From the tonic and
+  the progression walk, whose point is staying close, also accept shapes up to 2 frets
+  outside the window (Smooth still goes to the least movement). In other modes, the right
+  chord played outside the window gets neutral feedback ("Right chord, but outside frets
+  5–9") with no error sound; it counts as not right.
 - If a chord has no voicing inside the window on a string set, questions widen the window
   for that chord by the fewest frets needed (shown in the prompt) instead of never asking
   for it; reference views show the nearest shapes outside the window.

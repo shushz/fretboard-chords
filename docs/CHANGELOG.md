@@ -33,3 +33,4 @@
 - Docs: README screenshots and text updated for Help & about; standing rule (CLAUDE.md + PR template) to keep README screenshots and in-app help current in every PR.
 - README: Progress screenshots with demo data (charts and the What to practise map) and text for the redesign; Help & about gains a "Your progress" section; README shot setup made idempotent.
 - Session status (3 / 20, right answers, End session) moves into the top bar, freeing a row for the board; "End" renamed "End session". Show answer gives neutral feedback (no "Not quite", no error sound).
+- Grading and the fret window: open strings count inside windows starting at fret 1; From the tonic and Progression walk accept shapes up to 2 frets outside the window; elsewhere, the right chord outside the window gets neutral "Right chord, but outside frets …" feedback instead of "Not quite".
