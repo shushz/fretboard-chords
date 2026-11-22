@@ -30,3 +30,4 @@
 - Navigation & help: single Preferences entry, Back from Preferences returns to the session (unanswered question regenerated if settings changed), Help & about page with GitHub link, per-mode help, build version on Home.
 - Progress redesign: per-answer log, improvement charts per practice day with a recent-vs-earlier summary, chord-function × string-set practice map with Practise this.
 - PR previews: every PR gets a live preview link with its own storage and demo data; Pages now served from the gh-pages branch.
+- Docs: README screenshots and text updated for Help & about; standing rule (CLAUDE.md + PR template) to keep README screenshots and in-app help current in every PR.

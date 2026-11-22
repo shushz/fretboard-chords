@@ -89,6 +89,10 @@ test.describe('phone', () => {
 
     await page.goto('./#/stats');
     await page.screenshot({ path: `${DIR}/progress.png` });
+
+    await page.goto('./');
+    await page.getByRole('button', { name: /^Help & about/ }).click();
+    await page.screenshot({ path: `${DIR}/help.png` });
   });
 });
 
