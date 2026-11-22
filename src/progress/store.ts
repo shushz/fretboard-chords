@@ -1,6 +1,8 @@
 import { signal } from '@preact/signals';
-import { get, set } from 'idb-keyval';
-import { onAttempts } from './record';
+import { kvGet as get, kvSet as set } from '../storage';
+import { onAttempts, recordAttempts } from './record';
+import { IS_PREVIEW } from '../env';
+import { makeDemoAttempts } from './demo';
 import { type DayStats, type ItemStats, updateDaily, updateStats } from './stats';
 import { itemKey } from './types';
 
@@ -20,6 +22,15 @@ export async function loadProgress(): Promise<void> {
     /* IndexedDB unavailable: in-memory only */
   }
   progressLoaded.value = true;
+  // PR previews start with a demo history so Progress, reviews and drills have data.
+  if (IS_PREVIEW && Object.keys(stats.value).length === 0)
+    recordAttempts(makeDemoAttempts(Date.now()));
+}
+
+/** Previews only: replace everything with a fresh demo history. */
+export function resetDemoData(): void {
+  replaceProgress({}, {});
+  recordAttempts(makeDemoAttempts(Date.now()));
 }
 
 let pending: ReturnType<typeof setTimeout> | undefined;

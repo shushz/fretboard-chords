@@ -1,10 +1,11 @@
 /** Remember the last practice setup per device (a convenience, not a preference). */
 import type { Preferences } from '../prefs/model';
+import { localKey } from '../storage';
 import { keyToAscii, parseKeyName, resolveKey } from '../theory/keys';
 import type { PracticeConfig } from './config';
 import { MODES } from './modes';
 
-const KEY = 'fretboard-chords:lastSetup';
+const KEY = localKey('lastSetup');
 
 export function saveSetup(c: PracticeConfig): void {
   try {

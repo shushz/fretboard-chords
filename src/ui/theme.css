@@ -1053,3 +1053,22 @@ input {
 .no-fit {
   color: var(--text);
 }
+
+/* PR preview builds only */
+.preview-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 12px;
+  padding-top: env(safe-area-inset-top);
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.preview-bar a,
+.preview-bar .link {
+  color: inherit;
+  text-decoration: underline;
+}
