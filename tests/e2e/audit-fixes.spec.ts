@@ -130,7 +130,7 @@ test('progress: trend charts, chord-by-string-set map, practise a cell', async (
   await expect(page.getByRole('heading', { name: 'Getting better?' })).toBeVisible();
   await expect(page.locator('.line-chart')).toHaveCount(2);
   await expect(page.getByRole('heading', { name: 'What to practise' })).toBeVisible();
-  await expect(page.locator('.fn-grid thead')).toContainText(/1–3|2–4/); // questions pick either string set;
+  await expect(page.locator('.fn-grid thead')).toContainText(/1–3|2–4/); // questions pick either string set
   const cell = page.locator('.cell-btn').first();
   await cell.click();
   await expect(page.locator('.fn-chip')).toContainText('in minor keys');
