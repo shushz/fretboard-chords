@@ -27,12 +27,13 @@ test('attempts are recorded, persisted, exported, imported and reset', async ({ 
   }
   await page.getByRole('button', { name: 'End' }).click();
   await page.goto('./#/stats');
-  await expect(page.locator('.heat')).toContainText('F♯m');
-  await expect(page.locator('.heat')).toContainText('67%');
+  await expect(page.locator('.fn-grid')).toContainText('Minor keys');
+  await expect(page.locator('.fn-grid')).toContainText('67%');
+  await expect(page.locator('.line-chart')).toHaveCount(2);
   await expect(page.locator('.weak')).toContainText('F♯m · i · 1–3');
   await page.waitForTimeout(400);
   await page.reload();
-  await expect(page.locator('.heat')).toContainText('67%');
+  await expect(page.locator('.fn-grid')).toContainText('67%');
   await shot(page, 'm07-stats');
 
   const [download] = await Promise.all([
@@ -43,6 +44,7 @@ test('attempts are recorded, persisted, exported, imported and reset', async ({ 
   const json = JSON.parse(readFileSync(path!, 'utf8'));
   expect(json.app).toBe('fretboard-chords');
   expect(Object.keys(json.stats)).toHaveLength(1);
+  expect(json.log).toHaveLength(3);
 
   page.on('dialog', (d) => void d.accept());
   await page.getByRole('button', { name: 'Reset all progress' }).click();
@@ -50,5 +52,6 @@ test('attempts are recorded, persisted, exported, imported and reset', async ({ 
 
   await page.locator('input[type=file]').setInputFiles(path!);
   await expect(page.getByRole('status')).toContainText('Imported 1 items');
-  await expect(page.locator('.heat')).toContainText('67%');
+  await expect(page.locator('.fn-grid')).toContainText('67%');
+  await expect(page.locator('.line-chart')).toHaveCount(2);
 });

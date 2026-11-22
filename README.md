@@ -38,16 +38,19 @@ R–3–7 shells), in **one key or a random key** per question.
 
 ### Progress and review
 
-- Each answer is recorded per key, chord, string set and shape. The **Progress** screen
-  shows accuracy and speed as a key × degree grid, per string set and per mode, plus a
-  14-day trend and your streak.
+- **Getting better?** The Progress screen charts each day you practised: how often you were
+  right and how long right answers took, with a plain summary (“In your last 5 practice
+  days: 72% right (+23 points), 4.3 s per right answer (−1.0 s)…”). Filter by mode.
+- **What to practise:** a map of chords by numeral (across all keys) × string set, coloured
+  by recent accuracy. Tap a cell to see that chord's trend and practise it.
 - **Spaced repetition** steers questions toward what's due and what's weak. _Review due
   items_ and _Drill these_ (your 10 weakest items) run targeted sessions.
 - Export and import your progress as JSON. Everything stays on your device.
 
 <p>
-  <img src="docs/screenshots/readme/progression-walk-landscape.png" width="62%" alt="Progression walk in landscape: board on the left, the progression and feedback on the right">
-  <img src="docs/screenshots/readme/progress.png" width="24%" alt="Progress screen: streak, 14-day trend, key by degree grid">
+  <img src="docs/screenshots/readme/progression-walk-landscape.png" width="48%" alt="Progression walk in landscape: board on the left, the progression and feedback on the right">
+  <img src="docs/screenshots/readme/progress.png" width="24%" alt="Progress screen: summary, charts of right answers and answer time per practice day">
+  <img src="docs/screenshots/readme/progress-map.png" width="24%" alt="What to practise: chords by numeral × string set, coloured by recent accuracy">
 </p>
 
 ### Music details it gets right
