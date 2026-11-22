@@ -24,7 +24,7 @@ test('random key setup is remembered', async ({ page }) => {
   await page.goto('./#/practice');
   await page.getByRole('radio', { name: 'Random key' }).click();
   await page.getByRole('button', { name: /^Start/ }).click();
-  await page.getByRole('button', { name: 'End' }).click();
+  await page.getByRole('button', { name: 'End session' }).click();
   await page.goto('./');
   await page.reload();
   await page.goto('./#/practice');

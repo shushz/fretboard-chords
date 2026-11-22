@@ -239,7 +239,7 @@ for (const vp of VIEWPORTS) {
           const next = page.getByRole('button', { name: /^(Next|Next chord|Finish)$/ });
           await next.first().click();
           await visit(page, problems, pre, `${mode} next`);
-          await page.getByRole('button', { name: 'End' }).click();
+          await page.getByRole('button', { name: 'End session' }).click();
           await expect(page.getByText('Session complete')).toBeVisible();
           await visit(page, problems, pre, `${mode} summary`);
         }

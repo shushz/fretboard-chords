@@ -2,7 +2,7 @@ import { BoardFrame } from '../ui/BoardFrame';
 /** Shared UI for questions answered by tapping a voicing on the fretboard. */
 import type { ComponentChildren } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { feedback, playNote, strum } from '../audio/engine';
+import { feedback, playNote, revealSound, strum } from '../audio/engine';
 import { type Chord, toneForPitchClass } from '../theory/chords';
 import type { FretWindow, Region } from '../fretboard/regions';
 import { type StringNum, midiAt, pitchClassAt } from '../fretboard/tuning';
@@ -69,6 +69,7 @@ export function TapQuestion(props: TapQuestionProps) {
   const [taps, setTaps] = useState<Taps>(new Map());
   const [grade, setGrade] = useState<TapGrade | null>(null);
   const [timedOut, setTimedOut] = useState(false);
+  const [shown, setShown] = useState(false);
   const tapsRef = useRef<Taps>(taps);
   tapsRef.current = taps;
   const gradedRef = useRef(false);
@@ -93,7 +94,8 @@ export function TapQuestion(props: TapQuestionProps) {
     return () => clearTimeout(id);
   }, [grade]);
 
-  const submit = (t: Taps, gaveUp: boolean) => {
+  /** `reveal`: the user tapped Show answer (neutral feedback, still counts as not right). */
+  const submit = (t: Taps, gaveUp: boolean, reveal = false) => {
     if (gradedRef.current) return;
     gradedRef.current = true;
     const g0 = props.grade(t);
@@ -101,7 +103,11 @@ export function TapQuestion(props: TapQuestionProps) {
     setGrade(g);
     const timeMs = performance.now() - started.current;
     const v = g.matched ?? g.reveal[0];
-    feedback(g.correct, v ? v.notes.map((n) => n.midi) : []);
+    const midis = v ? v.notes.map((n) => n.midi) : [];
+    if (reveal) {
+      setShown(true);
+      revealSound(midis);
+    } else feedback(g.correct, midis);
     props.onGraded(g.correct, timeMs, g.matched);
   };
 
@@ -195,11 +201,19 @@ export function TapQuestion(props: TapQuestionProps) {
       ) : null}
       {grade ? (
         <FeedbackBar
-          state={grade.correct ? 'correct' : 'wrong'}
+          state={grade.correct ? 'correct' : shown ? 'shown' : 'wrong'}
           onNext={props.onNext}
           nextLabel={props.nextLabel}
         >
-          <strong>{grade.correct ? '✓ Correct' : timedOut ? "⏱ Time's up" : '✕ Not quite'}</strong>{' '}
+          <strong>
+            {grade.correct
+              ? '✓ Correct'
+              : shown
+                ? 'Answer:'
+                : timedOut
+                  ? "⏱ Time's up"
+                  : '✕ Not quite'}
+          </strong>{' '}
           <span>{grade.message}</span>
         </FeedbackBar>
       ) : (
@@ -218,7 +232,7 @@ export function TapQuestion(props: TapQuestionProps) {
             Clear
           </button>
           {props.extraActions}
-          <button type="button" class="btn secondary" onClick={() => submit(taps, true)}>
+          <button type="button" class="btn secondary" onClick={() => submit(taps, true, true)}>
             Show answer
           </button>
         </div>

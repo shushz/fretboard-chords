@@ -33,7 +33,7 @@ async function missThreeTimes(page: Page) {
     await page.getByRole('button', { name: 'Show answer' }).click();
     await page.getByRole('button', { name: 'Next' }).click();
   }
-  await page.getByRole('button', { name: 'End' }).click();
+  await page.getByRole('button', { name: 'End session' }).click();
   await page.waitForTimeout(400);
 }
 

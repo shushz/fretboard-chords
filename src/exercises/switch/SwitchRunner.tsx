@@ -1,6 +1,6 @@
 import { BoardFrame } from '../../ui/BoardFrame';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
-import { feedback, playNote, strum } from '../../audio/engine';
+import { feedback, playNote, revealSound, strum } from '../../audio/engine';
 import { buildChord, chordSymbol, qualityName } from '../../theory/chords';
 import { formatStringSet } from '../../fretboard/regions';
 import { type StringNum, midiAt } from '../../fretboard/tuning';
@@ -66,11 +66,13 @@ export function SwitchRunner(props: RunnerProps) {
 
   const grade = (ok: boolean, reason?: string, tap?: { s: StringNum; f: number }) => {
     setResult({ ok, reason, tap });
-    feedback(
-      ok,
-      after.map((n) => n.midi),
-    );
-    if (!ok) setTimeout(() => strum(after.map((n) => n.midi)), 700);
+    if (reason === 'shown') revealSound(after.map((n) => n.midi));
+    else
+      feedback(
+        ok,
+        after.map((n) => n.midi),
+      );
+    if (!ok && reason !== 'shown') setTimeout(() => strum(after.map((n) => n.midi)), 700);
     props.onGraded([
       {
         item: switchItem(q),
@@ -167,10 +169,12 @@ export function SwitchRunner(props: RunnerProps) {
       {result ? (
         <>
           <FeedbackBar
-            state={result.ok ? 'correct' : 'wrong'}
+            state={result.ok ? 'correct' : result.reason === 'shown' ? 'shown' : 'wrong'}
             onNext={!p.practice.switchNameChord || named ? props.onNext : undefined}
           >
-            <strong>{result.ok ? '✓ Correct' : '✕ Not quite'}</strong>{' '}
+            <strong>
+              {result.ok ? '✓ Correct' : result.reason === 'shown' ? 'Answer:' : '✕ Not quite'}
+            </strong>{' '}
             <span>
               {result.reason === 'moved-wrong-note' && 'That note stays. '}
               The {roleLabel(moved.role, p)} on string {moved.string} ({formatNote(moved.tone.note)}
@@ -212,7 +216,7 @@ export function SwitchRunner(props: RunnerProps) {
         </>
       ) : (
         <div class="actions">
-          <button type="button" class="btn secondary" onClick={() => grade(false)}>
+          <button type="button" class="btn secondary" onClick={() => grade(false, 'shown')}>
             Show answer
           </button>
         </div>

@@ -24,7 +24,7 @@ test('weak items can be drilled from the stats screen; due items offered on home
     await page.getByRole('button', { name: 'Show answer' }).click();
     await page.getByRole('button', { name: 'Next' }).click();
   }
-  await page.getByRole('button', { name: 'End' }).click();
+  await page.getByRole('button', { name: 'End session' }).click();
   await page.waitForTimeout(400);
 
   await page.goto('./');
@@ -33,7 +33,7 @@ test('weak items can be drilled from the stats screen; due items offered on home
 
   await page.goto('./#/stats');
   await page.getByRole('button', { name: 'Drill these' }).click();
-  await expect(page.locator('.drill-tag')).toHaveText('Weak spots');
+  await expect(page.locator('.topbar h1')).toHaveText('Weak spots');
   await expect(page.locator('.drill-item')).toHaveText('F♯m · i · 1–3');
   await expect(page.locator('.prompt-main')).toHaveText('F♯m · i');
   await tap(page, 1, 5);

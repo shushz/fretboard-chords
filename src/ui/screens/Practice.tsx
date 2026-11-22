@@ -31,6 +31,7 @@ import { navigate, route } from '../router';
 import type { Preferences } from '../../prefs/model';
 import { loadSetup, saveSetup } from '../../exercises/lastSetup';
 import { itemLabel } from '../../progress/labels';
+import { sessionHeader } from '../sessionHeader';
 
 interface Drill {
   title: string;
@@ -69,6 +70,37 @@ export function Practice() {
     prefsWhenLeft.current = null;
     if (before && before !== prefs.value && session?.phase === 'answering') setRegen((x) => x + 1);
   }, [visible]);
+  // Session status lives in the top bar while a question is on screen.
+  const running = visible && session !== null && session.phase !== 'done';
+  useEffect(() => {
+    if (!running || !session) {
+      sessionHeader.value = null;
+      return;
+    }
+    const sl = session.length;
+    const byChords = !drill && config.mode === 'progression';
+    const next = {
+      progress:
+        sl.kind === 'questions'
+          ? byChords
+            ? `${session.attempts.length} / ${sl.count} chords`
+            : `${session.index + 1} / ${sl.count}`
+          : `${Math.max(0, Math.ceil((sl.minutes * 60_000 - (Date.now() - session.startedAt)) / 60_000))} min left`,
+      correct: session.attempts.filter((a) => a.correct).length,
+      title: drill?.title,
+      finish: () => setSession((s) => (s ? finishSession(s) : s)),
+    };
+    // Only on change: App re-renders on this signal, which re-renders this screen.
+    const cur = sessionHeader.value;
+    if (
+      !cur ||
+      cur.progress !== next.progress ||
+      cur.correct !== next.correct ||
+      cur.title !== next.title
+    )
+      sessionHeader.value = next;
+  });
+  useEffect(() => () => void (sessionHeader.value = null), []);
   const prev = useRef<unknown>(null);
   const prevKey = useRef<Key | null>(null);
   const lastWindow = useRef<number | undefined>(undefined);
@@ -166,24 +198,9 @@ export function Practice() {
 
   const cfg = current.config;
   const mode = cfg ? modeDef(cfg.mode) : undefined;
-  const sl = session.length;
-  const progress =
-    sl.kind === 'questions'
-      ? byChords
-        ? `${session.attempts.length} / ${sl.count} chords`
-        : `${session.index + 1} / ${sl.count}`
-      : `${Math.max(0, Math.ceil((sl.minutes * 60_000 - (Date.now() - session.startedAt)) / 60_000))} min left`;
 
   return (
     <div class="practice">
-      <div class="session-bar">
-        <span class="session-progress">{progress}</span>
-        {drill && <span class="drill-tag">{drill.title}</span>}
-        <span class="session-score">{session.attempts.filter((a) => a.correct).length} ✓</span>
-        <button type="button" class="link" onClick={() => setSession(finishSession(session))}>
-          End
-        </button>
-      </div>
       {drill && current.item && <div class="drill-item muted">{itemLabel(current.item, p)}</div>}
       {mode && cfg && (
         <mode.Runner
