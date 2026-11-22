@@ -1,5 +1,7 @@
 import { route, navigate, goBack, isKeptAlive, type Route } from './router';
 import { prefs, editPreferences } from '../prefs/store';
+import { IS_PREVIEW, PREVIEW_PR } from '../env';
+import { resetDemoData } from '../progress/store';
 import { Home } from './screens/Home';
 import { Explore } from './screens/Explore';
 import { PreferencesScreen } from './screens/PreferencesScreen';
@@ -20,6 +22,7 @@ export function App() {
   const r = route.value;
   return (
     <div class="app">
+      {IS_PREVIEW && <PreviewBar />}
       <header class="topbar">
         {r !== 'home' ? (
           <button type="button" class="icon-btn" aria-label="Back" onClick={goBack}>
@@ -69,6 +72,28 @@ export function App() {
         {r === 'stats' && <Stats />}
         {r === 'about' && <About />}
       </main>
+    </div>
+  );
+}
+
+/** Previews only: which PR this is, and a way back to fresh demo data. */
+function PreviewBar() {
+  return (
+    <div class="preview-bar" role="note">
+      <span>
+        Preview of{' '}
+        <a
+          href={`https://github.com/shushz/fretboard-chords/pull/${PREVIEW_PR}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          PR #{PREVIEW_PR}
+        </a>{' '}
+        · demo data
+      </span>
+      <button type="button" class="link" onClick={resetDemoData}>
+        Reset demo data
+      </button>
     </div>
   );
 }

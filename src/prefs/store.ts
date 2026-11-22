@@ -1,5 +1,5 @@
 import { signal } from '@preact/signals';
-import { get, set } from 'idb-keyval';
+import { kvGet as get, kvSet as set } from '../storage';
 import {
   DEFAULT_PREFERENCES,
   type Preferences,

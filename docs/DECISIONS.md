@@ -280,3 +280,15 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   explanation; "By string set" and "By mode" lists were folded into the map and filters.
   Trends start with this version (older answers weren't logged individually); streak and
   minutes still use the daily totals.
+- **2026-11-22 — PR previews** (owner request: a user-friendly way to evaluate a PR). Every
+  pull request is built and published at
+  `https://shushz.github.io/fretboard-chords/pr-preview/pr-<n>/` and the link is commented on
+  the PR (`.github/workflows/preview.yml`, `rossjrw/pr-preview-action`); it's removed when
+  the PR closes. To host previews next to the live app, Pages now serves the `gh-pages`
+  branch: `deploy.yml` publishes `main` to its root and leaves `pr-preview/` alone
+  (Settings → Pages → Source: Deploy from a branch, `gh-pages`, `/`). Previews share the
+  origin with the live app, so each uses its own IndexedDB database and localStorage
+  prefix (the live app keeps its existing storage), has no service worker, starts with
+  about two weeks of demo practice (`progress/demo.ts`, fed through the normal recording
+  path), and shows a banner naming the PR with a "Reset demo data" button. The live app's
+  service worker ignores `/pr-preview/` paths.
