@@ -66,6 +66,10 @@ export function Setup(props: {
           ))}
         </div>
         <p class="mode-desc">{MODES.find((m) => m.id === c.mode)?.description}</p>
+        <details class="mode-help">
+          <summary>How it works</summary>
+          <p>{MODES.find((m) => m.id === c.mode)?.help}</p>
+        </details>
         {(() => {
           const Extras = MODES.find((m) => m.id === c.mode)?.SetupExtras;
           return Extras ? <Extras config={c} onChange={props.onChange} /> : null;

@@ -22,6 +22,8 @@ export interface ModeDef {
   id: ModeId;
   name: string;
   description: string;
+  /** A few sentences on how the mode works, for setup and Help. */
+  help: string;
   Runner: FunctionComponent<RunnerProps>;
   /** Mode-specific setup controls. */
   SetupExtras?: FunctionComponent<{

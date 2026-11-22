@@ -61,10 +61,14 @@ R–3–7 shells), in **one key or a random key** per question.
   strum when you're right, a muted thunk when you're not.
 - **Hints you control.** Role labels and colours on a given shape can be hidden, since
   they give the answer away.
+- **Help built in.** _Help & about_ explains getting started, the main ideas (roles,
+  numerals, string sets, inversions, anchors…) and every mode; each mode's setup has a
+  short _How it works_.
 
 <p>
   <img src="docs/screenshots/readme/quality-switch-dark.png" width="24%" alt="Quality switch in dark mode: D major turned minor by moving the 3rd down a fret">
   <img src="docs/screenshots/readme/home.png" width="24%" alt="Home screen">
+  <img src="docs/screenshots/readme/help.png" width="24%" alt="Help & about: getting started, the main ideas, every mode">
 </p>
 
 ## Development

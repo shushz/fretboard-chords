@@ -1,4 +1,4 @@
-import { route, navigate, type Route } from './router';
+import { route, navigate, goBack, isKeptAlive, type Route } from './router';
 import { prefs, editPreferences } from '../prefs/store';
 import { IS_PREVIEW, PREVIEW_PR } from '../env';
 import { resetDemoData } from '../progress/store';
@@ -7,6 +7,7 @@ import { Explore } from './screens/Explore';
 import { PreferencesScreen } from './screens/PreferencesScreen';
 import { Practice } from './screens/Practice';
 import { Stats } from './screens/Stats';
+import { About } from './screens/About';
 
 const TITLES: Record<Route, string> = {
   home: 'Fretboard Chords',
@@ -14,6 +15,7 @@ const TITLES: Record<Route, string> = {
   prefs: 'Preferences',
   practice: 'Practice',
   stats: 'Progress',
+  about: 'Help & about',
 };
 
 export function App() {
@@ -23,7 +25,7 @@ export function App() {
       {IS_PREVIEW && <PreviewBar />}
       <header class="topbar">
         {r !== 'home' ? (
-          <button type="button" class="icon-btn" aria-label="Back" onClick={() => navigate('home')}>
+          <button type="button" class="icon-btn" aria-label="Back" onClick={goBack}>
             ‹
           </button>
         ) : (
@@ -54,10 +56,21 @@ export function App() {
       </header>
       <main class="screen">
         {r === 'home' && <Home />}
-        {r === 'explore' && <Explore />}
+        {/* A practice session or the explorer stays alive underneath Preferences / Help,
+            so Back returns to exactly where you were. */}
+        {isKeptAlive('explore') && (
+          <div hidden={r !== 'explore'}>
+            <Explore />
+          </div>
+        )}
+        {isKeptAlive('practice') && (
+          <div hidden={r !== 'practice'}>
+            <Practice />
+          </div>
+        )}
         {r === 'prefs' && <PreferencesScreen />}
-        {r === 'practice' && <Practice />}
         {r === 'stats' && <Stats />}
+        {r === 'about' && <About />}
       </main>
     </div>
   );

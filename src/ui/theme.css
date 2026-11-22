@@ -1054,6 +1054,83 @@ input {
   color: var(--text);
 }
 
+/* Help & about, home extras */
+.version {
+  margin: 20px 4px 4px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.version a,
+.about a {
+  color: var(--accent);
+}
+/* standalone link in the home footer: full-size tap area */
+.home .version a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
+}
+.mode-help {
+  margin: 0 2px 8px;
+}
+.mode-help summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+.mode-help p {
+  margin: 0 0 6px;
+  line-height: 1.45;
+}
+.about .card p,
+.about li,
+.about dd {
+  line-height: 1.5;
+}
+.steps,
+.tips {
+  margin: 0;
+  padding-left: 22px;
+  display: grid;
+  gap: 8px;
+}
+.glossary {
+  margin: 0;
+  display: grid;
+  gap: 4px;
+}
+.glossary dt {
+  font-weight: 700;
+  margin-top: 8px;
+}
+.glossary dd {
+  margin: 0;
+}
+.role-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0;
+}
+.role-chip {
+  min-width: 32px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.link.inline {
+  min-height: 0;
+  min-width: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+}
 /* PR preview builds only */
 .preview-bar {
   display: flex;

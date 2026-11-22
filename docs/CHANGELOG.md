@@ -27,4 +27,6 @@
 - Docs: README with screenshots, MIT license, package metadata; README screenshots regenerate with README_SHOTS=1. Fix: progression-walk counter shows chords done ("2 / 20 chords").
 - Fix: Name the chord options all share the answer's quality, the tonic isn't asked, misspelling pairs don't reveal the answer.
 - Name the chord: new "scale degree → chord" question type that tests root and quality together.
+- Navigation & help: single Preferences entry, Back from Preferences returns to the session (unanswered question regenerated if settings changed), Help & about page with GitHub link, per-mode help, build version on Home.
 - PR previews: every PR gets a live preview link with its own storage and demo data; Pages now served from the gh-pages branch.
+- Docs: README screenshots and text updated for Help & about; standing rule (CLAUDE.md + PR template) to keep README screenshots and in-app help current in every PR.

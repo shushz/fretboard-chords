@@ -70,6 +70,18 @@ merge each milestone PR yourself once checks pass.
 - Every PR gets a preview link (PR comment, built by `preview.yml`) with demo data; point the
   owner to it for UI changes. Previews must not touch the live app's storage.
 - Add a line to `docs/CHANGELOG.md` for each PR.
+- **Keep user-facing docs current in the same PR.** If a PR changes anything a user can
+  see or do, the same PR must:
+  1. Regenerate the README screenshots (`npm run build && README_SHOTS=1 npx playwright
+test tests/e2e/readme-shots.spec.ts --trace off`), extending
+     `tests/e2e/readme-shots.spec.ts` when a new screen or feature deserves a shot, look at
+     them, and update the README text that describes the change.
+  2. Update the in-app help: _Help & about_ (`src/ui/screens/About.tsx`) and the mode's
+     `description` / `help` in `src/exercises/modes.ts`, so they describe the app as it is
+     after the PR (screens, names of buttons and settings, behaviour).
+  3. Tick both in the PR template's checklist (`.github/pull_request_template.md`).
+     Stacked PRs: each PR's README and help match that PR; regenerate again after merging a
+     base branch in.
 - If you find a spec gap or ambiguity, make a reasonable choice, document it in the PR,
   and propose a SPEC.md edit in the same PR.
 

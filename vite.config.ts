@@ -2,6 +2,18 @@
 import { defineConfig } from 'vite';
 import preact from '@preact/preset-vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { execSync } from 'node:child_process';
+
+/** Version shown in the app: build time + short commit (when built from git). */
+function commit(): string {
+  try {
+    return execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] })
+      .toString()
+      .trim();
+  } catch {
+    return '';
+  }
+}
 
 /**
  * The live app is served at /fretboard-chords/. PR previews are built with
@@ -14,6 +26,8 @@ const previewPr = process.env.PREVIEW_PR || '';
 export default defineConfig({
   base,
   define: {
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+    __BUILD_COMMIT__: JSON.stringify(commit()),
     __PREVIEW_PR__: JSON.stringify(previewPr),
   },
   plugins: [

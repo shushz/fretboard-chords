@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { prefs } from '../../prefs/store';
 import { stats } from '../../progress/store';
 import { type PracticeConfig, concreteConfig, defaultConfig } from '../../exercises/config';
@@ -27,7 +27,8 @@ import { makeItemWeight } from '../../progress/srs';
 import { recordAttempts } from '../../progress/record';
 import type { Attempt, Item } from '../../progress/types';
 import { keyFromAscii } from '../pickers';
-import { navigate } from '../router';
+import { navigate, route } from '../router';
+import type { Preferences } from '../../prefs/model';
 import { loadSetup, saveSetup } from '../../exercises/lastSetup';
 import { itemLabel } from '../../progress/labels';
 
@@ -54,6 +55,20 @@ export function Practice() {
   );
   const [notice, setNotice] = useState<string | null>(null);
   const [retry, setRetry] = useState(0);
+  // Back from Preferences: the session is kept alive underneath. If settings changed while
+  // the current question was unanswered, it may no longer be valid: ask a fresh one.
+  const [regen, setRegen] = useState(0);
+  const prefsWhenLeft = useRef<Preferences | null>(null);
+  const visible = route.value === 'practice';
+  useEffect(() => {
+    if (!visible) {
+      prefsWhenLeft.current ??= prefs.value;
+      return;
+    }
+    const before = prefsWhenLeft.current;
+    prefsWhenLeft.current = null;
+    if (before && before !== prefs.value && session?.phase === 'answering') setRegen((x) => x + 1);
+  }, [visible]);
   const prev = useRef<unknown>(null);
   const prevKey = useRef<Key | null>(null);
   const lastWindow = useRef<number | undefined>(undefined);
@@ -105,7 +120,7 @@ export function Practice() {
         Math.random,
       ),
     };
-  }, [index, retry, drill, session === null]);
+  }, [index, retry, regen, drill, session === null]);
 
   if (!session) {
     return (
@@ -172,7 +187,7 @@ export function Practice() {
       {drill && current.item && <div class="drill-item muted">{itemLabel(current.item, p)}</div>}
       {mode && cfg && (
         <mode.Runner
-          key={`${session.index}:${retry}`}
+          key={`${session.index}:${retry}:${regen}`}
           config={cfg}
           prefs={p}
           prev={prev}
