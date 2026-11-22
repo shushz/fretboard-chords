@@ -256,3 +256,13 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   (natural v / harmonic V), which would be arguable rather than wrong; it uses ° / ø7.
   Setup "Question type": Numeral → chord, Scale degree → chord, Chord → numeral, Mix
   (default). Degrees are counted on the natural-minor scale in minor keys.
+- **2026-11-22 — Navigation and help** (owner requests). Home no longer has a second
+  Preferences entry (the gear is the one way in, on every screen). Preferences and the new
+  Help & about page open "on top": the practice session or the chord explorer stays alive
+  underneath and Back returns to it; if a setting changed while a question was unanswered,
+  that question is regenerated with the new settings. Help & about covers getting started,
+  the main ideas (roles, numerals, string sets, fret window, inversions, anchors, Smooth,
+  review/mastery), every mode, tips, privacy, and contact via GitHub issues; each mode's
+  setup also has a "How it works" note. No welcome card or pop-ups (owner: annoying).
+  Version = build time + short commit, stamped at build (`__BUILD_TIME__`,
+  `__BUILD_COMMIT__`), shown in small print on Home and in Help & about.

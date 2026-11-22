@@ -62,6 +62,8 @@ async function checkScreen(page: Page, screen: string): Promise<Problem[]> {
     );
     for (const el of targets) {
       if (!visible(el)) continue;
+      // Links inside a sentence are exempt from target size (WCAG 2.5.8 "inline" exception).
+      if (el.matches('p a, li a, dd a, p .link.inline, li .link.inline')) continue;
       const r = el.getBoundingClientRect();
       // SVG cells are scaled with the board; allow 1px rounding
       if (r.width < 43.5 || r.height < 43.5)
@@ -213,6 +215,8 @@ for (const vp of VIEWPORTS) {
         await visit(page, problems, pre, 'prefs');
         await page.goto('./#/stats');
         await visit(page, problems, pre, 'stats-empty');
+        await page.goto('./#/about');
+        await visit(page, problems, pre, 'about');
         await page.goto('./#/explore');
         await visit(page, problems, pre, 'explore');
         await page.getByRole('button', { name: 'V', exact: true }).click();

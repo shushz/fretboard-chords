@@ -1,4 +1,5 @@
 import { navigate } from '../router';
+import { REPO_URL, versionLabel } from '../../version';
 import { stats } from '../../progress/store';
 import { dueItems } from '../../progress/srs';
 import { pendingDrill } from '../../exercises/drillState';
@@ -36,17 +37,23 @@ export function Home() {
         )}
         <button type="button" class="menu-item" onClick={() => navigate('stats')}>
           <strong>Progress</strong>
-          <span>Accuracy and speed per key, degree and string set; backup</span>
+          <span>How you're improving, and what to practise next</span>
         </button>
         <button type="button" class="menu-item" onClick={() => navigate('explore')}>
           <strong>Chord explorer</strong>
           <span>See every voicing of a diatonic chord in a region</span>
         </button>
-        <button type="button" class="menu-item" onClick={() => navigate('prefs')}>
-          <strong>Preferences</strong>
-          <span>Spelling, harmony, fretboard, practice, sound &amp; look</span>
+        <button type="button" class="menu-item" onClick={() => navigate('about')}>
+          <strong>Help &amp; about</strong>
+          <span>How it works, the main ideas, contact</span>
         </button>
       </nav>
+      <p class="version">
+        {versionLabel()} ·{' '}
+        <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
+          Source on GitHub
+        </a>
+      </p>
     </div>
   );
 }
