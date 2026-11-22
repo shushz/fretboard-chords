@@ -1,6 +1,7 @@
+import { Fragment } from 'preact';
 import { useState } from 'preact/hooks';
 import { prefs, setPreferences } from '../../prefs/store';
-import { daily, replaceProgress, stats } from '../../progress/store';
+import { answerLog, daily, replaceProgress, stats } from '../../progress/store';
 import {
   type ItemStats,
   aggAccuracy,
@@ -13,19 +14,29 @@ import {
   rollingAccuracy,
   streak,
   totalMinutes,
-  trend,
   weakest,
 } from '../../progress/stats';
 import { makeBackup, parseBackup, withoutKey } from '../../progress/backup';
-import { MODE_NAMES, degreeLabel, itemLabel, keyLabel } from '../../progress/labels';
+import {
+  type ChordFunction,
+  type TrendFilter,
+  type TrendPoint,
+  compareRecent,
+  dailyTrend,
+  functionKey,
+  functionOf,
+} from '../../progress/log';
+import { MODE_NAMES, itemLabel, keyLabel } from '../../progress/labels';
 import { type ModeId, parseItemKey } from '../../progress/types';
 import type { Preferences } from '../../prefs/model';
 import { Section } from '../controls';
-import { parseKeyName } from '../../theory/keys';
-import { type DegreeIndex, chordNumeral, diatonicChord } from '../../theory/chords';
+import { key as makeKey, scale } from '../../theory/keys';
+import { note } from '../../theory/notes';
+import { type DegreeIndex, type Quality, romanNumeral } from '../../theory/chords';
 import { numeralOptions } from '../../prefs/model';
 import { readableTextOn } from '../contrast';
 import { pendingDrill } from '../../exercises/drillState';
+import { MODES } from '../../exercises/modes';
 import { navigate } from '../router';
 
 function pct(x: number | null): string {
@@ -57,6 +68,18 @@ function hslHex(h: number, s: number, l: number): string {
   );
 }
 
+/** "iv" for a chord function, using C major / A minor as a neutral reference key. */
+function functionNumeral(f: ChordFunction): string {
+  const ref = f.keyMode === 'major' ? makeKey(note('C'), 'major') : makeKey(note('A'), 'minor');
+  const d = f.degree as DegreeIndex;
+  return romanNumeral(ref, d, scale(ref)[d], f.quality as Quality, numeralOptions());
+}
+
+function functionLabel(f: ChordFunction): string {
+  const set = f.stringSet === '*' ? '' : ` · strings ${f.stringSet.replace('-', '–')}`;
+  return `${functionNumeral(f)} in ${f.keyMode} keys${set}`;
+}
+
 export function Stats() {
   const p = prefs.value;
   const s = stats.value;
@@ -72,6 +95,10 @@ export function Stats() {
     isMastered(x, thresholds, isSeventhItem(parseItemKey(x.key))),
   ).length;
   const total = items.reduce((a, x) => a + x.attempts, 0);
+  const [mode, setMode] = useState<ModeId | null>(null);
+  const [fn, setFn] = useState<ChordFunction | null>(null);
+  const filter: TrendFilter = { mode: mode ?? undefined, fn: fn ?? undefined };
+  const modesUsed = MODES.filter((m) => items.some((x) => parseItemKey(x.key).mode === m.id));
 
   return (
     <div class="stats">
@@ -83,7 +110,7 @@ export function Stats() {
           </div>
           <div>
             <strong>{Math.round(totalMinutes(d))}</strong>
-            <span>minutes</span>
+            <span>minutes practised</span>
           </div>
           <div>
             <strong>
@@ -92,6 +119,11 @@ export function Stats() {
             <span>items mastered</span>
           </div>
         </div>
+        <p class="explain">
+          An <i>item</i> is one chord in one key, on one string set, in one mode. It's mastered at{' '}
+          {Math.round(p.practice.masteryAccuracy * 100)} % right over its last 10 tries, answered in
+          under {(p.practice.masteryTimeTriadMs / 1000).toFixed(1)} s.
+        </p>
       </section>
       {total === 0 ? (
         <p class="muted empty">
@@ -99,19 +131,37 @@ export function Stats() {
         </p>
       ) : (
         <>
-          <Trend daily={d} now={now} />
-          <HeatGrid stats={s} p={p} />
-          <Breakdown
-            title="By string set"
-            groups={groupBy(s, (i) => (i.stringSet === '*' ? null : i.stringSet))}
-            label={(k) => k.replace('-', '–')}
-          />
-          <Breakdown
-            title="By mode"
-            groups={groupBy(s, (i) => i.mode)}
-            label={(k) => MODE_NAMES[k as ModeId] ?? k}
-          />
+          <div class="filter-row" role="group" aria-label="Show">
+            <button
+              type="button"
+              class={`chip${mode === null ? ' on' : ''}`}
+              aria-pressed={mode === null}
+              onClick={() => {
+                setMode(null);
+                setFn(null);
+              }}
+            >
+              All modes
+            </button>
+            {modesUsed.map((m) => (
+              <button
+                type="button"
+                key={m.id}
+                class={`chip${mode === m.id ? ' on' : ''}`}
+                aria-pressed={mode === m.id}
+                onClick={() => {
+                  setMode(m.id);
+                  setFn(null);
+                }}
+              >
+                {m.name}
+              </button>
+            ))}
+          </div>
+          <Improvement filter={filter} fn={fn} onClearFn={() => setFn(null)} />
+          <WhatToPractise stats={s} mode={mode} selected={fn} onSelect={setFn} />
           <Weakest stats={s} p={p} />
+          <ByKey stats={s} p={p} />
         </>
       )}
       <Backup />
@@ -119,134 +169,322 @@ export function Stats() {
   );
 }
 
-function Trend(props: { daily: typeof daily.value; now: number }) {
-  const t = trend(props.daily, props.now, 14);
-  const max = Math.max(1, ...t.map((x) => x.attempts));
-  const W = 14 * 22;
+function Improvement(props: {
+  filter: TrendFilter;
+  fn: ChordFunction | null;
+  onClearFn: () => void;
+}) {
+  const pts = dailyTrend(answerLog.value, props.filter, 30);
+  const cmp = compareRecent(answerLog.value, props.filter, 7);
+  const [picked, setPicked] = useState<number | null>(null);
+  const sel = picked !== null && picked < pts.length ? pts[picked] : null;
   return (
-    <Section title="Last 14 days">
-      <svg
-        class="trend"
-        viewBox={`0 0 ${W} 80`}
-        role="img"
-        aria-label="Questions per day, coloured by accuracy"
-      >
-        {t.map((x, i) => {
-          const h = (x.attempts / max) * 64;
-          return (
-            <g key={x.day}>
-              <rect
-                x={i * 22 + 3}
-                y={70 - h}
-                width="16"
-                height={Math.max(h, 1)}
-                rx="3"
-                fill={x.attempts ? heat(x.accuracy) : 'var(--border)'}
-              >
-                <title>
-                  {x.day}: {x.attempts} questions, {pct(x.accuracy)}
-                </title>
-              </rect>
-              <text x={i * 22 + 11} y="79" class="trend-label">
-                {x.day.slice(8)}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
+    <Section title="Getting better?">
+      <p class="explain">
+        How you did on each day you practised (days off are skipped): the share of right answers,
+        and how long your right answers took.
+        {props.fn ? ' Showing one chord across all keys.' : ''}
+      </p>
+      {props.fn && (
+        <button type="button" class="chip on fn-chip" onClick={props.onClearFn}>
+          {functionLabel(props.fn)} ✕
+        </button>
+      )}
+      {pts.length === 0 ? (
+        <p class="muted">
+          Nothing to show yet for this selection. Trends build up from now on as you practise.
+        </p>
+      ) : (
+        <>
+          {cmp && <p class="trend-summary">{describeComparison(cmp)}</p>}
+          <LineChart
+            title="Right answers"
+            points={pts}
+            value={(x) => x.accuracy}
+            max={1}
+            ticks={[0, 0.5, 1]}
+            format={(v) => `${Math.round(v * 100)}%`}
+            picked={picked}
+            onPick={setPicked}
+          />
+          <LineChart
+            title="Time per right answer (median)"
+            points={pts}
+            value={(x) => (x.medianMs === null ? null : x.medianMs / 1000)}
+            max={niceMax(Math.max(1, ...pts.map((x) => (x.medianMs ?? 0) / 1000)))}
+            ticks={null}
+            format={(v) => `${v.toFixed(1)} s`}
+            picked={picked}
+            onPick={setPicked}
+          />
+          <p class="chart-readout" aria-live="polite">
+            {sel
+              ? `${formatDay(sel.day)}: ${sel.answers} answers, ${pct(sel.accuracy)} right, ${secs(sel.medianMs)} per right answer`
+              : 'Tap a point to see that day.'}
+          </p>
+        </>
+      )}
     </Section>
   );
 }
 
-function HeatGrid(props: { stats: Record<string, ItemStats>; p: Preferences }) {
-  const byKey = groupBy(props.stats, (i) => i.key);
-  const keys = [...byKey.keys()].sort();
+function describeComparison(c: NonNullable<ReturnType<typeof compareRecent>>): string {
+  const span = c.days === 1 ? 'your last practice day' : `your last ${c.days} practice days`;
+  const prev = c.days === 1 ? 'the day before' : `the ${c.days} before`;
+  const acc = Math.round((c.after.accuracy - c.before.accuracy) * 100);
+  const parts = [`${pct(c.after.accuracy)} right (${acc >= 0 ? '+' : '−'}${Math.abs(acc)} points)`];
+  if (c.after.medianMs !== null && c.before.medianMs !== null) {
+    const dt = (c.after.medianMs - c.before.medianMs) / 1000;
+    parts.push(
+      `${secs(c.after.medianMs)} per right answer (${dt <= 0 ? '−' : '+'}${Math.abs(dt).toFixed(1)} s)`,
+    );
+  }
+  return `In ${span}: ${parts.join(', ')}, compared with ${prev}.`;
+}
+
+function niceMax(v: number): number {
+  for (const m of [1, 2, 3, 4, 5, 6, 8, 10, 15, 20, 30, 60]) if (v <= m) return m;
+  return Math.ceil(v / 10) * 10;
+}
+
+function formatDay(day: string): string {
+  const [y, m, dd] = day.split('-').map(Number);
+  return new Date(y, m - 1, dd).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+}
+
+/** One series, one axis. Points are tappable; the readout below names the picked day. */
+function LineChart(props: {
+  title: string;
+  points: TrendPoint[];
+  value: (p: TrendPoint) => number | null;
+  max: number;
+  ticks: number[] | null;
+  format: (v: number) => string;
+  picked: number | null;
+  onPick: (i: number) => void;
+}) {
+  const W = 320;
+  const H = 110;
+  const L = 40;
+  const R = 10;
+  const T = 8;
+  const B = 22;
+  const n = props.points.length;
+  const x = (i: number) => (n === 1 ? (L + W - R) / 2 : L + (i * (W - L - R)) / (n - 1));
+  const y = (v: number) => T + (1 - v / props.max) * (H - T - B);
+  const ticks = props.ticks ?? [0, props.max / 2, props.max];
+  const vals = props.points.map(props.value);
+  const path = vals
+    .map((v, i) => (v === null ? null : `${x(i).toFixed(1)},${y(v).toFixed(1)}`))
+    .filter(Boolean)
+    .join(' ');
   return (
-    <Section title="Keys × degrees (accuracy · median time)">
+    <figure class="line-chart">
+      <figcaption>{props.title}</figcaption>
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${props.title} per practice day`}>
+        {ticks.map((t) => (
+          <g key={t}>
+            <line class="grid" x1={L} x2={W - R} y1={y(t)} y2={y(t)} />
+            <text class="tick" x={L - 6} y={y(t)} dy="0.35em">
+              {props.format(t)}
+            </text>
+          </g>
+        ))}
+        <text class="tick" x={x(0)} y={H - 6} text-anchor={n === 1 ? 'middle' : 'start'}>
+          {formatDay(props.points[0].day)}
+        </text>
+        {n > 1 && (
+          <text class="tick" x={x(n - 1)} y={H - 6} text-anchor="end">
+            {formatDay(props.points[n - 1].day)}
+          </text>
+        )}
+        <polyline class="series" points={path} />
+        {props.points.map((pt, i) => {
+          const v = vals[i];
+          if (v === null) return null;
+          return (
+            <g key={pt.day}>
+              <circle
+                class={`dot${props.picked === i ? ' picked' : ''}${pt.answers < 5 ? ' thin' : ''}`}
+                cx={x(i)}
+                cy={y(v)}
+                r={props.picked === i ? 6 : 4}
+              />
+              <circle class="hit" cx={x(i)} cy={y(v)} r="14" onClick={() => props.onPick(i)}>
+                <title>
+                  {formatDay(pt.day)}: {props.format(v)} ({pt.answers} answers)
+                </title>
+              </circle>
+            </g>
+          );
+        })}
+      </svg>
+    </figure>
+  );
+}
+
+/**
+ * The practice map: one row per chord function (a numeral of major or minor keys, across all
+ * keys), one column per string set. Tap a cell to see its trend and practise it.
+ */
+function WhatToPractise(props: {
+  stats: Record<string, ItemStats>;
+  mode: ModeId | null;
+  selected: ChordFunction | null;
+  onSelect: (f: ChordFunction) => void;
+}) {
+  const rows = new Map<string, ChordFunction>();
+  const cols = new Set<string>();
+  const cells = new Map<string, ItemStats[]>();
+  for (const st of Object.values(props.stats)) {
+    const it = parseItemKey(st.key);
+    if (props.mode && it.mode !== props.mode) continue;
+    const f = functionOf(it);
+    const rowKey = functionKey({ ...f, stringSet: '*' });
+    rows.set(rowKey, { ...f, stringSet: '*' });
+    cols.add(f.stringSet);
+    const ck = functionKey(f);
+    cells.set(ck, [...(cells.get(ck) ?? []), st]);
+  }
+  const colList = [...cols].sort((a, b) =>
+    a === '*' ? 1 : b === '*' ? -1 : stringOrder(a) - stringOrder(b),
+  );
+  const rowList = [...rows.values()].sort(
+    (a, b) =>
+      (a.keyMode === b.keyMode ? 0 : a.keyMode === 'major' ? -1 : 1) ||
+      a.degree - b.degree ||
+      a.quality.localeCompare(b.quality),
+  );
+  const selKey = props.selected ? functionKey(props.selected) : null;
+  const selItems = selKey ? (cells.get(selKey) ?? []) : [];
+
+  return (
+    <Section title="What to practise">
+      <p class="explain">
+        Each row is a chord by its numeral, across all keys (e.g. <i>iv</i> in minor keys is B♭m in
+        Fm, C♯m in G♯m…). Each column is a group of strings. Colour shows how often you've been
+        right lately, the small number how long you take. Tap a cell to see that chord's trend above
+        and to practise it.
+      </p>
       <div class="heat-wrap">
-        <table class="heat">
+        <table class="heat fn-grid">
           <thead>
             <tr>
               <th scope="col">
-                <span class="sr-only">Key</span>
+                <span class="sr-only">Chord</span>
               </th>
-              {[1, 2, 3, 4, 5, 6, 7].map((n) => (
-                <th key={n} scope="col" class="heat-col">
-                  {n}
+              {colList.map((c) => (
+                <th key={c} scope="col" class="heat-col">
+                  {c === '*' ? 'no board' : c.replace('-', '–')}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {keys.map((k) => {
-              const byDeg = groupBy(Object.fromEntries(byKey.get(k)!.map((x) => [x.key, x])), (i) =>
-                String(i.degree),
-              );
+            {rowList.map((r, i) => {
+              const first = i === 0 || rowList[i - 1].keyMode !== r.keyMode;
               return (
-                <tr key={k}>
-                  <th scope="row">{keyLabel(k, props.p)}</th>
-                  {[0, 1, 2, 3, 4, 5, 6].map((deg) => {
-                    const g = byDeg.get(String(deg));
-                    if (!g) {
-                      // Name the degree even where nothing is recorded yet, so gaps are readable.
-                      const kk = parseKeyName(k);
-                      const label = kk
-                        ? chordNumeral(
-                            diatonicChord(kk, deg as DegreeIndex, false, props.p.harmony),
-                            numeralOptions(),
-                          )
-                        : String(deg + 1);
+                <Fragment key={functionKey(r)}>
+                  {first && (
+                    <tr class="group-row">
+                      <th colSpan={colList.length + 1} scope="rowgroup">
+                        {r.keyMode === 'major' ? 'Major keys' : 'Minor keys'}
+                      </th>
+                    </tr>
+                  )}
+                  <tr>
+                    <th scope="row">{functionNumeral(r)}</th>
+                    {colList.map((c) => {
+                      const f = { ...r, stringSet: c as ChordFunction['stringSet'] };
+                      const g = cells.get(functionKey(f));
+                      if (!g) return <td key={c} class="empty-cell" />;
+                      const a = aggregate(g);
+                      const acc = aggAccuracy(a);
+                      const on = selKey === functionKey(f);
                       return (
-                        <td key={deg} class="empty-cell" title={`${label}: not practised yet`}>
-                          <b>{label}</b>
+                        <td key={c} class={on ? 'picked' : ''}>
+                          <button
+                            type="button"
+                            class="cell-btn"
+                            style={{ background: heat(acc), color: readableTextOn(heat(acc)) }}
+                            aria-pressed={on}
+                            aria-label={`${functionLabel(f)}: ${pct(acc)} right, ${secs(aggMedian(a))}`}
+                            onClick={() => props.onSelect(f)}
+                          >
+                            <b>{pct(acc)}</b>
+                            <span>{secs(aggMedian(a))}</span>
+                          </button>
                         </td>
                       );
-                    }
-                    const a = aggregate(g);
-                    const acc = aggAccuracy(a);
-                    return (
-                      <td
-                        key={deg}
-                        style={{ background: heat(acc), color: readableTextOn(heat(acc)) }}
-                      >
-                        <b>{degreeLabel(parseItemKey(g[0].key), props.p)}</b>
-                        <span>{pct(acc)}</span>
-                        <span>{secs(aggMedian(a))}</span>
-                      </td>
-                    );
-                  })}
-                </tr>
+                    })}
+                  </tr>
+                </Fragment>
               );
             })}
           </tbody>
         </table>
       </div>
+      {props.selected && selItems.length > 0 && (
+        <div class="fn-detail">
+          <p>
+            <b>{functionLabel(props.selected)}</b>: {selItems.reduce((n, x) => n + x.attempts, 0)}{' '}
+            answers in {new Set(selItems.map((x) => parseItemKey(x.key).key)).size} key
+            {new Set(selItems.map((x) => parseItemKey(x.key).key)).size === 1 ? '' : 's'}
+            {props.mode ? ` (${MODE_NAMES[props.mode]})` : ''}.
+          </p>
+          <button
+            type="button"
+            class="btn wide"
+            onClick={() => {
+              const items = [...selItems]
+                .sort(
+                  (a, b) =>
+                    rollingAccuracy(a) - rollingAccuracy(b) || medianTime(b) - medianTime(a),
+                )
+                .slice(0, 10)
+                .map((x) => parseItemKey(x.key));
+              pendingDrill.value = { title: functionNumeral(props.selected!), items, passes: 2 };
+              navigate('practice');
+            }}
+          >
+            Practise this
+          </button>
+        </div>
+      )}
     </Section>
   );
 }
 
-function Breakdown(props: {
-  title: string;
-  groups: Map<string, ItemStats[]>;
-  label: (k: string) => string;
-}) {
-  if (props.groups.size === 0) return null;
+function stringOrder(s: string): number {
+  const [a, b] = s.split('-').map(Number);
+  return a * 10 + b;
+}
+
+function ByKey(props: { stats: Record<string, ItemStats>; p: Preferences }) {
+  const groups = groupBy(props.stats, (i) => i.key);
+  if (groups.size < 2) return null;
   return (
-    <Section title={props.title}>
+    <Section title="By key">
+      <p class="explain">
+        Chord names and spellings change from key to key; this mostly matters for Name the chord and
+        for finding roots quickly.
+      </p>
       <ul class="rows">
-        {[...props.groups.entries()].map(([k, g]) => {
-          const a = aggregate(g);
-          return (
-            <li key={k}>
-              <span>{props.label(k)}</span>
-              <span class="bar">
-                <span style={{ width: pct(aggAccuracy(a)), background: heat(aggAccuracy(a)) }} />
-              </span>
-              <span class="num">{pct(aggAccuracy(a))}</span>
-              <span class="num">{secs(aggMedian(a))}</span>
-            </li>
-          );
-        })}
+        {[...groups.entries()]
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([k, g]) => {
+            const a = aggregate(g);
+            return (
+              <li key={k}>
+                <span>{keyLabel(k, props.p)}</span>
+                <span class="bar">
+                  <span style={{ width: pct(aggAccuracy(a)), background: heat(aggAccuracy(a)) }} />
+                </span>
+                <span class="num">{pct(aggAccuracy(a))}</span>
+                <span class="num">{secs(aggMedian(a))}</span>
+              </li>
+            );
+          })}
       </ul>
     </Section>
   );
@@ -294,7 +532,7 @@ function Backup() {
   const [resetKey, setResetKey] = useState('');
 
   const doExport = () => {
-    const b = makeBackup(prefs.value, stats.value, daily.value, Date.now());
+    const b = makeBackup(prefs.value, stats.value, daily.value, Date.now(), answerLog.value);
     const blob = new Blob([JSON.stringify(b, null, 1)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -313,7 +551,7 @@ function Backup() {
       return;
     }
     if (!confirm('Replace your current progress and preferences with this backup?')) return;
-    replaceProgress(r.backup.stats, r.backup.daily);
+    replaceProgress(r.backup.stats, r.backup.daily, r.backup.log ?? []);
     setPreferences(r.backup.preferences);
     setMsg(
       `Imported ${Object.keys(r.backup.stats).length} items${r.skipped ? `, skipped ${r.skipped} invalid entries` : ''}.`,
@@ -374,7 +612,7 @@ function Backup() {
         onClick={() => {
           if (!confirm('Reset ALL progress? This cannot be undone (export a backup first).'))
             return;
-          replaceProgress({}, {});
+          replaceProgress({}, {}, []);
           setMsg('All progress reset.');
         }}
       >

@@ -2,6 +2,7 @@
 import { type Preferences, mergePreferences } from '../prefs/model';
 import type { DayStats, ItemStats } from './stats';
 import { parseItemKey } from './types';
+import { type LogEntry, sanitizeLog } from './log';
 
 export interface Backup {
   app: 'fretboard-chords';
@@ -10,6 +11,8 @@ export interface Backup {
   preferences: Preferences;
   stats: Record<string, ItemStats>;
   daily: Record<string, DayStats>;
+  /** Answer log (optional: backups from before it existed have none). */
+  log?: LogEntry[];
 }
 
 export function makeBackup(
@@ -17,6 +20,7 @@ export function makeBackup(
   stats: Record<string, ItemStats>,
   daily: Record<string, DayStats>,
   now: number,
+  log: LogEntry[] = [],
 ): Backup {
   return {
     app: 'fretboard-chords',
@@ -25,6 +29,7 @@ export function makeBackup(
     preferences,
     stats,
     daily,
+    log,
   };
 }
 
@@ -97,6 +102,7 @@ export function parseBackup(text: string): ParseResult {
       preferences: mergePreferences(b.preferences),
       stats,
       daily,
+      log: sanitizeLog(b.log),
     },
   };
 }

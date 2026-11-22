@@ -94,13 +94,22 @@ test('progression walk counts chords, not progressions', async ({ page }) => {
   await expect(page.locator('.session-progress')).toHaveText('1 / 20 chords');
 });
 
-test('heat grid names every degree, including ones not practised yet', async ({ page }) => {
+test('progress: trend charts, chord-by-string-set map, practise a cell', async ({ page }) => {
   await page.goto('./#/practice');
   await page.getByRole('button', { name: /^Start/ }).click();
-  await page.getByRole('button', { name: 'Show answer' }).click();
-  await page.getByRole('button', { name: 'Next' }).click();
+  for (let i = 0; i < 2; i++) {
+    await page.getByRole('button', { name: 'Show answer' }).click();
+    await page.getByRole('button', { name: 'Next' }).click();
+  }
   await page.getByRole('button', { name: 'End' }).click();
   await page.goto('./#/stats');
-  await expect(page.locator('.heat thead')).toContainText('1234567');
-  await expect(page.locator('.heat td.empty-cell').first()).not.toBeEmpty();
+  await expect(page.getByRole('heading', { name: 'Getting better?' })).toBeVisible();
+  await expect(page.locator('.line-chart')).toHaveCount(2);
+  await expect(page.getByRole('heading', { name: 'What to practise' })).toBeVisible();
+  await expect(page.locator('.fn-grid thead')).toContainText('1–3');
+  const cell = page.locator('.cell-btn').first();
+  await cell.click();
+  await expect(page.locator('.fn-chip')).toContainText('in minor keys');
+  await page.getByRole('button', { name: 'Practise this' }).click();
+  await expect(page.locator('.drill-tag')).toBeVisible();
 });

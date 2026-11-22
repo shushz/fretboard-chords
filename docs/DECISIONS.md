@@ -266,3 +266,17 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   setup also has a "How it works" note. No welcome card or pop-ups (owner: annoying).
   Version = build time + short commit, stamped at build (`__BUILD_TIME__`,
   `__BUILD_COMMIT__`), shown in small print on Home and in Help & about.
+- **2026-11-22 — Progress redesigned around "am I getting better?" and "what should I
+  practise?"** (owner request). New per-answer log (`progress/log.ts`, IndexedDB key `log`,
+  capped at 20 000 answers ≈ 1–2 MB, included in backups) makes trends possible; item stats
+  only hold the current state. The page now has one filter row (all modes / one mode) and:
+  _Getting better?_ — two single-series charts per practice day (days off skipped): share
+  of right answers, and median time of right answers, with a plain-language comparison of
+  the last N practice days against the N before (weighted by answers); tap a point for
+  that day. _What to practise_ replaces "keys × degrees": rows are chord functions (a
+  numeral of major or minor keys, across all keys), columns are string sets, because the
+  shape matters more than the key; tap a cell to filter the trend to it and "Practise this"
+  (drills its weakest items). Weakest items stay; "By key" becomes a short list with an
+  explanation; "By string set" and "By mode" lists were folded into the map and filters.
+  Trends start with this version (older answers weren't logged individually); streak and
+  minutes still use the daily totals.
