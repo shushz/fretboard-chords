@@ -28,3 +28,4 @@
 - Fix: Name the chord options all share the answer's quality, the tonic isn't asked, misspelling pairs don't reveal the answer.
 - Name the chord: new "scale degree → chord" question type that tests root and quality together.
 - Navigation & help: single Preferences entry, Back from Preferences returns to the session (unanswered question regenerated if settings changed), Help & about page with GitHub link, per-mode help, build version on Home.
+- PR previews: every PR gets a live preview link with its own storage and demo data; Pages now served from the gh-pages branch.

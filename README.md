@@ -88,8 +88,10 @@ npm run dev        # dev server at http://localhost:5173/fretboard-chords/
 
 Playwright needs a Chromium build: `npx playwright install chromium`.
 
-CI runs lint, tests, build, e2e and the audit on every pull request. Every push to
-`main` deploys to GitHub Pages.
+CI runs lint, tests, build, e2e and the audit on every pull request. Every pull request
+also gets a **live preview** (with its own storage and demo data) at
+`https://shushz.github.io/fretboard-chords/pr-preview/pr-<number>/`, linked in a PR comment.
+Every push to `main` deploys the live app to GitHub Pages.
 
 ### Project layout
 

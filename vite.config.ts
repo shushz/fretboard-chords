@@ -15,15 +15,26 @@ function commit(): string {
   }
 }
 
+/**
+ * The live app is served at /fretboard-chords/. PR previews are built with
+ * BASE_PATH=/fretboard-chords/pr-preview/pr-<n>/ and PREVIEW_PR=<n> (preview.yml): they
+ * get their own storage and demo data, and no service worker.
+ */
+const base = process.env.BASE_PATH || '/fretboard-chords/';
+const previewPr = process.env.PREVIEW_PR || '';
+
 export default defineConfig({
-  base: '/fretboard-chords/',
+  base,
   define: {
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
     __BUILD_COMMIT__: JSON.stringify(commit()),
+    __PREVIEW_PR__: JSON.stringify(previewPr),
   },
   plugins: [
     preact(),
     VitePWA({
+      // Previews are for trying things out: no offline install, no cache to go stale.
+      disable: previewPr !== '',
       registerType: 'autoUpdate',
       injectRegister: false,
       includeAssets: ['icon.svg', 'favicon-32.png', 'apple-touch-icon.png'],
@@ -36,8 +47,8 @@ export default defineConfig({
         background_color: '#1d2430',
         display: 'standalone',
         orientation: 'any',
-        start_url: '/fretboard-chords/',
-        scope: '/fretboard-chords/',
+        start_url: base,
+        scope: base,
         icons: [
           { src: 'pwa-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'pwa-512.png', sizes: '512x512', type: 'image/png' },
@@ -46,7 +57,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],
-        navigateFallback: '/fretboard-chords/index.html',
+        navigateFallback: `${base}index.html`,
+        // Previews live under the live app's path: never answer them with the live app.
+        navigateFallbackDenylist: [/\/pr-preview\//],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
