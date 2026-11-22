@@ -314,6 +314,7 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
 - Open strings still count towards the 4-fret span limit (unchanged).
 
 ## Preview link in the PR description (fix-preview-link)
+
 - The preview action's sticky comment emailed the owner on every new PR. `comment: false`
   turns it off; a github-script step puts the link in a marked block at the top of the PR
   description instead (description edits send no notification). Idempotent; re-added on
