@@ -5,8 +5,32 @@ test('quality switch has "Show answer"', async ({ page }) => {
   await page.getByRole('radio', { name: /Quality switch/ }).click();
   await page.getByRole('button', { name: /^Start/ }).click();
   await page.getByRole('button', { name: 'Show answer' }).click();
-  await expect(page.getByRole('status')).toContainText('Not quite');
+  // Asking for the answer isn't a mistake: neutral feedback, not "Not quite".
+  await expect(page.getByRole('status')).toContainText('Answer:');
+  await expect(page.getByRole('status')).not.toContainText('Not quite');
+  await expect(page.getByRole('status')).toHaveClass(/shown/);
   await expect(page.locator('[data-kind=reveal]')).toHaveCount(1);
+});
+
+test('Show answer is neutral in tap modes', async ({ page }) => {
+  await page.goto('./#/practice');
+  await page.getByRole('radio', { name: /Find the chord/ }).click();
+  await page.getByRole('button', { name: /^Start/ }).click();
+  await page.getByRole('button', { name: 'Show answer' }).click();
+  await expect(page.getByRole('status')).toHaveClass(/shown/);
+  await expect(page.getByRole('status')).toContainText('Answer:');
+});
+
+test('session status sits in the top bar; End session shows the summary', async ({ page }) => {
+  await page.goto('./#/practice');
+  await page.getByRole('button', { name: /^Start/ }).click();
+  const bar = page.locator('.topbar');
+  await expect(bar.locator('.session-progress')).toHaveText('1 / 20');
+  await expect(bar.locator('.session-score')).toHaveText('0 ✓');
+  await bar.getByRole('button', { name: 'End session' }).click();
+  await expect(page.getByText('Session complete')).toBeVisible();
+  await expect(bar.locator('.session-progress')).toHaveCount(0);
+  await expect(bar.getByRole('heading', { name: 'Practice' })).toBeVisible();
 });
 
 test('name the tones: a wrong label keeps the role colour and explains each string', async ({
@@ -39,7 +63,7 @@ test('session summary median time counts correct answers only', async ({ page })
   await page.getByRole('button', { name: /^Start/ }).click();
   await page.getByRole('button', { name: 'Show answer' }).click();
   await page.getByRole('button', { name: 'Next' }).click();
-  await page.getByRole('button', { name: 'End' }).click();
+  await page.getByRole('button', { name: 'End session' }).click();
   await expect(page.locator('.big-stats')).toContainText('0.0 s');
 });
 
@@ -101,15 +125,15 @@ test('progress: trend charts, chord-by-string-set map, practise a cell', async (
     await page.getByRole('button', { name: 'Show answer' }).click();
     await page.getByRole('button', { name: 'Next' }).click();
   }
-  await page.getByRole('button', { name: 'End' }).click();
+  await page.getByRole('button', { name: 'End session' }).click();
   await page.goto('./#/stats');
   await expect(page.getByRole('heading', { name: 'Getting better?' })).toBeVisible();
   await expect(page.locator('.line-chart')).toHaveCount(2);
   await expect(page.getByRole('heading', { name: 'What to practise' })).toBeVisible();
-  await expect(page.locator('.fn-grid thead')).toContainText('1–3');
+  await expect(page.locator('.fn-grid thead')).toContainText(/1–3|2–4/); // questions pick either string set
   const cell = page.locator('.cell-btn').first();
   await cell.click();
   await expect(page.locator('.fn-chip')).toContainText('in minor keys');
   await page.getByRole('button', { name: 'Practise this' }).click();
-  await expect(page.locator('.drill-tag')).toBeVisible();
+  await expect(page.locator('.topbar h1')).toBeVisible();
 });

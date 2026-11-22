@@ -107,6 +107,11 @@ export function thunk(): void {
 }
 
 /** Feedback after grading: correct → strum the chord; wrong → muted thunk. */
+/** After "Show answer": just play the answer, no error sound. */
+export function revealSound(chordMidis: readonly number[] = []): void {
+  strum(chordMidis, 0.05);
+}
+
 export function feedback(correct: boolean, chordMidis: readonly number[] = []): void {
   if (correct) strum(chordMidis, 0.05);
   else thunk();

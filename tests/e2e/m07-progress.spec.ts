@@ -25,7 +25,7 @@ test('attempts are recorded, persisted, exported, imported and reset', async ({ 
     await tap(page, 2, i === 2 ? 6 : 7);
     await page.getByRole('button', { name: 'Next' }).click();
   }
-  await page.getByRole('button', { name: 'End' }).click();
+  await page.getByRole('button', { name: 'End session' }).click();
   await page.goto('./#/stats');
   await expect(page.locator('.fn-grid')).toContainText('Minor keys');
   await expect(page.locator('.fn-grid')).toContainText('67%');

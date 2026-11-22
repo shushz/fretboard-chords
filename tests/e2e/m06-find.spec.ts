@@ -46,7 +46,7 @@ test('find the chord: correct, wrong, summary', async ({ page }) => {
   await expect(page.getByTestId('note-2-7')).toHaveAttribute('data-kind', 'reveal');
   await shot(page, 'm06-wrong');
   await page.getByRole('button', { name: 'Next' }).click();
-  await page.getByRole('button', { name: 'End' }).click();
+  await page.getByRole('button', { name: 'End session' }).click();
   await expect(page.getByText('Session complete')).toBeVisible();
   await expect(page.locator('.big-stats')).toContainText('1/2');
   await shot(page, 'm06-summary');

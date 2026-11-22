@@ -91,7 +91,7 @@ test.describe('phone', () => {
         await tap(page, 2, 7);
       }
     }
-    await page.getByRole('button', { name: 'End' }).click();
+    await page.getByRole('button', { name: 'End session' }).click();
 
     // From the tonic — smooth answer, given shape faded with key
     await setup(page, /^From the tonic/, ['iv']);
@@ -103,7 +103,7 @@ test.describe('phone', () => {
     await expect(page.getByRole('status')).toContainText('Smooth');
     await page.screenshot({ path: `${DIR}/from-the-tonic.png` });
     await page.getByRole('button', { name: 'Next' }).click();
-    await page.getByRole('button', { name: 'End' }).click();
+    await page.getByRole('button', { name: 'End session' }).click();
 
     // Name the tones — mid-answer
     await setup(page, /^Name the tones/, ['i']);
@@ -114,7 +114,7 @@ test.describe('phone', () => {
     await page.getByRole('button', { name: 'Role R' }).click();
     await page.getByRole('button', { name: 'Role b3' }).click();
     await page.getByRole('button', { name: 'Next' }).click();
-    await page.getByRole('button', { name: 'End' }).click();
+    await page.getByRole('button', { name: 'End session' }).click();
 
     // Progress with a realistic two-week history (the same demo data PR previews use).
     await page.goto('./#/stats');

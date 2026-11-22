@@ -214,7 +214,12 @@ key reaches the threshold).
 - Notes as circles; after answering, show role labels (R/b3/5…) and optionally note
   names; color-code roles consistently (same color for R everywhere).
 - Tap feedback: plucked note on each tap; correct → strum the chord + subtle green;
-  wrong → muted "thunk" + reveal correct voicing(s).
+  wrong → muted "thunk" + reveal correct voicing(s). **Show answer** is not a mistake:
+  neutral (accent) feedback, the answer is strummed, no thunk; it still counts as not
+  right for review.
+- During a session the top bar carries its status (question count, right answers,
+  **End session**) so the board gets the height; End session shows the summary, Back
+  leaves without it.
 - Must work one-handed on a phone held while the guitar is in the lap (large buttons,
   no tiny controls).
 

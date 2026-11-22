@@ -8,6 +8,7 @@ import { PreferencesScreen } from './screens/PreferencesScreen';
 import { Practice } from './screens/Practice';
 import { Stats } from './screens/Stats';
 import { About } from './screens/About';
+import { sessionHeader } from './sessionHeader';
 
 const TITLES: Record<Route, string> = {
   home: 'Fretboard Chords',
@@ -33,7 +34,7 @@ export function App() {
             ◉
           </span>
         )}
-        <h1>{TITLES[r]}</h1>
+        {r === 'practice' && sessionHeader.value ? <SessionStatus /> : <h1>{TITLES[r]}</h1>}
         <button
           type="button"
           class="icon-btn"
@@ -73,6 +74,26 @@ export function App() {
         {r === 'about' && <About />}
       </main>
     </div>
+  );
+}
+
+/** In a running session the top bar carries its status, so the board gets the height. */
+function SessionStatus() {
+  const h = sessionHeader.value!;
+  return (
+    <>
+      {/* "Practice" alone gives way to the status on narrow screens; a drill title stays. */}
+      <h1 class={h.title ? 'with-status' : 'with-status plain'}>{h.title ?? TITLES.practice}</h1>
+      <span class="session-status">
+        <span class="session-progress">{h.progress}</span>
+        <span class="session-score">{h.correct} ✓</span>
+      </span>
+      {/* Ends now and shows the session summary. Back leaves without it; answers are saved
+          either way. */}
+      <button type="button" class="link end-session" onClick={h.finish}>
+        End session
+      </button>
+    </>
   );
 }
 

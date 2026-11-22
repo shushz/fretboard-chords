@@ -1,7 +1,7 @@
 import { BoardFrame } from '../../ui/BoardFrame';
 import { formatNote } from '../../theory/notes';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
-import { feedback, playNote, strum } from '../../audio/engine';
+import { feedback, playNote, revealSound, strum } from '../../audio/engine';
 import { chordNumeral, chordSymbol, toneForPitchClass } from '../../theory/chords';
 import { formatKey } from '../../theory/keys';
 import type { Role } from '../../theory/roles';
@@ -196,6 +196,7 @@ function TapRoleView(props: RunnerProps & { q: TapRoleQuestion }) {
   const { q, prefs: p, config } = props;
   const [tap, setTap] = useState<{ s: StringNum; f: number } | null>(null);
   const [ok, setOk] = useState<boolean | null>(null);
+  const [shown, setShown] = useState(false);
   const elapsed = useTimer();
   const vw = useBoardWidth();
   const maxFret = p.fretboard.fretRange;
@@ -215,7 +216,9 @@ function TapRoleView(props: RunnerProps & { q: TapRoleQuestion }) {
   const submit = (s: StringNum, f: number, giveUp = false) => {
     const correct = !giveUp && gradeTapRole(q, s, f);
     setOk(correct);
-    feedback(correct, correct ? [midiAt(s, f)] : chordMidis());
+    setShown(giveUp);
+    if (giveUp) revealSound(chordMidis());
+    else feedback(correct, correct ? [midiAt(s, f)] : chordMidis());
     props.onGraded([
       {
         item: tonesItem(q),
@@ -288,8 +291,8 @@ function TapRoleView(props: RunnerProps & { q: TapRoleQuestion }) {
         />
       </BoardFrame>
       {ok !== null ? (
-        <FeedbackBar state={ok ? 'correct' : 'wrong'} onNext={props.onNext}>
-          <strong>{ok ? '✓ Correct' : '✕ Not quite'}</strong>{' '}
+        <FeedbackBar state={ok ? 'correct' : shown ? 'shown' : 'wrong'} onNext={props.onNext}>
+          <strong>{ok ? '✓ Correct' : shown ? 'Answer:' : '✕ Not quite'}</strong>{' '}
           <span>
             {numeral} = {chordSymbol(q.chord, symbolOptions(p))} ({chordToneName(q.chord, p)}); the{' '}
             {roleLabel(q.role, p)} is{' '}

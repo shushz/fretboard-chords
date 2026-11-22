@@ -32,3 +32,4 @@
 - PR previews: every PR gets a live preview link with its own storage and demo data; Pages now served from the gh-pages branch.
 - Docs: README screenshots and text updated for Help & about; standing rule (CLAUDE.md + PR template) to keep README screenshots and in-app help current in every PR.
 - README: Progress screenshots with demo data (charts and the What to practise map) and text for the redesign; Help & about gains a "Your progress" section; README shot setup made idempotent.
+- Session status (3 / 20, right answers, End session) moves into the top bar, freeing a row for the board; "End" renamed "End session". Show answer gives neutral feedback (no "Not quite", no error sound).

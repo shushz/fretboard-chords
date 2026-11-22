@@ -292,3 +292,11 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   about two weeks of demo practice (`progress/demo.ts`, fed through the normal recording
   path), and shows a banner naming the PR with a "Reset demo data" button. The live app's
   service worker ignores `/pr-preview/` paths.
+
+## Show answer and the session bar (fix-session-header)
+
+- Show answer stays a "not right" attempt for spaced repetition (you didn't find it), but the
+  feedback is neutral: accent colour, "Answer:", the chord is strummed, no thunk.
+- The session row merged into the top bar. On narrow screens (< 480 px) the plain
+  "Practice" title is hidden to make room; a drill's title is kept and ellipsised.
+- "End" renamed "End session" (clearer, and distinct from the progression walk's "Finish").

@@ -35,7 +35,13 @@ export function About() {
           </li>
           <li>
             After each answer the board shows every note's role and you hear the chord. Tap{' '}
-            <b>Next</b> to continue.
+            <b>Next</b> to continue. Stuck? <b>Show answer</b> reveals it (it counts as one to
+            review again, not as a mistake).
+          </li>
+          <li>
+            The top bar shows how far you are (<i>3 / 20</i>) and how many you got right.{' '}
+            <b>End session</b> stops early and shows the session's summary; the back arrow leaves
+            without it. Your answers are saved either way.
           </li>
           <li>
             Come back daily. <b>Review due items</b> on the home screen brings back what you're

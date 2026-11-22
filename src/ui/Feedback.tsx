@@ -1,7 +1,8 @@
 import type { ComponentChildren } from 'preact';
 
 export function FeedbackBar(props: {
-  state: 'correct' | 'wrong' | null;
+  /** `shown`: the user asked to see the answer — neutral, not a mistake. */
+  state: 'correct' | 'wrong' | 'shown' | null;
   children?: ComponentChildren;
   onNext?: () => void;
   nextLabel?: string;
