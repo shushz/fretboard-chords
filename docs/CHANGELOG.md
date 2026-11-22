@@ -27,3 +27,4 @@
 - Docs: README with screenshots, MIT license, package metadata; README screenshots regenerate with README_SHOTS=1. Fix: progression-walk counter shows chords done ("2 / 20 chords").
 - Fix: Name the chord options all share the answer's quality, the tonic isn't asked, misspelling pairs don't reveal the answer.
 - Name the chord: new "scale degree → chord" question type that tests root and quality together.
+- PR previews: every PR gets a live preview link with its own storage and demo data; Pages now served from the gh-pages branch.
