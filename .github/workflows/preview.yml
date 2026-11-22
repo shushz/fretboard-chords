@@ -2,8 +2,9 @@ name: PR preview
 
 # Builds every pull request and publishes it to
 #   https://shushz.github.io/fretboard-chords/pr-preview/pr-<number>/
-# with its own storage and demo data, then comments the link on the PR. The preview is
-# removed when the PR is closed or merged.
+# with its own storage and demo data, then puts the link at the top of the PR description
+# (editing the description sends no notification email; a bot comment would). The preview
+# is removed when the PR is closed or merged.
 
 on:
   pull_request:
@@ -39,3 +40,23 @@ jobs:
           source-dir: dist
           preview-branch: gh-pages
           umbrella-dir: pr-preview
+          # No sticky comment: it emails the PR author. The link goes in the description.
+          comment: false
+      - name: Link the preview in the PR description
+        if: github.event.action != 'closed'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const start = '<!-- preview-link -->';
+            const end = '<!-- /preview-link -->';
+            const n = context.payload.pull_request.number;
+            const url = `https://${context.repo.owner}.github.io/${context.repo.repo}/pr-preview/pr-${n}/`;
+            const line = `${start}\n**Preview:** ${url} (own storage, demo data)\n${end}`;
+            // Read the current description: the event payload can be stale.
+            const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: n });
+            const body = pr.body ?? '';
+            const re = new RegExp(`${start}[\\s\\S]*?${end}`);
+            const next = re.test(body) ? body.replace(re, line) : `${line}\n\n${body}`;
+            if (next !== body) {
+              await github.rest.pulls.update({ ...context.repo, pull_number: n, body: next });
+            }

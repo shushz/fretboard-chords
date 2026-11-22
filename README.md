@@ -97,7 +97,8 @@ Playwright needs a Chromium build: `npx playwright install chromium`.
 
 CI runs lint, tests, build, e2e and the audit on every pull request. Every pull request
 also gets a **live preview** (with its own storage and demo data) at
-`https://shushz.github.io/fretboard-chords/pr-preview/pr-<number>/`, linked in a PR comment.
+`https://shushz.github.io/fretboard-chords/pr-preview/pr-<number>/`, linked at the top of the PR
+description.
 Every push to `main` deploys the live app to GitHub Pages.
 
 ### Project layout
