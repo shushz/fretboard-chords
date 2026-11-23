@@ -11,7 +11,7 @@ test('explorer: when no shape fits, the nearest shapes are shown faded', async (
   expect(await page.locator('[data-kind=shown]').count()).toBe(0);
   await expect(page.getByRole('button', { name: '▶ Play' })).toBeEnabled();
   await shot(page, 'missing-explore-no-fit');
-  // a chord that fits shows its shape normally, plus faded neighbours
+  // a chord that fits shows its shape normally, plus faded neighbors
   await page.getByRole('button', { name: 'i', exact: true }).click();
   await expect(page.getByTestId('note-2-7')).toHaveAttribute('data-kind', 'shown');
 });

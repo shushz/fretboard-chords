@@ -73,7 +73,7 @@ async function idbKeys(page: Page): Promise<string[]> {
   );
 }
 
-test('a long history is summarised, survives a reload and shows All time by week', async ({
+test('a long history is summarized, survives a reload and shows All time by week', async ({
   page,
 }) => {
   await importBackup(page, backupFile(120));

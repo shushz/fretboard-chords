@@ -35,7 +35,7 @@ export function KeyPicker(props: { value: Key; prefs: Preferences; onChange: (k:
 
 export function StringSetPicker(props: {
   value: StringSetId;
-  /** Sevenths: show drop-2 sets and shell sets as two labelled groups. */
+  /** Sevenths: show drop-2 sets and shell sets as two labeled groups. */
   sevenths?: boolean;
   onChange: (s: StringSetId) => void;
 }) {

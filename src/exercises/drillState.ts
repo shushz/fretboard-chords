@@ -1,7 +1,7 @@
 import { signal } from '@preact/signals';
 import type { Item } from '../progress/types';
 
-/** Items queued for a targeted session (set by "Drill these" / "Review due"). */
+/** Items queued for a targeted session (set by "Practice these" / "Review due"). */
 export interface PendingDrill {
   title: string;
   items: Item[];

@@ -52,7 +52,7 @@ test('drilling one weak item twice uses a different fret window the second time'
 }) => {
   await missThreeTimes(page);
   await page.goto('./#/stats');
-  await page.getByRole('button', { name: 'Drill these' }).click();
+  await page.getByRole('button', { name: 'Practice these' }).click();
   await expect(page.locator('.session-progress')).toHaveText('1 / 2');
   const first = await page.locator('.prompt-sub').textContent();
   await page.getByRole('button', { name: 'Show answer' }).click();

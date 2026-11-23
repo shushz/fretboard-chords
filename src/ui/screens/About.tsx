@@ -26,7 +26,7 @@ export function About() {
             Open <b>Practice</b>, pick a mode (start with <i>Find the chord</i>) and a key.
           </li>
           <li>
-            Choose which chords to practise, a group of strings (e.g. 1–3, the three highest) and a
+            Choose which chords to practice, a group of strings (e.g. 1–3, the three highest) and a
             fret window. The dashed box on the board marks this region.
           </li>
           <li>
@@ -67,7 +67,7 @@ export function About() {
               ))}
             </span>
             R is the root, ♭3 or 3 the third (minor or major), ♭5 or 5 the fifth, ♭7 or 7 the
-            seventh. Each role keeps its colour everywhere.
+            seventh. Each role keeps its color everywhere.
           </dd>
           <dt>Roman numerals</dt>
           <dd>
@@ -78,12 +78,12 @@ export function About() {
           <dt>String sets</dt>
           <dd>
             Strings are numbered from the thinnest: string 1 is high E, string 6 low E. Triads are
-            practised on three neighbouring strings (1–3, 2–4…), seventh chords on four (drop-2
+            practiced on three neighboring strings (1–3, 2–4…), seventh chords on four (drop-2
             voicings) or as three-note shells.
           </dd>
           <dt>Fret window</dt>
           <dd>
-            The frets you practise in, e.g. 5–9. Open strings count as inside a window that starts
+            The frets you practice in, e.g. 5–9. Open strings count as inside a window that starts
             at fret 1. If a chord has no shape fully inside the window, the question widens it by a
             fret or two and says so. Modes about staying close (From the tonic, Progression walk)
             also accept shapes up to 2 frets outside it; elsewhere, the right chord played outside
@@ -107,7 +107,7 @@ export function About() {
           </dd>
           <dt>Review and mastery</dt>
           <dd>
-            Each thing you practise (a chord, in a key, on a string set, in a mode) is tracked.
+            Each thing you practice (a chord, in a key, on a string set, in a mode) is tracked.
             Mistakes bring it back soon; correct answers space it out over days. It counts as
             mastered at 90 % right over the last 10 tries with a median answer under 3 s (5 s for
             seventh chords). Thresholds are in Preferences.
@@ -129,14 +129,14 @@ export function About() {
       <Section title="Your progress">
         <p>
           <b>Progress</b> answers two questions. <i>Getting better?</i> charts each day you
-          practised: how often you were right and how long your right answers took, with a one-line
+          practiced: how often you were right and how long your right answers took, with a one-line
           comparison of your recent days against earlier ones. Use the buttons at the top to look at
           one mode. After a month of practice, <b>All time</b> shows every week since you started,
-          compared with your first weeks. <i>What to practise</i> is a map: each row is a chord by
-          its numeral across all keys (iv in minor keys…), each column a group of strings, coloured
+          compared with your first weeks. <i>What to practice</i> is a map: each row is a chord by
+          its numeral across all keys (iv in minor keys…), each column a group of strings, colored
           by how often you've been right lately. Tap a cell to see that chord's trend, then{' '}
-          <b>Practise this</b> to drill it. <i>Weakest items</i> and <b>Drill these</b> do the same
-          for your ten weakest items overall.
+          <b>Practice this</b> to work on it. <i>Weakest items</i> and <b>Practice these</b> do the
+          same for your ten weakest items overall.
         </p>
       </Section>
 

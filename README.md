@@ -14,11 +14,11 @@ fully offline.
 <p>
   <img src="docs/screenshots/readme/find-the-chord.png" width="24%" alt="Find the chord: F♯m i on strings 1–3, answered correctly, with roles R, ♭3 and 5 shown">
   <img src="docs/screenshots/readme/from-the-tonic.png" width="24%" alt="From the tonic: from the i chord, the iv found with the Smooth badge">
-  <img src="docs/screenshots/readme/name-the-tones.png" width="24%" alt="Name the tones: labelling each note of a shape with role buttons">
+  <img src="docs/screenshots/readme/name-the-tones.png" width="24%" alt="Name the tones: labeling each note of a shape with role buttons">
   <img src="docs/screenshots/readme/chord-explorer-dark.png" width="24%" alt="Chord explorer in dark mode showing a C♯7 drop-2 voicing">
 </p>
 
-## What you practise
+## What you practice
 
 Pick a key, the chords you care about (the core set by default, e.g. i, iv, V, ii°, ♭VI,
 ♭VII in minor), a group of strings and a fret window. Then choose a mode:
@@ -38,13 +38,13 @@ R–3–7 shells), in **one key or a random key** per question.
 
 ### Progress and review
 
-- **Getting better?** The Progress screen charts each day you practised: how often you were
+- **Getting better?** The Progress screen charts each day you practiced: how often you were
   right and how long right answers took, with a plain summary (“In your last 5 practice
   days: 72% right (+23 points), 4.3 s per right answer (−1.0 s)…”). Filter by mode.
-- **What to practise:** a map of chords by numeral (across all keys) × string set, coloured
-  by recent accuracy. Tap a cell to see that chord's trend and practise it.
+- **What to practice:** a map of chords by numeral (across all keys) × string set, colored
+  by recent accuracy. Tap a cell to see that chord's trend and practice it.
 - **Spaced repetition** steers questions toward what's due and what's weak. _Review due
-  items_ and _Drill these_ (your 10 weakest items) run targeted sessions.
+  items_ and _Practice these_ (your 10 weakest items) run targeted sessions.
 - **All time:** after a month of practice, the charts can also show every week since you
   started, compared with your first weeks. Older days are stored as compact daily summaries,
   so a year of daily practice takes well under 1 MB.
@@ -54,7 +54,7 @@ R–3–7 shells), in **one key or a random key** per question.
 <p>
   <img src="docs/screenshots/readme/progression-walk-landscape.png" width="48%" alt="Progression walk in landscape: board on the left, the progression and feedback on the right">
   <img src="docs/screenshots/readme/progress.png" width="24%" alt="Progress screen: summary, charts of right answers and answer time per practice day">
-  <img src="docs/screenshots/readme/progress-map.png" width="24%" alt="What to practise: chords by numeral × string set, coloured by recent accuracy">
+  <img src="docs/screenshots/readme/progress-map.png" width="24%" alt="What to practice: chords by numeral × string set, colored by recent accuracy">
 </p>
 
 ### Music details it gets right
@@ -63,10 +63,10 @@ R–3–7 shells), in **one key or a random key** per question.
   from pitch alone. In G♯ minor the V chord is D♯–F𝄪–A♯, and in E♭ minor the ii° is
   F–A♭–C♭. Theoretical keys such as G♭m can be enabled and are spelled with double flats.
 - **Your choice of enharmonic keys** (D♭ or C♯, E♭m or D♯m, …), harmonic V/V7 or natural
-  v in minor, and which string sets to practise. These are all preferences, not hard-coded.
-- **Plucked-string sound**, synthesised in the browser: you hear each note you tap, a
+  v in minor, and which string sets to practice. These are all preferences, not hard-coded.
+- **Plucked-string sound**, synthesized in the browser: you hear each note you tap, a
   strum when you're right, a muted thunk when you're not.
-- **Hints you control.** Role labels and colours on a given shape can be hidden, since
+- **Hints you control.** Role labels and colors on a given shape can be hidden, since
   they give the answer away.
 - **Help built in.** _Help & about_ explains getting started, the main ideas (roles,
   numerals, string sets, inversions, anchors…) and every mode; each mode's setup has a

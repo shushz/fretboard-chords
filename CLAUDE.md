@@ -79,7 +79,7 @@ test tests/e2e/readme-shots.spec.ts --trace off`), extending
      them, and update the README text that describes the change.
   2. Update the in-app help: _Help & about_ (`src/ui/screens/About.tsx`) and the mode's
      `description` / `help` in `src/exercises/modes.ts`, so they describe the app as it is
-     after the PR (screens, names of buttons and settings, behaviour).
+     after the PR (screens, names of buttons and settings, behavior).
   3. Tick both in the PR template's checklist (`.github/pull_request_template.md`).
      Stacked PRs: each PR's README and help match that PR; regenerate again after merging a
      base branch in.

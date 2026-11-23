@@ -51,7 +51,7 @@ export default defineConfig({
         name: 'Fretboard Chords',
         short_name: 'Fretboard',
         description:
-          'Drill diatonic chord shapes, chord-tone roles and chord relationships on the guitar neck. Works offline.',
+          'Learn the chords of every key on the guitar neck: their shapes, what each string plays, and how they connect. Works offline.',
         theme_color: '#1d2430',
         background_color: '#1d2430',
         display: 'standalone',

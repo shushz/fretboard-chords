@@ -13,7 +13,7 @@ export const RAW_DAYS = 60;
 /** Correct-answer times kept per summary: these quantiles of the day's times. */
 const QUANTILES = [0.1, 0.3, 0.5, 0.7, 0.9];
 
-/** One day × mode × chord function, summarised. */
+/** One day × mode × chord function, summarized. */
 export interface Rollup {
   /** Day, YYYY-MM-DD (local). */
   d: string;
@@ -79,7 +79,7 @@ function rawCells(log: readonly LogEntry[]): Cell[] {
   return [...m.values()];
 }
 
-/** Summarise raw answers (whole days) into rollups. */
+/** Summarize raw answers (whole days) into rollups. */
 export function rollUp(log: readonly LogEntry[]): Rollup[] {
   return rawCells(log).map((c) => {
     const s = [...c.times].sort((a, b) => a - b);
@@ -103,7 +103,7 @@ export function rawFrom(now: number, rawDays = RAW_DAYS): string {
 
 /**
  * Split answers into those kept raw (from `rawFrom(now)` on) and rollups for older whole
- * days, merged with existing rollups. Days already summarised are not summarised again.
+ * days, merged with existing rollups. Days already summarized are not summarized again.
  */
 export function compact(
   log: readonly LogEntry[],

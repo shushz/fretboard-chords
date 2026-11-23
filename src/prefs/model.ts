@@ -53,7 +53,7 @@ export interface Preferences {
     switchDom7: boolean;
     switchNameChord: boolean;
     /**
-     * Show roles and role colours on the shape a question gives you (From the tonic,
+     * Show roles and role colors on the shape a question gives you (From the tonic,
      * Next/previous shape) before you answer. Off = neutral notes; they're a hint.
      */
     givenShapeRoles: boolean;

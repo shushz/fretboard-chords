@@ -1,11 +1,11 @@
-/** Colour helpers for readable text on role colours (pure). */
+/** Color helpers for readable text on role colors (pure). */
 
 function channel(v: number): number {
   v /= 255;
   return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
 }
 
-/** Relative luminance of a #rrggbb colour (WCAG). */
+/** Relative luminance of a #rrggbb color (WCAG). */
 export function luminance(hex: string): number {
   const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
   if (!m) return 0;

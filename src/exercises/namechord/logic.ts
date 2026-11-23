@@ -97,7 +97,7 @@ function noteKey(n: Note): string {
 
 /**
  * Wrong roots for "what is <numeral>?", all to be shown with the answer's quality:
- * the same letter with the wrong accidental (A for A♭), neighbouring and 4th/5th-related
+ * the same letter with the wrong accidental (A for A♭), neighboring and 4th/5th-related
  * scale degrees (counting slips), and the enharmonic misspelling (G♯ for A♭). Double
  * accidentals only appear when the key itself uses them.
  */

@@ -33,9 +33,9 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
 - **2026-11-20 — "Next/previous shape" ordering uses the average fret** of a voicing on
   the same string set; ties in anchor distance prefer the lower fret. Movement between
   voicings = sum of per-string fret differences.
-- **2026-11-20 — Visual style "Workshop".** Neutral warm-grey surfaces, a single blue
+- **2026-11-20 — Visual style "Workshop".** Neutral warm-gray surfaces, a single blue
   accent, a wood-tone fretboard (maple in light, rosewood in dark), system font stack
-  (no web fonts — offline). Light/dark/system via `look.theme`. Role colours by chord
+  (no web fonts — offline). Light/dark/system via `look.theme`. Role colors by chord
   member: root red, 3rd blue, 5th amber, 7th violet (`look.roleColors`, editable).
 - **2026-11-20 — Horizontal neck, string 1 on top (tab orientation), equal fret widths.**
   On narrow screens the board shows the region window plus context frets so every
@@ -101,8 +101,8 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   board widens to include both). Direction up/down/both is a setup option
   (`config.variant`). Item = shown inversion + direction.
 - **2026-11-20 — Mode 4 (Name the tones):** "Label" variant asks string by string from
-  the bass up, with big role buttons (R, b3, 3, b5, 5; + b7, 7 for sevenths) coloured by
-  role, plus Undo; graded when every note is labelled (all must be right). "Tap"
+  the bass up, with big role buttons (R, b3, 3, b5, 5; + b7, 7 for sevenths) colored by
+  role, plus Undo; graded when every note is labeled (all must be right). "Tap"
   variant asks for a role on one string; any fret on that string with the right pitch
   class counts (questions are only generated when such a fret exists in the window).
   Setup option: label / tap / both (both balances the two variants ~50/50).
@@ -128,7 +128,7 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   per chord; running out of time counts as a miss.
 - **2026-11-20 — Mode 6 (Name the chord):** 4 options. Forward distractors always
   include the enharmonic misspelling when the root has an accidental (G♯m for A♭m), then
-  a random mix of: right root/wrong quality, neighbouring degrees, the same degree in the
+  a random mix of: right root/wrong quality, neighboring degrees, the same degree in the
   relative key. Reverse distractors include the case-flipped numeral (IV for iv) plus
   other diatonic numerals. The chord is played after answering. The typed-answer
   variant is left for later (SPEC says "later").
@@ -154,7 +154,7 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
 - **2026-11-20 — From the tonic: random tonic shape + no repeated questions** (owner
   request). By default the shown I/i shape is picked from every shape on the neck on the
   enabled string sets, and the question's region is a fret window of the usual width
-  centred on it (`windowAround`); "Inside the fret window" keeps the previous behaviour.
+  centered on it (`windowAround`); "Inside the fret window" keeps the previous behavior.
   Setup option "Tonic shape" (`config.variant`: `neck` default / `window`). Consecutive
   questions prefer a different tonic shape _and_ a different target; if that's
   impossible (e.g. one target selected) they still always differ in at least one of the
@@ -191,7 +191,7 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   there is more than one item; a repeated item gets a different random fret window, so it
   is never the identical question.
 - **2026-11-20 — Progression list with random keys from both modes** shows all ten
-  progressions, labelled "(major)" / "(minor)" (it previously offered only "Random");
+  progressions, labeled "(major)" / "(minor)" (it previously offered only "Random");
   choosing one limits the random keys to that progression's mode.
 - **2026-11-20 — Notation is always music symbols** (owner decision). The "Accidental
   symbols", "Diminished labels" and "Role labels" preferences are removed: the app always
@@ -201,7 +201,7 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
 - **2026-11-20 — Optional hint on given shapes** (owner request). New preference
   `practice.givenShapeRoles` (default on, also a toggle in the From the tonic and
   Next/previous shape setup). Off: the shape a question shows has no role labels, no role
-  colours and the prompt doesn't name its inversion until you answer. Quality switch and
+  colors and the prompt doesn't name its inversion until you answer. Quality switch and
   Name the tones already hide roles before answering.
 - **2026-11-20 — Automated checks** (owner request). `src/exercises/properties.test.ts`
   checks every mode against generated setups (all keys, chords, string sets, windows):
@@ -211,11 +211,11 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   off-screen controls, tap targets < 44 px and low contrast (WCAG 4.5:1 text, 3:1 bold
   note labels). The written critique pass runs only when the owner asks.
 - **2026-11-20 — Fixes from the first audit:** the board no longer shrinks below 44 px tap
-  cells (it scrolls sideways, centred on the region; the explorer's Play button no longer
-  squeezes it); the open-string column is wider; labels on role colours pick dark or white
+  cells (it scrolls sideways, centered on the region; the explorer's Play button no longer
+  squeezes it); the open-string column is wider; labels on role colors pick dark or white
   text for contrast; light-theme muted/green/red text and dark-theme red fills darkened;
   "End" is a full-size target; Quality switch gained "Show answer"; the session summary's
-  median time counts correct answers only; Name the tones keeps role colours on wrong
+  median time counts correct answers only; Name the tones keeps role colors on wrong
   labels (red ring) and explains each string; landscape side-column buttons stack.
 - **2026-11-20 — Audit recommendations accepted by the owner (all nine):**
   1. Practice setup: compact mode picker (2 columns on phones, 4 on wide screens), only
@@ -230,7 +230,7 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
      fret-number row.
   6. Screens ≥ 700 px wide (tablets) use the side-column layout of phone landscape. Notes
      weren't enlarged: at that width the board column has no room to grow.
-  7. Sevenths: string sets shown as two labelled groups, "Drop-2 (4 notes)" and "Shells
+  7. Sevenths: string sets shown as two labeled groups, "Drop-2 (4 notes)" and "Shells
      (R–3–7)", in the explorer and in practice setup.
   8. Progression walk: session length counts chords (counter shows chords done, "2 / 20 chords"), not progressions;
      a session ends after the progression that reaches the count.
@@ -241,7 +241,7 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
 - **2026-11-21 — Name the chord: no option can be ruled out at a glance** (owner report).
   The Roman numeral already states the quality (iv = minor, ii° = diminished, V7), so all
   forward options now share the answer's quality and the question tests the root and its
-  spelling: wrong accidental (A for A♭), neighbouring and 4th/5th-related scale degrees,
+  spelling: wrong accidental (A for A♭), neighboring and 4th/5th-related scale degrees,
   and sometimes the misspelling (G♯ for A♭), but only together with a second same-pitch
   pair so a pair never reveals the answer. Double accidentals appear only in keys that use
   them. Reverse options are all written with the chord's quality (all lowercase for a minor
@@ -267,15 +267,15 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   Version = build time + short commit, stamped at build (`__BUILD_TIME__`,
   `__BUILD_COMMIT__`), shown in small print on Home and in Help & about.
 - **2026-11-22 — Progress redesigned around "am I getting better?" and "what should I
-  practise?"** (owner request). New per-answer log (`progress/log.ts`, IndexedDB key `log`,
+  practice?"** (owner request). New per-answer log (`progress/log.ts`, IndexedDB key `log`,
   capped at 20 000 answers ≈ 1–2 MB, included in backups) makes trends possible; item stats
   only hold the current state. The page now has one filter row (all modes / one mode) and:
   _Getting better?_ — two single-series charts per practice day (days off skipped): share
   of right answers, and median time of right answers, with a plain-language comparison of
   the last N practice days against the N before (weighted by answers); tap a point for
-  that day. _What to practise_ replaces "keys × degrees": rows are chord functions (a
+  that day. _What to practice_ replaces "keys × degrees": rows are chord functions (a
   numeral of major or minor keys, across all keys), columns are string sets, because the
-  shape matters more than the key; tap a cell to filter the trend to it and "Practise this"
+  shape matters more than the key; tap a cell to filter the trend to it and "Practice this"
   (drills its weakest items). Weakest items stay; "By key" becomes a short list with an
   explanation; "By string set" and "By mode" lists were folded into the map and filters.
   Trends start with this version (older answers weren't logged individually); streak and
@@ -296,9 +296,9 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
 ## Show answer and the session bar (fix-session-header)
 
 - Show answer stays a "not right" attempt for spaced repetition (you didn't find it), but the
-  feedback is neutral: accent colour, "Answer:", the chord is strummed, no thunk.
+  feedback is neutral: accent color, "Answer:", the chord is strummed, no thunk.
 - The session row merged into the top bar. On narrow screens (< 480 px) the plain
-  "Practice" title is hidden to make room; a drill's title is kept and ellipsised.
+  "Practice" title is hidden to make room; a drill's title is kept and ellipsized.
 - "End" renamed "End session" (clearer, and distinct from the progression walk's "Finish").
 
 ## The fret window in grading (fix-window-grading)
@@ -309,9 +309,9 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   shape within the window ± 2 frets (`NEARBY_SLACK`). Smooth ✦ = movement no larger than
   the smoothest in-window shape, so a smoother nearby shape also earns it.
 - Other modes keep the window strict (it's what's being drilled), but a right chord outside
-  it gets neutral feedback and the notes keep their role colours. It still counts as not
+  it gets neutral feedback and the notes keep their role colors. It still counts as not
   right for review.
-- Open strings still count towards the 4-fret span limit (unchanged).
+- Open strings still count toward the 4-fret span limit (unchanged).
 
 ## Preview link in the PR description (fix-preview-link)
 
@@ -359,3 +359,13 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
 - Canonical link → live app; PR previews add `noindex` at build time.
 - `og-image.png` was composed from the README find-the-chord screenshot; regenerate it if
   the app's look changes a lot.
+
+## American spelling, no "drill" (fix-wording-us)
+
+- Owner's choice: American English everywhere (UI, help, docs, comments): practice (noun
+  and verb), color, labeled, neighboring, summarize, gray, center, behavior, toward.
+- "Drill" read as jargon/intense and was inconsistent with "Practice this". UI uses
+  "practice"; Home/install tagline: "Learn the chords of every key on the guitar neck: their
+  shapes, what each string plays, and how they connect. Works offline." Internal code names
+  (`drill*`, `pendingDrill`) are unchanged.
+- No stored data keys contained these words, so nothing saved is affected.

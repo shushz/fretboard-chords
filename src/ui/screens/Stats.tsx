@@ -61,7 +61,7 @@ function heat(acc: number | null): string {
   return hslHex(acc * 120, 0.65, 0.45);
 }
 
-/** #rrggbb for an HSL colour (so text colour can be picked for contrast). */
+/** #rrggbb for an HSL color (so text color can be picked for contrast). */
 function hslHex(h: number, s: number, l: number): string {
   const k = (n: number) => (n + h / 30) % 12;
   const a = s * Math.min(l, 1 - l);
@@ -120,7 +120,7 @@ export function Stats() {
           </div>
           <div>
             <strong>{Math.round(totalMinutes(d))}</strong>
-            <span>minutes practised</span>
+            <span>minutes practiced</span>
           </div>
           <div>
             <strong>
@@ -170,7 +170,7 @@ export function Stats() {
             ))}
           </div>
           <Improvement filter={filter} fn={fn} onClearFn={() => setFn(null)} />
-          <WhatToPractise stats={s} mode={mode} selected={fn} onSelect={setFn} />
+          <WhatToPractice stats={s} mode={mode} selected={fn} onSelect={setFn} />
           <Weakest stats={s} p={p} />
           <ByKey stats={s} p={p} />
         </>
@@ -201,7 +201,7 @@ function Improvement(props: {
   return (
     <Section title="Getting better?">
       <p class="explain">
-        How you did on each {all ? 'week' : 'day'} you practised (days off are skipped): the share
+        How you did on each {all ? 'week' : 'day'} you practiced (days off are skipped): the share
         of right answers, and how long your right answers took.
         {props.fn ? ' Showing one chord across all keys.' : ''}
       </p>
@@ -235,7 +235,7 @@ function Improvement(props: {
       )}
       {pts.length === 0 ? (
         <p class="muted">
-          Nothing to show yet for this selection. Trends build up from now on as you practise.
+          Nothing to show yet for this selection. Trends build up from now on as you practice.
         </p>
       ) : (
         <>
@@ -391,9 +391,9 @@ function LineChart(props: {
 
 /**
  * The practice map: one row per chord function (a numeral of major or minor keys, across all
- * keys), one column per string set. Tap a cell to see its trend and practise it.
+ * keys), one column per string set. Tap a cell to see its trend and practice it.
  */
-function WhatToPractise(props: {
+function WhatToPractice(props: {
   stats: Record<string, ItemStats>;
   mode: ModeId | null;
   selected: ChordFunction | null;
@@ -425,12 +425,12 @@ function WhatToPractise(props: {
   const selItems = selKey ? (cells.get(selKey) ?? []) : [];
 
   return (
-    <Section title="What to practise">
+    <Section title="What to practice">
       <p class="explain">
         Each row is a chord by its numeral, across all keys (e.g. <i>iv</i> in minor keys is B♭m in
-        Fm, C♯m in G♯m…). Each column is a group of strings. Colour shows how often you've been
-        right lately, the small number how long you take. Tap a cell to see that chord's trend above
-        and to practise it.
+        Fm, C♯m in G♯m…). Each column is a group of strings. Color shows how often you've been right
+        lately, the small number how long you take. Tap a cell to see that chord's trend above and
+        to practice it.
       </p>
       <div class="heat-wrap">
         <table class="heat fn-grid">
@@ -513,7 +513,7 @@ function WhatToPractise(props: {
               navigate('practice');
             }}
           >
-            Practise this
+            Practice this
           </button>
         </div>
       )}
@@ -585,7 +585,7 @@ function Weakest(props: { stats: Record<string, ItemStats>; p: Preferences }) {
           navigate('practice');
         }}
       >
-        Drill these
+        Practice these
       </button>
     </Section>
   );
