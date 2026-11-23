@@ -225,16 +225,6 @@ export function Setup(props: {
             Random
           </button>
         </div>
-        <Segmented
-          label="Root anchor"
-          value={c.anchor}
-          options={[
-            { value: 'off', label: 'Off' },
-            { value: 'ghost', label: 'Ghost' },
-            { value: 'required', label: 'Required' },
-          ]}
-          onChange={(anchor) => set({ anchor })}
-        />
       </section>
       <button type="button" class="btn wide start" onClick={props.onStart}>
         Start · {sl.kind === 'questions' ? `${sl.count} questions` : `${sl.minutes} min`}

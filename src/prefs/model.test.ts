@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_PREFERENCES,
-  anchorStringList,
+  ANCHOR_STRINGS,
   mergePreferences,
   numeralOptions,
   symbolOptions,
@@ -17,7 +17,8 @@ describe('preferences model', () => {
     expect(p.spelling.allowTheoretical).toBe(false);
     expect(p.harmony.minorV).toBe('harmonic');
     expect(p.fretboard.stringSets).toEqual(['1-3', '2-4']);
-    expect(p.fretboard.anchor).toBe('ghost');
+    expect(p.fretboard.rootHint).toBe('after');
+    expect(p.practice.tapRoot).toBe(false);
     expect(p.fretboard.window).toEqual({ start: 5, width: 5 });
     expect(p.fretboard.maxSpan).toBe(4);
     expect(p.practice.masteryAccuracy).toBe(0.9);
@@ -67,10 +68,24 @@ describe('preferences model', () => {
   });
   it('update is immutable', () => {
     const p = updatePreferences(DEFAULT_PREFERENCES, (d) => {
-      d.fretboard.anchorStrings = '5';
+      d.fretboard.rootHint = 'during';
     });
-    expect(DEFAULT_PREFERENCES.fretboard.anchorStrings).toBe('both');
-    expect(anchorStringList(p)).toEqual([5]);
-    expect(anchorStringList(DEFAULT_PREFERENCES)).toEqual([6, 5]);
+    expect(DEFAULT_PREFERENCES.fretboard.rootHint).toBe('after');
+    expect(p.fretboard.rootHint).toBe('during');
+    expect(ANCHOR_STRINGS).toEqual([6, 5]);
+  });
+  it('migrates the old Root anchor setting', () => {
+    const old = (anchor: string) => mergePreferences({ fretboard: { anchor, anchorStrings: '5' } });
+    expect(old('off').fretboard.rootHint).toBe('never');
+    expect(old('ghost').fretboard.rootHint).toBe('after');
+    expect(old('required').fretboard.rootHint).toBe('after');
+    expect(old('required').practice.tapRoot).toBe(true);
+    expect(old('ghost').practice.tapRoot).toBe(false);
+    expect('anchor' in old('off').fretboard).toBe(false);
+    expect('anchorStrings' in old('off').fretboard).toBe(false);
+    // once migrated, the new setting wins
+    expect(
+      mergePreferences({ fretboard: { anchor: 'off', rootHint: 'during' } }).fretboard.rootHint,
+    ).toBe('during');
   });
 });

@@ -8,8 +8,11 @@ import type { FretWindow, StringSetId } from '../fretboard/regions';
 import type { FretRange } from '../fretboard/tuning';
 import type { ChordMember } from '../theory/roles';
 
-export type AnchorMode = 'off' | 'ghost' | 'required';
-export type AnchorStrings = '6' | '5' | 'both';
+/**
+ * The root on string 6/5 near a chord shape (a "root anchor", SPEC §4.1), shown dimmed as
+ * a hint: never, after answering, or while answering too.
+ */
+export type RootHint = 'never' | 'after' | 'during';
 export type Theme = 'system' | 'light' | 'dark';
 export type SessionLength =
   { kind: 'questions'; count: number } | { kind: 'minutes'; minutes: number };
@@ -27,8 +30,7 @@ export interface Preferences {
     randomWindow: boolean;
     allowOutside: boolean;
     maxSpan: number;
-    anchor: AnchorMode;
-    anchorStrings: AnchorStrings;
+    rootHint: RootHint;
     leftHanded: boolean;
     showNoteNames: boolean;
     showRoles: boolean;
@@ -57,6 +59,11 @@ export interface Preferences {
      * Next/previous shape) before you answer. Off = neutral notes; they're a hint.
      */
     givenShapeRoles: boolean;
+    /**
+     * Find the chord: also tap the root on string 6 or 5 (the anchored variant). Not shown
+     * in Preferences: it's the default for a new setup, set in the Find the chord setup.
+     */
+    tapRoot: boolean;
   };
   sound: {
     volume: number;
@@ -87,8 +94,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
     randomWindow: false,
     allowOutside: false,
     maxSpan: 4,
-    anchor: 'ghost',
-    anchorStrings: 'both',
+    rootHint: 'after',
     leftHanded: false,
     showNoteNames: false,
     showRoles: true,
@@ -108,6 +114,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
     switchDom7: false,
     switchNameChord: false,
     givenShapeRoles: true,
+    tapRoot: false,
   },
   sound: { volume: 0.8, muted: false, strumMs: 30 },
   look: { theme: 'system', roleColors: { ...DEFAULT_ROLE_COLORS } },
@@ -128,6 +135,14 @@ export function mergePreferences(
   base: Preferences = DEFAULT_PREFERENCES,
 ): Preferences {
   const p = mergeValue(base, stored) as Preferences;
+  // "Root anchor" Off / Ghost / Required became a hint (rootHint) plus the Find the chord
+  // option "Also tap the root" (tapRoot); the anchor-string choice is automatic now.
+  const oldAnchor = isObj(stored) && isObj(stored.fretboard) ? stored.fretboard.anchor : undefined;
+  const hadHint = isObj(stored) && isObj(stored.fretboard) && 'rootHint' in stored.fretboard;
+  if (!hadHint && typeof oldAnchor === 'string') {
+    p.fretboard.rootHint = oldAnchor === 'off' ? 'never' : 'after';
+    if (oldAnchor === 'required') p.practice.tapRoot = true;
+  }
   // The per-pair "Default" (auto) option was removed: pin each pair to the choice it
   // resolved to, so existing spellings don't change.
   for (const id of Object.keys(p.spelling.pairs) as (keyof typeof p.spelling.pairs)[]) {
@@ -177,10 +192,8 @@ export function numeralOptions(_p?: Preferences): NumeralOptions {
   return { glyphs: true, dimStyle: 'symbol' };
 }
 
-export function anchorStringList(p: Preferences): (5 | 6)[] {
-  const s = p.fretboard.anchorStrings;
-  return s === 'both' ? [6, 5] : s === '6' ? [6] : [5];
-}
+/** Strings a root anchor can be on: the nearest root on each that fits is shown. */
+export const ANCHOR_STRINGS: readonly (5 | 6)[] = [6, 5];
 
 /** Immutable deep update helper: `update(p, (d) => { d.sound.muted = true; })`. */
 export function updatePreferences(p: Preferences, fn: (draft: Preferences) => void): Preferences {

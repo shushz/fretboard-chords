@@ -63,6 +63,8 @@ export interface TapQuestionProps {
   legend?: { given: string; answer: string };
   /** Rendered above the prompt (e.g. a progression strip). */
   before?: ComponentChildren;
+  /** Hint notes shown dimmed, with roles, until the answer is graded (e.g. the root on 6/5). */
+  hints?: readonly VoicingNote[];
   /** Reference notes always shown dimmed (e.g. the previous chord). */
   context?: readonly VoicingNote[];
   /**
@@ -152,6 +154,8 @@ export function TapQuestion(props: TapQuestionProps) {
   };
   for (const n of props.context ?? [])
     add(noteMarker(n, 'ghost', p, { showRoles: false, colored: false }));
+  if (!grade)
+    for (const n of props.hints ?? []) add(noteMarker(n, 'ghost', p, { showRoles: true }));
   for (const n of props.shown ?? []) {
     add(
       // After answering, the given shape fades so the answer stands out (key below the board).

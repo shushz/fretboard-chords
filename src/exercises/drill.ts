@@ -1,6 +1,6 @@
 /** Build practice configs that target specific items (weak-spot drilling, reviews). */
 import type { Preferences } from '../prefs/model';
-import { anchorStringList } from '../prefs/model';
+import { ANCHOR_STRINGS } from '../prefs/model';
 import { parseKeyName, resolveKey } from '../theory/keys';
 import type { DegreeIndex } from '../theory/chords';
 import { type Item, type ModeId, itemKey } from '../progress/types';
@@ -38,12 +38,9 @@ export function drillConfig(item: Item, p: Preferences): PracticeConfig | null {
     stringSets: item.stringSet === '*' ? stringSetsFor(p, sevenths) : [item.stringSet],
     window: { ...p.fretboard.window },
     sevenths,
-    anchor: item.anchor
-      ? 'required'
-      : p.fretboard.anchor === 'required'
-        ? 'ghost'
-        : p.fretboard.anchor,
-    anchorStrings: item.anchor ? [item.anchor] : anchorStringList(p),
+    // An anchored item is drilled anchored, on its string; others without the root tap.
+    tapRoot: !!item.anchor,
+    anchorStrings: item.anchor ? [item.anchor] : [...ANCHOR_STRINGS],
     variant: variantFor(item),
   };
 }

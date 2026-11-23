@@ -80,7 +80,7 @@ export function generateFindQuestion(cfg: PracticeConfig, o: GenerateOptions): F
       const region = fit.region;
       const valid = fit.valid[0];
       let anchorOpts: (5 | 6 | null)[] = [null];
-      if (cfg.anchor === 'required') {
+      if (cfg.tapRoot) {
         const a = anchorCandidates(region, cfg.anchorStrings).filter(
           (s) => anchorFrets({ chord, region }, s, o.voicing.maxFret).length > 0,
         );

@@ -1,6 +1,6 @@
 import type { ModeId } from '../progress/types';
 import type { ModeDef } from './types';
-import { FindRunner } from './find/FindRunner';
+import { FindRunner, FindSetup } from './find/FindRunner';
 import { TonicRunner, TonicSetup } from './tonic/TonicRunner';
 import { ShapeRunner, ShapeSetup } from './shape/ShapeRunner';
 import { TonesRunner, TonesSetup } from './tones/TonesRunner';
@@ -14,7 +14,8 @@ export const MODES: ModeDef[] = [
     name: 'Find the chord',
     description: 'Find a chord of the key on part of the neck',
     Runner: FindRunner,
-    help: 'You get a chord (e.g. “F♯m · iv · strings 2–4 · frets 5–9”). Tap its notes, one per string, inside the dashed region. Any correct shape inside it counts; the right chord somewhere else is pointed out but doesn’t count. A miss shows every right shape with its roles. With the root anchor set to Required, tap the root on string 6 or 5 as well.',
+    SetupExtras: FindSetup,
+    help: 'You get a chord (e.g. “F♯m · iv · strings 2–4 · frets 5–9”). Tap its notes, one per string, inside the dashed region. Any correct shape inside it counts; the right chord somewhere else is pointed out but doesn’t count. A miss shows every right shape with its roles. With “Also tap the root on string 6 or 5” on, tap the chord’s root on a bass string first.',
   },
   {
     id: 'fromTonic',

@@ -1,5 +1,5 @@
-import type { AnchorMode, Preferences } from '../prefs/model';
-import { anchorStringList } from '../prefs/model';
+import type { Preferences } from '../prefs/model';
+import { ANCHOR_STRINGS } from '../prefs/model';
 import { CORE_DEGREES, type DegreeIndex } from '../theory/chords';
 import { type Key, type Mode, type SpellingOptions, sameKey, selectableKeys } from '../theory/keys';
 import {
@@ -18,7 +18,9 @@ export interface PracticeConfig {
   stringSets: StringSetId[];
   window: FretWindow;
   sevenths: boolean;
-  anchor: AnchorMode;
+  /** Find the chord: also tap the root on string 6 or 5 (the anchored variant). */
+  tapRoot: boolean;
+  /** Strings the root may be asked on (both normally; one for a drill of an anchored item). */
   anchorStrings: (5 | 6)[];
   /** Mode-specific options. */
   variant?: string;
@@ -83,8 +85,8 @@ export function defaultConfig(
       ? randomWindow(p.fretboard.window.width, p.fretboard.fretRange, rand)
       : { ...p.fretboard.window },
     sevenths,
-    anchor: p.fretboard.anchor,
-    anchorStrings: anchorStringList(p),
+    tapRoot: p.practice.tapRoot,
+    anchorStrings: [...ANCHOR_STRINGS],
   };
 }
 

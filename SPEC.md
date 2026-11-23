@@ -146,8 +146,14 @@ A memory anchor ties an upper-string triad to the familiar root on string 6 or 5
   (or 5), within the fret window ± 2 frets. Typical: 2–4 triad + root on 6
   (strings 6, 4, 3, 2 with string 5 muted), or 1–3 triad + root on 5 or 6.
 - The engine pairs every upper-string voicing with its nearest 6th- and 5th-string roots.
-- Anchor display preference: **off** / **ghost** (anchor root shown dimmed as a reference)
-  / **required** (the user must tap the anchor root too). Default: ghost.
+- The anchor is shown as a hint (Preferences → Labels & hints, "Root on string 6 / 5"):
+  **never** / **after answering** (default) / **while answering**. It applies to Find the
+  chord and the chord explorer. The strings are automatic: the nearest root on each of 6
+  and 5 below the string set and within the window ± 2 (both for 1–3 and 2–4, string 6
+  only for 3–5, none for 4–6).
+- **Anchored variant** of Find the chord: a setup switch, "Also tap the root on string 6
+  or 5" (off by default); the string is picked per question. While it's on, the hint is
+  not shown before answering (it would give the root away).
 - The anchor root is graded and tracked like any other note: role R on string 6/5.
 
 ## 5. Exercise modes
@@ -246,10 +252,10 @@ device and included in the export/import. The Preferences screen is grouped:
 - **Harmony:** minor-key V as V/V7 (harmonic, default) or v/m7 (natural). Labels are
   always vii°, iiø7 and ♭3 (not preferences).
 - **Fretboard:** enabled string sets (default 1–3, 2–4); fret range (15/17/19/22);
-  default window and width; allow one note outside the window; max span; root anchor
-  off/ghost/required, on string 6/5/both; left-handed; show note names / roles / fret numbers.
+  default window and width; allow one note outside the window; max span; left-handed; show note names / roles / fret numbers.
 - **Sevenths:** drop-2 4-string sets and/or 3-note shells.
-- **Practice:** show roles/colors on the shape a question gives you (hint, on);
+- **Practice:** show roles/colors on the shape a question gives you (hint, on); root on
+  string 6/5 as a hint: never / after answering (default) / while answering;
   session length, mastery thresholds, share of fresh items, tempo for the
   progression walk.
 - **Sound & look:** volume/mute, strum speed, theme (light/dark/system), role colors.

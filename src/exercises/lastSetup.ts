@@ -19,11 +19,18 @@ export function loadSetup(p: Preferences): PracticeConfig | null {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return null;
-    const o = JSON.parse(raw) as Omit<PracticeConfig, 'key'> & { key: string };
+    const o = JSON.parse(raw) as Omit<PracticeConfig, 'key'> & { key: string; anchor?: string };
     const k = parseKeyName(o.key);
     if (!k || !MODES.some((m) => m.id === o.mode)) return null;
     if (!Array.isArray(o.degrees) || !Array.isArray(o.stringSets) || !o.window) return null;
-    return { ...o, key: resolveKey(k, p.spelling).key };
+    // Setups saved before "Root anchor" became "Also tap the root": Required → tap the root.
+    const { anchor, ...rest } = o;
+    return {
+      ...rest,
+      tapRoot: typeof o.tapRoot === 'boolean' ? o.tapRoot : anchor === 'required',
+      anchorStrings: Array.isArray(o.anchorStrings) ? o.anchorStrings : [6, 5],
+      key: resolveKey(k, p.spelling).key,
+    };
   } catch {
     return null;
   }

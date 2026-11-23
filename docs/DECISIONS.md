@@ -381,3 +381,18 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   feedback; the end-of-progression count only counts right answers.
 - Wording: no "voicing", "diatonic" or "spaced repetition" on the main screens; Progress
   map column for Name the chord is "Names only"; percentages written "68%".
+
+## Root anchor redesign (fix-root-anchor)
+
+- Owner report: whatever "Root anchor" was set to, the faded root still showed after
+  answering. Cause: it showed when _either_ the preference or the session said Ghost, and
+  the preference defaulted to Ghost.
+- Owner's direction: it's a hint, so it lives in Labels & hints; the strings should be
+  automatic. Now `fretboard.rootHint`: never / after (default) / during. Strings: the
+  nearest root on each of 6 and 5 that lies below the string set and within window ± 2
+  (`ANCHOR_STRINGS`); this replaces the "Anchor string" preference, so CLAUDE.md no
+  longer lists anchors as a preference example.
+- "Required" is the Find the chord anchored variant: a setup switch (`tapRoot`, default
+  from a hidden `practice.tapRoot`). The hint isn't shown before answering while it's on.
+- Migration: stored `anchor` off → never; ghost → after; required → after + tapRoot.
+  Saved setups with `anchor: 'required'` load with tapRoot on.

@@ -197,7 +197,7 @@ describe('find the chord', () => {
       for (const set of ['1-3', '2-4'] as StringSetId[]) {
         const cfg = cfgFor('find', k, P, {
           stringSets: [set],
-          anchor: 'required',
+          tapRoot: true,
           anchorStrings: [6, 5],
         });
         const rand = seeded(3);

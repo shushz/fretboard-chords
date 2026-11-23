@@ -97,8 +97,10 @@ export function About() {
           </dd>
           <dt>Root anchor</dt>
           <dd>
-            An optional landmark: the chord's root on string 6 or 5, the bass notes you probably
-            know best. It can be shown faintly, or required as part of the answer.
+            A landmark: the chord's root on string 6 or 5, the bass notes you probably know best. In
+            Find the chord and the chord explorer it's shown as a faded R after you answer; in
+            Preferences → Labels &amp; hints you can show it while answering, or never. In Find the
+            chord's setup, <i>Also tap the root on string 6 or 5</i> makes it part of the answer.
           </dd>
           <dt>Smooth ✦</dt>
           <dd>

@@ -1,7 +1,7 @@
 import { BoardFrame } from '../BoardFrame';
 import { useMemo, useState } from 'preact/hooks';
 import { prefs } from '../../prefs/store';
-import { anchorStringList, numeralOptions, symbolOptions } from '../../prefs/model';
+import { ANCHOR_STRINGS, numeralOptions, symbolOptions } from '../../prefs/model';
 import {
   CORE_DEGREES,
   type DegreeIndex,
@@ -68,8 +68,8 @@ export function Explore() {
     for (const n of v.notes) put(noteMarker(n, 'outside', p));
   }
   for (const v of voicings) for (const n of v.notes) put(noteMarker(n, 'shown', p));
-  if (p.fretboard.anchor !== 'off') {
-    for (const a of pairAnchors(chord, voicings, anchorStringList(p), maxFret, win)) {
+  if (p.fretboard.rootHint !== 'never') {
+    for (const a of pairAnchors(chord, voicings, ANCHOR_STRINGS, maxFret, win)) {
       if (
         !markers.some((m) => m.string === a.anchor.note.string && m.fret === a.anchor.note.fret)
       ) {
