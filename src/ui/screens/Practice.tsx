@@ -83,8 +83,8 @@ export function Practice() {
       progress:
         sl.kind === 'questions'
           ? byChords
-            ? `${session.attempts.length} / ${sl.count} chords`
-            : `${session.index + 1} / ${sl.count}`
+            ? `${session.attempts.length}/${sl.count}`
+            : `${session.index + 1}/${sl.count}`
           : `${Math.max(0, Math.ceil((sl.minutes * 60_000 - (Date.now() - session.startedAt)) / 60_000))} min left`,
       correct: session.attempts.filter((a) => a.correct).length,
       title: drill?.title,
@@ -252,11 +252,11 @@ function Summary(props: { attempts: Attempt[]; durationMs: number; onAgain: () =
             <span>correct</span>
           </div>
           <div>
-            <strong>{Math.round(s.accuracy * 100)} %</strong>
+            <strong>{Math.round(s.accuracy * 100)}%</strong>
             <span>accuracy</span>
           </div>
           <div>
-            <strong>{(s.medianMs / 1000).toFixed(1)} s</strong>
+            <strong>{s.correct ? `${(s.medianMs / 1000).toFixed(1)} s` : '–'}</strong>
             <span>median time</span>
           </div>
         </div>

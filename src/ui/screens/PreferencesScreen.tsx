@@ -225,7 +225,7 @@ export function PreferencesScreen() {
           min={0.5}
           max={1}
           step={0.05}
-          format={(v) => `${Math.round(v * 100)} %`}
+          format={(v) => `${Math.round(v * 100)}%`}
           onChange={(v) => editPreferences((d) => void (d.practice.masteryAccuracy = v))}
         />
         <Stepper
@@ -252,7 +252,7 @@ export function PreferencesScreen() {
           min={0}
           max={0.5}
           step={0.05}
-          format={(v) => `${Math.round(v * 100)} %`}
+          format={(v) => `${Math.round(v * 100)}%`}
           onChange={(v) => editPreferences((d) => void (d.practice.freshShare = v))}
         />
         <Stepper
@@ -307,7 +307,7 @@ export function PreferencesScreen() {
           min={0}
           max={1}
           step={0.1}
-          format={(v) => `${Math.round(v * 100)} %`}
+          format={(v) => `${Math.round(v * 100)}%`}
           onChange={(v) => editPreferences((d) => void (d.sound.volume = v))}
         />
         <Stepper

@@ -46,13 +46,13 @@ test('preferences during a session: Back returns to the same session', async ({ 
   await page.getByRole('button', { name: /^Start/ }).click();
   await page.getByRole('button', { name: 'Show answer' }).click();
   await page.getByRole('button', { name: 'Next' }).click();
-  await expect(page.locator('.session-progress')).toHaveText('2 / 20');
+  await expect(page.locator('.session-progress')).toHaveText('2/20');
   const prompt = await page.locator('.prompt-main').textContent();
   await page.getByRole('button', { name: 'Preferences' }).click();
   await expect(page.getByRole('heading', { name: 'Preferences' })).toBeVisible();
   await page.getByRole('button', { name: 'Back' }).click();
   // same session, same unanswered question (nothing changed)
-  await expect(page.locator('.session-progress')).toHaveText('2 / 20');
+  await expect(page.locator('.session-progress')).toHaveText('2/20');
   await expect(page.locator('.prompt-main')).toHaveText(prompt!);
   await expect(page.getByRole('button', { name: 'Show answer' })).toBeVisible();
 });
@@ -65,7 +65,7 @@ test('a setting changed mid-question takes effect when you come back', async ({ 
   await page.getByRole('button', { name: 'Preferences' }).click();
   await page.getByRole('switch', { name: /Show roles on the given shape/ }).uncheck();
   await page.getByRole('button', { name: 'Back' }).click();
-  await expect(page.locator('.session-progress')).toHaveText('1 / 20');
+  await expect(page.locator('.session-progress')).toHaveText('1/20');
   await expect(page.locator('[data-kind=shown]')).toHaveCount(3);
   await expect(page.locator('[data-kind=shown] text')).toHaveCount(0); // hint now hidden
 });

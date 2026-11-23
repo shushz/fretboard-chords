@@ -39,7 +39,7 @@ export function About() {
             review again, not as a mistake).
           </li>
           <li>
-            The top bar shows how far you are (<i>3 / 20</i>) and how many you got right.{' '}
+            The top bar shows how far you are (<i>3/20</i>) and how many you got right.{' '}
             <b>End session</b> stops early and shows the session's summary; the back arrow leaves
             without it. Your answers are saved either way.
           </li>
@@ -109,7 +109,7 @@ export function About() {
           <dd>
             Each thing you practice (a chord, in a key, on a string set, in a mode) is tracked.
             Mistakes bring it back soon; correct answers space it out over days. It counts as
-            mastered at 90 % right over the last 10 tries with a median answer under 3 s (5 s for
+            mastered at 90% right over the last 10 tries with a median answer under 3 s (5 s for
             seventh chords). Thresholds are in Preferences.
           </dd>
         </dl>

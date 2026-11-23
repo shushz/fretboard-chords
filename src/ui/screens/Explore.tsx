@@ -20,7 +20,6 @@ import { chooseVisibleRange } from '../fretboardGeometry';
 import { useBoardWidth } from '../useViewport';
 import { KeyPicker, StringSetPicker, WindowPicker, keyFromAscii } from '../pickers';
 import { chordToneName, noteMarker } from '../markers';
-import { formatKey } from '../../theory/keys';
 import { playNote, strum } from '../../audio/engine';
 import { midiAt } from '../../fretboard/tuning';
 
@@ -91,9 +90,8 @@ export function Explore() {
       <div class="prompt">
         <div class="prompt-main">
           {chordSymbol(chord, symbolOptions(p))}{' '}
-          <span class="muted">
-            · {chordNumeral(chord, numeralOptions(p))} in {formatKey(k)}
-          </span>
+          {/* The key is in the Key picker below; repeating it ("F♯m · i in F♯m") was noise. */}
+          <span class="muted">· {chordNumeral(chord, numeralOptions(p))}</span>
         </div>
         <button
           type="button"
@@ -107,7 +105,7 @@ export function Explore() {
           {chordToneName(chord, p)} ·{' '}
           {voicings.length > 0 ? (
             <>
-              {voicings.length} voicing{voicings.length === 1 ? '' : 's'} in region
+              {voicings.length} shape{voicings.length === 1 ? '' : 's'} here
             </>
           ) : (
             <span class="no-fit" role="note">

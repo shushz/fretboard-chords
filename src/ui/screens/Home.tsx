@@ -32,7 +32,7 @@ export function Home() {
             }}
           >
             <strong>Review due items ({due.length})</strong>
-            <span>Spaced repetition: items whose review time has come</span>
+            <span>Questions that are due for review</span>
           </button>
         )}
         <button type="button" class="menu-item" onClick={() => navigate('stats')}>
@@ -41,7 +41,7 @@ export function Home() {
         </button>
         <button type="button" class="menu-item" onClick={() => navigate('explore')}>
           <strong>Chord explorer</strong>
-          <span>See every voicing of a diatonic chord in a region</span>
+          <span>See every shape of a chord on part of the neck</span>
         </button>
         <button type="button" class="menu-item" onClick={() => navigate('about')}>
           <strong>Help &amp; about</strong>

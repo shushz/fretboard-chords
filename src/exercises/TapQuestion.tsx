@@ -53,7 +53,8 @@ export interface TapQuestionProps {
   playOnShow?: readonly number[];
   requiredStrings: readonly StringNum[];
   grade: (taps: Taps) => TapGrade;
-  onGraded: (correct: boolean, timeMs: number, matched: Voicing | null) => void;
+  /** `revealed`: the user tapped Show answer (not a mistake, though not right either). */
+  onGraded: (correct: boolean, timeMs: number, matched: Voicing | null, revealed: boolean) => void;
   onNext: () => void;
   label: string;
   /** Extra controls rendered next to Clear / Show answer. */
@@ -131,7 +132,7 @@ export function TapQuestion(props: TapQuestionProps) {
       setElsewhere(true);
       revealSound(away.notes.map((n) => n.midi));
     } else feedback(g.correct, midis);
-    props.onGraded(g.correct, timeMs, g.matched);
+    props.onGraded(g.correct, timeMs, g.matched, reveal);
   };
 
   const onTap = (s: StringNum, f: number) => {

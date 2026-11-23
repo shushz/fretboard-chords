@@ -369,3 +369,15 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   shapes, what each string plays, and how they connect. Works offline." Internal code names
   (`drill*`, `pendingDrill`) are unchanged.
 - No stored data keys contained these words, so nothing saved is affected.
+
+## Critique pass 2 fixes (fix-critique-findings)
+
+- Session counter "3/20" (no spaces; the progression walk drops "chords", its strip shows
+  them) so "End session" fits on one line at 360 px.
+- Side column only in landscape (compact phones, or ≥ 700 px wide and wider than tall):
+  portrait tablets get the stacked layout with a full-width board.
+- Line charts capped at 480 px wide: the SVG scales its text with its width.
+- Show answer in the progression strip gets a neutral (accent-tint) step, like its
+  feedback; the end-of-progression count only counts right answers.
+- Wording: no "voicing", "diatonic" or "spaced repetition" on the main screens; Progress
+  map column for Name the chord is "Names only"; percentages written "68%".

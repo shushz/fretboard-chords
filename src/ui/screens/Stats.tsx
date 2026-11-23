@@ -131,7 +131,7 @@ export function Stats() {
         </div>
         <p class="explain">
           An <i>item</i> is one chord in one key, on one string set, in one mode. It's mastered at{' '}
-          {Math.round(p.practice.masteryAccuracy * 100)} % right over its last 10 tries, answered in
+          {Math.round(p.practice.masteryAccuracy * 100)}% right over its last 10 tries, answered in
           under {(p.practice.masteryTimeTriadMs / 1000).toFixed(1)} s.
         </p>
       </section>
@@ -254,16 +254,20 @@ function Improvement(props: {
             picked={picked}
             onPick={setPicked}
           />
-          <LineChart
-            title="Time per right answer (median)"
-            points={pts}
-            value={(x) => (x.medianMs === null ? null : x.medianMs / 1000)}
-            max={niceMax(Math.max(1, ...pts.map((x) => (x.medianMs ?? 0) / 1000)))}
-            ticks={null}
-            format={(v) => `${v.toFixed(1)} s`}
-            picked={picked}
-            onPick={setPicked}
-          />
+          {pts.some((x) => x.medianMs !== null) ? (
+            <LineChart
+              title="Time per right answer (median)"
+              points={pts}
+              value={(x) => (x.medianMs === null ? null : x.medianMs / 1000)}
+              max={niceMax(Math.max(1, ...pts.map((x) => (x.medianMs ?? 0) / 1000)))}
+              ticks={null}
+              format={(v) => `${v.toFixed(1)} s`}
+              picked={picked}
+              onPick={setPicked}
+            />
+          ) : (
+            <p class="muted">No right answers yet here, so no answer times to show.</p>
+          )}
           <p class="chart-readout" aria-live="polite">
             {sel
               ? `${all ? 'Week of ' : ''}${formatDay(sel.day)}: ${sel.answers} answers, ${pct(sel.accuracy)} right, ${secs(sel.medianMs)} per right answer`
@@ -441,7 +445,7 @@ function WhatToPractice(props: {
               </th>
               {colList.map((c) => (
                 <th key={c} scope="col" class="heat-col">
-                  {c === '*' ? 'no board' : c.replace('-', '–')}
+                  {c === '*' ? 'Names only' : c.replace('-', '–')}
                 </th>
               ))}
             </tr>
