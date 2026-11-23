@@ -616,8 +616,15 @@ input {
   padding: 10px 12px;
   border-radius: 8px;
 }
+/* Narrow screens: the session status needs the whole top bar, so the title gives way
+   ("Practice") or moves to the line under it (a drill's title, see .drill-title). */
 @media (max-width: 479px) {
-  .topbar h1.plain {
+  .topbar h1.with-status {
+    display: none;
+  }
+}
+@media (min-width: 480px) {
+  .drill-title {
     display: none;
   }
 }

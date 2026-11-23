@@ -396,3 +396,9 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   from a hidden `practice.tapRoot`). The hint isn't shown before answering while it's on.
 - Migration: stored `anchor` off → never; ghost → after; required → after + tapRoot.
   Saved setups with `anchor: 'required'` load with tapRoot on.
+
+## Session title on narrow screens (fix-session-title-portrait)
+
+- Below 480 px the top bar in a session shows only Back, the counter, End session, sound
+  and Preferences. A review/drill title ("Review", "Weak spots", "iv") moves to the
+  existing line under the bar, before the item. Wider screens are unchanged.
