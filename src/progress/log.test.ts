@@ -1,13 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import {
-  LOG_CAP,
-  appendLog,
-  compareRecent,
-  dailyTrend,
-  functionKey,
-  functionOf,
-  sanitizeLog,
-} from './log';
+import { LOG_CAP, appendLog, functionKey, functionOf, sanitizeLog } from './log';
+import { type History, compare, trend } from './history';
 import type { Attempt, Item } from './types';
 
 const DAY = 86_400_000;
@@ -51,27 +44,28 @@ describe('answer log', () => {
     );
     log = appendLog(log, [att(2, false, 9000, item({ mode: 'find' }))]);
     log = appendLog(log, [att(5, true, 1500, item({ key: 'Bbm' }))]); // same function, other key
-    const all = dailyTrend(log, {});
+    const h: History = { log, rollups: [] };
+    const all = trend(h, {});
     expect(all.map((p) => p.answers)).toEqual([2, 3, 1]);
-    const tonic = dailyTrend(log, { mode: 'fromTonic' });
+    const tonic = trend(h, { mode: 'fromTonic' });
     expect(tonic.map((p) => p.accuracy)).toEqual([0.5, 1, 1]);
     expect(tonic.map((p) => p.medianMs)).toEqual([3000, 1500, 1500]);
     const fn = functionOf(item());
     expect(functionKey(fn)).toBe('minor|3|min|2-4');
-    expect(dailyTrend(log, { fn }).map((p) => p.answers)).toEqual([1 + 1, 2 + 1, 1]);
+    expect(trend(h, { fn: functionKey(fn) }).map((p) => p.answers)).toEqual([1 + 1, 2 + 1, 1]);
   });
 
   it('compares recent practice days with earlier ones, weighted by answers', () => {
     const a: Attempt[] = [];
     for (let d = 0; d < 4; d++)
       for (let i = 0; i < 10; i++) a.push(att(d, d >= 2 ? i < 9 : i < 5, d >= 2 ? 1000 : 3000));
-    const c = compareRecent(appendLog([], a), {})!;
-    expect(c.days).toBe(2);
+    const c = compare({ log: appendLog([], a), rollups: [] }, {}, 7)!;
+    expect(c.count).toBe(2);
     expect(c.before.accuracy).toBeCloseTo(0.5);
     expect(c.after.accuracy).toBeCloseTo(0.9);
     expect(c.before.medianMs).toBe(3000);
     expect(c.after.medianMs).toBe(1000);
-    expect(compareRecent(appendLog([], [att(0, true, 1)]), {})).toBeNull();
+    expect(compare({ log: appendLog([], [att(0, true, 1)]), rollups: [] }, {}, 7)).toBeNull();
   });
 
   it('sanitizes imported logs', () => {

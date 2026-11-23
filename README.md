@@ -45,7 +45,11 @@ R–3–7 shells), in **one key or a random key** per question.
   by recent accuracy. Tap a cell to see that chord's trend and practise it.
 - **Spaced repetition** steers questions toward what's due and what's weak. _Review due
   items_ and _Drill these_ (your 10 weakest items) run targeted sessions.
-- Export and import your progress as JSON. Everything stays on your device.
+- **All time:** after a month of practice, the charts can also show every week since you
+  started, compared with your first weeks. Older days are stored as compact daily summaries,
+  so a year of daily practice takes well under 1 MB.
+- Export and import your progress as JSON. Everything stays on your device; the app asks the
+  browser to keep it, and Progress reminds you when you haven't backed up for a while.
 
 <p>
   <img src="docs/screenshots/readme/progression-walk-landscape.png" width="48%" alt="Progression walk in landscape: board on the left, the progression and feedback on the right">

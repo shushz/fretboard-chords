@@ -31,7 +31,13 @@ non-diatonic harmony beyond the harmonic-minor V/V7.
 - **Audio**: Web Audio API, plucked-string synthesis (Karplus-Strong or similar),
   no sample files required. AudioContext unlocked on first user gesture.
 - **Storage**: IndexedDB (via `idb-keyval` or Dexie) for progress and settings;
-  JSON export/import for backup.
+  JSON export/import for backup. Answers of the last 60 days are kept one by one, one key
+  per day (a save writes only that day); older days are folded into per-day summaries per
+  mode × chord function (answers, right answers, a few quantiles of right-answer times),
+  so years of history stay well under 1 MB and trends can go back to the start. The app
+  asks the browser for persistent storage, and Progress shows when the last backup was
+  made, with a plain reminder line once there are two weeks of practice and no backup in
+  the last 30 days.
 - **Tests**: Vitest (unit, mandatory for all theory/fretboard logic);
   Playwright (e2e + screenshots at a phone viewport, e.g. 412×915).
 - **Deploy**: GitHub Pages via GitHub Actions on push to `main`

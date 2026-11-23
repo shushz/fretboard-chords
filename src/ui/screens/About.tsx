@@ -131,11 +131,12 @@ export function About() {
           <b>Progress</b> answers two questions. <i>Getting better?</i> charts each day you
           practised: how often you were right and how long your right answers took, with a one-line
           comparison of your recent days against earlier ones. Use the buttons at the top to look at
-          one mode. <i>What to practise</i> is a map: each row is a chord by its numeral across all
-          keys (iv in minor keys…), each column a group of strings, coloured by how often you've
-          been right lately. Tap a cell to see that chord's trend, then <b>Practise this</b> to
-          drill it. <i>Weakest items</i> and <b>Drill these</b> do the same for your ten weakest
-          items overall.
+          one mode. After a month of practice, <b>All time</b> shows every week since you started,
+          compared with your first weeks. <i>What to practise</i> is a map: each row is a chord by
+          its numeral across all keys (iv in minor keys…), each column a group of strings, coloured
+          by how often you've been right lately. Tap a cell to see that chord's trend, then{' '}
+          <b>Practise this</b> to drill it. <i>Weakest items</i> and <b>Drill these</b> do the same
+          for your ten weakest items overall.
         </p>
       </Section>
 
@@ -163,8 +164,10 @@ export function About() {
       <Section title="Privacy">
         <p>
           Everything stays on this device: no account, no tracking, no data sent anywhere. Your
-          progress lives in this browser. Use <b>Progress → Export JSON</b> to back it up or move it
-          to another device.
+          progress lives in this browser, which the app asks to keep it. Browsers can still clear
+          site data (for example Safari, for sites not added to the Home Screen and unused for a
+          week), so use <b>Progress → Export JSON</b> now and then to back it up or move it to
+          another device. Progress shows when you last did.
         </p>
       </Section>
 
