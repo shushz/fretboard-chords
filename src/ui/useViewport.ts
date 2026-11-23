@@ -25,10 +25,12 @@ export function isCompactLandscape(w: number, h: number): boolean {
 
 /**
  * Question and controls sit in a side column next to the board: phones on their side and
- * screens ≥ 700 px wide (tablets). Keep in sync with the media query in theme.css.
+ * landscape screens ≥ 700 px wide (tablets, desktops). Keep in sync with the media query
+ * in theme.css.
  */
 export function usesSideColumn(w: number, h: number): boolean {
-  return isCompactLandscape(w, h) || w >= 700;
+  // Portrait tablets keep the stacked layout: a full-width board is far bigger there.
+  return isCompactLandscape(w, h) || (w >= 700 && w > h);
 }
 
 /** Horizontal space available to the fretboard, in CSS px. */

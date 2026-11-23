@@ -38,7 +38,7 @@ test('find the chord: correct, wrong, summary', async ({ page }) => {
   await page.getByRole('button', { name: 'Next' }).click();
 
   // Wrong answer
-  await expect(page.locator('.session-progress')).toHaveText('2 / 20');
+  await expect(page.locator('.session-progress')).toHaveText('2/20');
   await tap(page, 1, 5);
   await tap(page, 2, 5);
   await tap(page, 3, 5);

@@ -41,7 +41,7 @@ test('reviewing one due item asks it once, not over and over', async ({ page }) 
   await missThreeTimes(page);
   await page.goto('./');
   await page.getByRole('button', { name: /Review due items \(1\)/ }).click();
-  await expect(page.locator('.session-progress')).toHaveText('1 / 1');
+  await expect(page.locator('.session-progress')).toHaveText('1/1');
   await page.getByRole('button', { name: 'Show answer' }).click();
   await page.getByRole('button', { name: 'Next' }).click();
   await expect(page.getByText('Session complete')).toBeVisible();
@@ -53,11 +53,11 @@ test('drilling one weak item twice uses a different fret window the second time'
   await missThreeTimes(page);
   await page.goto('./#/stats');
   await page.getByRole('button', { name: 'Practice these' }).click();
-  await expect(page.locator('.session-progress')).toHaveText('1 / 2');
+  await expect(page.locator('.session-progress')).toHaveText('1/2');
   const first = await page.locator('.prompt-sub').textContent();
   await page.getByRole('button', { name: 'Show answer' }).click();
   await page.getByRole('button', { name: 'Next' }).click();
-  await expect(page.locator('.session-progress')).toHaveText('2 / 2');
+  await expect(page.locator('.session-progress')).toHaveText('2/2');
   await expect(page.locator('.prompt-main')).toHaveText('F♯m · iv');
   const second = await page.locator('.prompt-sub').textContent();
   expect(second).not.toBe(first);

@@ -30,8 +30,10 @@ describe('fretboard geometry', () => {
     expect(isCompactLandscape(1280, 800)).toBe(false);
     expect(boardWidthFor(412, 915)).toBe(388);
     expect(boardWidthFor(915, 412)).toBe(915 - 24 - SIDE_COLUMN_PX - 16);
-    // tablets and wide screens use the side column too
-    expect(boardWidthFor(820, 1180)).toBe(820 - 24 - SIDE_COLUMN_PX - 16);
+    // portrait tablets stack (full-width board); landscape tablets and wide screens use
+    // the side column
+    expect(boardWidthFor(820, 1180)).toBe(820 - 24);
+    expect(boardWidthFor(1180, 820)).toBe(1180 - 24 - SIDE_COLUMN_PX - 16);
     expect(boardWidthFor(1600, 900)).toBe(1200 - 24 - SIDE_COLUMN_PX - 16);
   });
   it('lays out frets left to right and mirrors for left-handed', () => {

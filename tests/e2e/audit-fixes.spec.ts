@@ -25,7 +25,7 @@ test('session status sits in the top bar; End session shows the summary', async 
   await page.goto('./#/practice');
   await page.getByRole('button', { name: /^Start/ }).click();
   const bar = page.locator('.topbar');
-  await expect(bar.locator('.session-progress')).toHaveText('1 / 20');
+  await expect(bar.locator('.session-progress')).toHaveText('1/20');
   await expect(bar.locator('.session-score')).toHaveText('0 ✓');
   await bar.getByRole('button', { name: 'End session' }).click();
   await expect(page.getByText('Session complete')).toBeVisible();
@@ -64,7 +64,8 @@ test('session summary median time counts correct answers only', async ({ page })
   await page.getByRole('button', { name: 'Show answer' }).click();
   await page.getByRole('button', { name: 'Next' }).click();
   await page.getByRole('button', { name: 'End session' }).click();
-  await expect(page.locator('.big-stats')).toContainText('0.0 s');
+  // nothing right: no time to report
+  await expect(page.locator('.big-stats')).toContainText('–median time');
 });
 
 test.describe('landscape', () => {
@@ -104,7 +105,7 @@ test('practice setup: key and chords are on the first phone screen', async ({ pa
   const key = await page.getByRole('combobox', { name: 'Key', exact: true }).boundingBox();
   expect(key!.y + key!.height).toBeLessThan(915 - 80);
   await expect(page.locator('.mode-desc')).toHaveText(
-    'Tap a diatonic chord in a region of the neck',
+    'Find a chord of the key on part of the neck',
   );
 });
 
@@ -112,10 +113,10 @@ test('progression walk counts chords, not progressions', async ({ page }) => {
   await page.goto('./#/practice');
   await page.getByRole('radio', { name: /^Progression walk/ }).click();
   await page.getByRole('button', { name: /^Start/ }).click();
-  await expect(page.locator('.session-progress')).toHaveText('0 / 20 chords');
+  await expect(page.locator('.session-progress')).toHaveText('0/20');
   await page.getByRole('button', { name: 'Show answer' }).click();
   await page.getByRole('button', { name: /^(Next chord|Finish)$/ }).click();
-  await expect(page.locator('.session-progress')).toHaveText('1 / 20 chords');
+  await expect(page.locator('.session-progress')).toHaveText('1/20');
 });
 
 test('progress: trend charts, chord-by-string-set map, practice a cell', async ({ page }) => {
@@ -128,7 +129,9 @@ test('progress: trend charts, chord-by-string-set map, practice a cell', async (
   await page.getByRole('button', { name: 'End session' }).click();
   await page.goto('./#/stats');
   await expect(page.getByRole('heading', { name: 'Getting better?' })).toBeVisible();
-  await expect(page.locator('.line-chart')).toHaveCount(2);
+  // only answers revealed: accuracy chart, and a note instead of an empty time chart
+  await expect(page.locator('.line-chart')).toHaveCount(1);
+  await expect(page.getByText('No right answers yet here')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'What to practice' })).toBeVisible();
   await expect(page.locator('.fn-grid thead')).toContainText(/1–3|2–4/); // questions pick either string set
   const cell = page.locator('.cell-btn').first();

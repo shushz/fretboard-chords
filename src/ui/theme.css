@@ -630,7 +630,7 @@ input {
 .session-status {
   margin-left: auto;
   display: flex;
-  gap: 10px;
+  gap: 8px;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -915,6 +915,9 @@ input {
 .prog-step.bad {
   background: color-mix(in srgb, var(--bad) 22%, var(--surface));
 }
+.prog-step.shown {
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+}
 .choices {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -986,7 +989,8 @@ input {
 
 /* Phones on their side and wide screens (tablets): question and controls beside the board.
    Keep in sync with usesSideColumn() in useViewport.ts. */
-@media (orientation: landscape) and (max-height: 600px), (min-width: 700px) {
+@media (orientation: landscape) and (max-height: 600px),
+  (orientation: landscape) and (min-width: 700px) {
   .runner:has(> .board-frame),
   .explore {
     display: grid;
@@ -1170,6 +1174,8 @@ input {
 }
 .line-chart {
   margin: 0 0 6px;
+  /* The SVG scales with its width: cap it so labels stay label-sized on wide screens. */
+  max-width: 480px;
 }
 .line-chart figcaption {
   font-size: 0.85rem;
@@ -1298,4 +1304,10 @@ input {
   flex: none;
   min-height: 44px;
   padding: 0 16px;
+}
+
+/* Top bar in a session: "End session" stays on one line. */
+.topbar .end-session {
+  white-space: nowrap;
+  padding: 0 2px;
 }

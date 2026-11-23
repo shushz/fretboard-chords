@@ -12,7 +12,7 @@ export const MODES: ModeDef[] = [
   {
     id: 'find',
     name: 'Find the chord',
-    description: 'Tap a diatonic chord in a region of the neck',
+    description: 'Find a chord of the key on part of the neck',
     Runner: FindRunner,
     help: 'You get a chord (e.g. “F♯m · iv · strings 2–4 · frets 5–9”). Tap its notes, one per string, inside the dashed region. Any correct shape inside it counts; the right chord somewhere else is pointed out but doesn’t count. A miss shows every right shape with its roles. With the root anchor set to Required, tap the root on string 6 or 5 as well.',
   },

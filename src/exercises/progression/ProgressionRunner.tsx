@@ -38,7 +38,8 @@ export function ProgressionRunner(props: RunnerProps) {
     [],
   );
   const [step, setStep] = useState(0);
-  const [results, setResults] = useState<(boolean | null)[]>([]);
+  // Per step: right, wrong, or 'shown' (Show answer: neutral, like its feedback).
+  const [results, setResults] = useState<(boolean | 'shown' | null)[]>([]);
   const played = useRef<Voicing[]>([]);
   const [finished, setFinished] = useState(false);
 
@@ -59,7 +60,7 @@ export function ProgressionRunner(props: RunnerProps) {
       {numerals.map((n, i) => (
         <span
           key={i}
-          class={`prog-step${i === step && !finished ? ' current' : ''}${results[i] === true ? ' ok' : results[i] === false ? ' bad' : ''}`}
+          class={`prog-step${i === step && !finished ? ' current' : ''}${results[i] === true ? ' ok' : results[i] === false ? ' bad' : results[i] === 'shown' ? ' shown' : ''}`}
         >
           {n}
         </span>
@@ -74,7 +75,7 @@ export function ProgressionRunner(props: RunnerProps) {
         <div class="feedback correct" role="status">
           <div class="feedback-text">
             <strong>
-              {results.filter(Boolean).length}/{results.length}
+              {results.filter((r) => r === true).length}/{results.length}
             </strong>{' '}
             chords found · {numerals.join(' – ')}
           </div>
@@ -133,13 +134,13 @@ export function ProgressionRunner(props: RunnerProps) {
           ),
         };
       }}
-      onGraded={(correct, timeMs, matched) => {
+      onGraded={(correct, timeMs, matched, revealed) => {
         const g = gradeStep(q, step, new Map(), prevVoicing);
         // remember what the user played (or the closest shape) for the next step
         played.current[step] = matched ?? g.smoothest[0] ?? q.valid[step][0];
         setResults((r) => {
           const n = [...r];
-          n[step] = correct;
+          n[step] = correct ? true : revealed ? 'shown' : false;
           return n;
         });
         props.onGraded([
