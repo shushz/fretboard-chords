@@ -1068,12 +1068,20 @@ input {
 .about a {
   color: var(--accent);
 }
-/* standalone link in the home footer: full-size tap area */
+/* Home footer: version and link side by side when they fit, else the link on its own line,
+   aligned with the text (its padding widens the tap area without shifting it). */
+.home .version {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 16px;
+}
 .home .version a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
   padding: 0 4px;
+  margin-left: -4px;
 }
 .mode-help {
   margin: 0 2px 8px;
