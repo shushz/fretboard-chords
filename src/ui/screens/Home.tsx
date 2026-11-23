@@ -49,7 +49,7 @@ export function Home() {
         </button>
       </nav>
       <p class="version">
-        {versionLabel()} ·{' '}
+        <span>{versionLabel()}</span>
         <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
           Source on GitHub
         </a>
