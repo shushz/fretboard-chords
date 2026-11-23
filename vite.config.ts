@@ -57,6 +57,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],
+        // Search Console's ownership file: for Google's crawler only, not the app.
+        globIgnores: ['**/google*.html'],
         navigateFallback: `${base}index.html`,
         // Previews live under the live app's path: never answer them with the live app.
         navigateFallbackDenylist: [/\/pr-preview\//],

@@ -36,3 +36,4 @@
 - Grading and the fret window: open strings count inside windows starting at fret 1; From the tonic and Progression walk accept shapes up to 2 frets outside the window; elsewhere, the right chord outside the window gets neutral "Right chord, but outside frets …" feedback instead of "Not quite".
 - PR previews: the link goes at the top of the PR description instead of a bot comment (no notification email).
 - Progress history: answers stored one key per day; days older than 60 folded into compact daily summaries (no more 20,000-answer cap), with an "All time" weekly view; the app asks for persistent storage; Progress shows the last backup and a plain reminder line after two weeks without one.
+- Google Search Console ownership file (`public/google74972c4ba0213d6f.html`), served by Pages, not precached; the app still makes no network requests.

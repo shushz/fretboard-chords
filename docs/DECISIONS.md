@@ -339,3 +339,10 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   origin as the live app). Its result is shown in Backup & reset.
 - Backup reminder: a plain line at the top of Progress (no dismissible card) when the first
   practice day is ≥ 14 days ago and there's no export in the last 30 days.
+
+## Google Search Console (fix-search-console)
+
+- URL-prefix property `https://shushz.github.io/fretboard-chords/`, verified with Google's
+  HTML file in `public/`. Keep it: Google re-checks and drops verification if it's gone.
+- It's static and only read by Google's crawler; the app sends nothing anywhere (privacy
+  promise unchanged). Excluded from the service worker precache and from Prettier.
