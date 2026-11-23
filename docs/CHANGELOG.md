@@ -21,17 +21,17 @@
 - Fix: fret numbers no longer clipped, region border clears the fret dots, landscape layout puts the question beside the board.
 - Fix: chords with no shape inside the fret window are no longer skipped — practice widens the window minimally; the explorer shows the nearest shapes faded.
 - Fix: progression picker lists every progression with random keys from both modes; review/drill sessions don't repeat the same question back to back.
-- Change: always use ♯ ♭ ° ø and ♭3 (notation preferences removed); optional hiding of roles/colours on the shape given in From the tonic and Next/previous shape.
+- Change: always use ♯ ♭ ° ø and ♭3 (notation preferences removed); optional hiding of roles/colors on the shape given in From the tonic and Next/previous shape.
 - Audit: property tests across all modes/setups, automated walkthrough (npm run audit, in CI), and the fixes it found (tap-target sizes, contrast, Quality switch Show answer, summary median, Name the tones feedback, landscape buttons).
 - Audit recommendations: compact mode picker, Labels & hints prefs, simpler spelling prefs, faded given shape with key, scroll cue, tablet side column, grouped seventh string sets, progression sessions count chords, heat-grid headings.
 - Docs: README with screenshots, MIT license, package metadata; README screenshots regenerate with README_SHOTS=1. Fix: progression-walk counter shows chords done ("2 / 20 chords").
 - Fix: Name the chord options all share the answer's quality, the tonic isn't asked, misspelling pairs don't reveal the answer.
 - Name the chord: new "scale degree → chord" question type that tests root and quality together.
 - Navigation & help: single Preferences entry, Back from Preferences returns to the session (unanswered question regenerated if settings changed), Help & about page with GitHub link, per-mode help, build version on Home.
-- Progress redesign: per-answer log, improvement charts per practice day with a recent-vs-earlier summary, chord-function × string-set practice map with Practise this.
+- Progress redesign: per-answer log, improvement charts per practice day with a recent-vs-earlier summary, chord-function × string-set practice map with Practice this.
 - PR previews: every PR gets a live preview link with its own storage and demo data; Pages now served from the gh-pages branch.
 - Docs: README screenshots and text updated for Help & about; standing rule (CLAUDE.md + PR template) to keep README screenshots and in-app help current in every PR.
-- README: Progress screenshots with demo data (charts and the What to practise map) and text for the redesign; Help & about gains a "Your progress" section; README shot setup made idempotent.
+- README: Progress screenshots with demo data (charts and the What to practice map) and text for the redesign; Help & about gains a "Your progress" section; README shot setup made idempotent.
 - Session status (3 / 20, right answers, End session) moves into the top bar, freeing a row for the board; "End" renamed "End session". Show answer gives neutral feedback (no "Not quite", no error sound).
 - Grading and the fret window: open strings count inside windows starting at fret 1; From the tonic and Progression walk accept shapes up to 2 frets outside the window; elsewhere, the right chord outside the window gets neutral "Right chord, but outside frets …" feedback instead of "Not quite".
 - PR previews: the link goes at the top of the PR description instead of a bot comment (no notification email).
@@ -39,3 +39,4 @@
 - Google Search Console ownership file (`public/google74972c4ba0213d6f.html`), served by Pages, not precached; the app still makes no network requests.
 - Search and link previews: descriptive title and meta description, canonical link, Open Graph/Twitter tags with a 1200×630 preview image, schema.org WebApplication data, a <noscript> description, sitemap.xml; PR previews are noindex.
 - Home: the top bar shows the app icon (as in the favicon and installed app) instead of a blue dot; the version line and "Source on GitHub" no longer wrap awkwardly.
+- Wording: American spelling throughout (practice, color, labeled, neighboring…); "Drill" dropped from the UI: new Home and install tagline, "Drill these" → "Practice these".

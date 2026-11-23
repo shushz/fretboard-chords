@@ -214,7 +214,7 @@ key reaches the threshold).
   ≤ 5 s (sevenths). Thresholds configurable.
 - Question selection: weighted toward due and weak items, with ~20 % fresh/random items.
 - **Stats screen**: per-key × degree heat grid (accuracy & speed), per string set,
-  per mode; trend over time; weakest 10 items with a "drill these" button;
+  per mode; trend over time; weakest 10 items with a "Practice these" button;
   daily streak and minutes practiced.
 - Export/import progress as JSON; reset per key or all.
 
@@ -249,7 +249,7 @@ device and included in the export/import. The Preferences screen is grouped:
   default window and width; allow one note outside the window; max span; root anchor
   off/ghost/required, on string 6/5/both; left-handed; show note names / roles / fret numbers.
 - **Sevenths:** drop-2 4-string sets and/or 3-note shells.
-- **Practice:** show roles/colours on the shape a question gives you (hint, on);
+- **Practice:** show roles/colors on the shape a question gives you (hint, on);
   session length, mastery thresholds, share of fresh items, tempo for the
   progression walk.
 - **Sound & look:** volume/mute, strum speed, theme (light/dark/system), role colors.

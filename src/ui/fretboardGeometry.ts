@@ -66,7 +66,7 @@ function mirror(g: BoardGeometry, x: number): number {
   return g.leftHanded ? g.width - x : x;
 }
 
-/** Centre x of a fret cell (fret 0 = open-string column). */
+/** Center x of a fret cell (fret 0 = open-string column). */
 export function fretCenterX(g: BoardGeometry, fret: number): number {
   if (fret === 0) return mirror(g, PAD_SIDE + g.openWidth / 2);
   const first = Math.max(1, g.fromFret);

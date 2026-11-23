@@ -78,7 +78,7 @@ async function checkScreen(page: Page, screen: string): Promise<Problem[]> {
         });
     }
 
-    // Text contrast (HTML text only; SVG labels sit on role colours checked separately)
+    // Text contrast (HTML text only; SVG labels sit on role colors checked separately)
     const parse = (c: string) => {
       const m = c.match(/rgba?\(([^)]+)\)/);
       if (!m) return null;
@@ -125,7 +125,7 @@ async function checkScreen(page: Page, screen: string): Promise<Problem[]> {
         out.push({ kind: 'contrast', detail: `${describe(el)} ${ratio.toFixed(2)}:1` });
     }
 
-    // Role-coloured notes: white label on the role colour
+    // Role-colored notes: white label on the role color
     for (const g of document.querySelectorAll('.fb-note:not(.ghost):not(.outside)')) {
       const c = g.querySelector('circle');
       const t = g.querySelector('.fb-label');

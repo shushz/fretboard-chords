@@ -33,7 +33,7 @@ test('session status sits in the top bar; End session shows the summary', async 
   await expect(bar.getByRole('heading', { name: 'Practice' })).toBeVisible();
 });
 
-test('name the tones: a wrong label keeps the role colour and explains each string', async ({
+test('name the tones: a wrong label keeps the role color and explains each string', async ({
   page,
 }) => {
   await page.goto('./#/practice');
@@ -118,7 +118,7 @@ test('progression walk counts chords, not progressions', async ({ page }) => {
   await expect(page.locator('.session-progress')).toHaveText('1 / 20 chords');
 });
 
-test('progress: trend charts, chord-by-string-set map, practise a cell', async ({ page }) => {
+test('progress: trend charts, chord-by-string-set map, practice a cell', async ({ page }) => {
   await page.goto('./#/practice');
   await page.getByRole('button', { name: /^Start/ }).click();
   for (let i = 0; i < 2; i++) {
@@ -129,11 +129,11 @@ test('progress: trend charts, chord-by-string-set map, practise a cell', async (
   await page.goto('./#/stats');
   await expect(page.getByRole('heading', { name: 'Getting better?' })).toBeVisible();
   await expect(page.locator('.line-chart')).toHaveCount(2);
-  await expect(page.getByRole('heading', { name: 'What to practise' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'What to practice' })).toBeVisible();
   await expect(page.locator('.fn-grid thead')).toContainText(/1–3|2–4/); // questions pick either string set
   const cell = page.locator('.cell-btn').first();
   await cell.click();
   await expect(page.locator('.fn-chip')).toContainText('in minor keys');
-  await page.getByRole('button', { name: 'Practise this' }).click();
+  await page.getByRole('button', { name: 'Practice this' }).click();
   await expect(page.locator('.topbar h1')).toBeVisible();
 });

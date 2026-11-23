@@ -149,7 +149,7 @@ export function PreferencesScreen() {
         />
         <Toggle
           label="Show roles on the given shape"
-          hint="Hint in From the tonic and Next / previous shape: role labels and colours on the shape you're shown, before you answer"
+          hint="Hint in From the tonic and Next / previous shape: role labels and colors on the shape you're shown, before you answer"
           checked={p.practice.givenShapeRoles}
           onChange={(v) => editPreferences((d) => void (d.practice.givenShapeRoles = v))}
         />
@@ -329,7 +329,7 @@ export function PreferencesScreen() {
           onChange={(v) => editPreferences((d) => void (d.look.theme = v))}
         />
         <div class="field">
-          <span class="field-label">Role colours</span>
+          <span class="field-label">Role colors</span>
           <div class="colors">
             {(Object.keys(MEMBER_LABEL) as ChordMember[]).map((m) => (
               <label key={m} class="color-swatch">

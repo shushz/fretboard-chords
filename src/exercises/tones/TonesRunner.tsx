@@ -91,7 +91,7 @@ function LabelView(props: RunnerProps & { q: LabelQuestion }) {
 
   const markers: Marker[] = notes.map((n, i) => {
     if (done) {
-      // Mislabelled notes keep their role colour (that's the lesson) with a red ring.
+      // Mislabeled notes keep their role color (that's the lesson) with a red ring.
       return noteMarker(n, done.perNote[i] ? 'correct' : 'missed', p, {
         showRoles: true,
         colored: true,

@@ -2,18 +2,18 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_ROLE_COLORS } from '../prefs/model';
 import { contrastRatio, readableTextOn } from './contrast';
 
-describe('readable text on role colours', () => {
-  it('every default role colour gets text with at least 3:1 contrast (bold labels)', () => {
+describe('readable text on role colors', () => {
+  it('every default role color gets text with at least 3:1 contrast (bold labels)', () => {
     for (const c of Object.values(DEFAULT_ROLE_COLORS)) {
       expect(contrastRatio(c, readableTextOn(c))).toBeGreaterThanOrEqual(3);
     }
   });
-  it('picks dark text on amber and white on deep colours', () => {
+  it('picks dark text on amber and white on deep colors', () => {
     expect(readableTextOn('#f5a524')).toBe('#14181f');
     expect(readableTextOn('#1d2430')).toBe('#ffffff');
     expect(contrastRatio('#ffffff', '#000000')).toBeCloseTo(21);
   });
-  it('any user-picked colour stays readable', () => {
+  it('any user-picked color stays readable', () => {
     for (let i = 0; i < 4096; i += 7) {
       const hex =
         '#' +

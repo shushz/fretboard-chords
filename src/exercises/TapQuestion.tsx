@@ -155,7 +155,7 @@ export function TapQuestion(props: TapQuestionProps) {
     add(
       // After answering, the given shape fades so the answer stands out (key below the board).
       noteMarker(n, grade ? 'given' : 'shown', p, {
-        // Before answering, roles *and* role colours are a hint: both follow `shownRoles`.
+        // Before answering, roles *and* role colors are a hint: both follow `shownRoles`.
         showRoles: grade ? true : (props.shownRoles ?? false),
         colored: grade ? true : (props.shownRoles ?? false),
       }),

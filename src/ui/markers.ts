@@ -5,7 +5,7 @@ import type { VoicingNote } from '../fretboard/voicings';
 import type { Marker, MarkerKind } from './Fretboard';
 import { roleColor, roleLabel } from './roleStyle';
 
-/** Marker for a chord-tone note, labelled per preferences (roles and/or note names). */
+/** Marker for a chord-tone note, labeled per preferences (roles and/or note names). */
 export function noteMarker(
   n: VoicingNote,
   kind: MarkerKind,

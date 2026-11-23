@@ -29,7 +29,7 @@ import {
  */
 export const MAX_WIDEN = 5;
 
-/** The window itself, then windows grown by 1..maxGrow frets (towards either side). */
+/** The window itself, then windows grown by 1..maxGrow frets (toward either side). */
 export function widenedWindows(w: FretWindow, maxFret: number, maxGrow: number): FretWindow[] {
   const out: FretWindow[] = [w];
   for (let g = 1; g <= maxGrow; g++) {

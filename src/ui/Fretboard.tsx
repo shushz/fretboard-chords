@@ -27,7 +27,7 @@ export type MarkerKind =
   | 'reveal'
   /** Reference shape outside the active region (explorer), drawn faded. */
   | 'outside'
-  /** Correct note, but the user's answer for it was wrong (role colour + red ring). */
+  /** Correct note, but the user's answer for it was wrong (role color + red ring). */
   | 'missed'
   /** The shape a question gave you, faded after answering. */
   | 'given';
@@ -39,9 +39,9 @@ export interface Marker {
   label?: string;
   /** Small text under the circle (e.g. note name when roles are shown). */
   sublabel?: string;
-  /** Fill colour (role colour). Neutral if omitted. */
+  /** Fill color (role color). Neutral if omitted. */
   color?: string;
-  /** Label colour (defaults to a readable dark/white on `color`). */
+  /** Label color (defaults to a readable dark/white on `color`). */
   textColor?: string;
 }
 

@@ -19,7 +19,7 @@ export interface LogEntry {
 
 /**
  * Safety bound on raw answers. Normally the raw log holds only the last RAW_DAYS days
- * (older days are summarised, see history.ts); this only guards against runaway data.
+ * (older days are summarized, see history.ts); this only guards against runaway data.
  */
 export const LOG_CAP = 100_000;
 
@@ -40,7 +40,7 @@ export function appendLog(
 
 /**
  * A chord function: one numeral of major or minor keys (across all keys), on one string
- * set. "iv in minor keys, strings 2–4" — the thing you actually practise; the key matters
+ * set. "iv in minor keys, strings 2–4" — the thing you actually practice; the key matters
  * less than the shape.
  */
 export interface ChordFunction {

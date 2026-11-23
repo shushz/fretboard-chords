@@ -62,7 +62,7 @@ describe('weighted median', () => {
 });
 
 describe('rollups', () => {
-  it('summarise a day per mode and chord function', () => {
+  it('summarize a day per mode and chord function', () => {
     const log = appendLog(
       [],
       [
@@ -79,7 +79,7 @@ describe('rollups', () => {
     expect(tonic.f).toBe(functionKey(functionOf(item())));
   });
 
-  it('keep the last RAW_DAYS days raw and summarise the rest, once', () => {
+  it('keep the last RAW_DAYS days raw and summarize the rest, once', () => {
     const log = appendLog([], year());
     const now = t0 + 364 * DAY;
     const c = compact(log, [], now);

@@ -79,7 +79,7 @@ describe('mode 6: name the chord', () => {
     );
     expect(roots).toContain('A'); // wrong accidental
     expect(roots).toContain('G#'); // misspelling
-    expect(roots).toContain('Gb'); // neighbouring degree
+    expect(roots).toContain('Gb'); // neighboring degree
   });
 
   it('"ii° in Am": every option is diminished', () => {

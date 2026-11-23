@@ -32,7 +32,7 @@ test('weak items can be drilled from the stats screen; due items offered on home
   await shot(page, 'm13-home-review');
 
   await page.goto('./#/stats');
-  await page.getByRole('button', { name: 'Drill these' }).click();
+  await page.getByRole('button', { name: 'Practice these' }).click();
   await expect(page.locator('.topbar h1')).toHaveText('Weak spots');
   await expect(page.locator('.drill-item')).toHaveText('F♯m · i · 1–3');
   await expect(page.locator('.prompt-main')).toHaveText('F♯m · i');

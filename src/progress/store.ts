@@ -30,7 +30,7 @@ export const stats = signal<Record<string, ItemStats>>({});
 export const daily = signal<Record<string, DayStats>>({});
 /** Recent answers, one by one (the last RAW_DAYS days). */
 export const answerLog = signal<LogEntry[]>([]);
-/** Older days, summarised. */
+/** Older days, summarized. */
 export const rollups = signal<Rollup[]>([]);
 /** Everything the trend charts need. */
 export const history = computed<History>(() => ({

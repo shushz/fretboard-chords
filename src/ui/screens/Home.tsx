@@ -10,8 +10,8 @@ export function Home() {
   return (
     <div class="home">
       <p class="lead">
-        Drill diatonic chord shapes, chord-tone roles and chord relationships on the guitar neck —
-        in every key, fully offline.
+        Learn the chords of every key on the guitar neck: their shapes, what each string plays, and
+        how they connect. Works offline.
       </p>
       <nav class="menu">
         <button type="button" class="menu-item primary" onClick={() => navigate('practice')}>
@@ -37,7 +37,7 @@ export function Home() {
         )}
         <button type="button" class="menu-item" onClick={() => navigate('stats')}>
           <strong>Progress</strong>
-          <span>How you're improving, and what to practise next</span>
+          <span>How you're improving, and what to practice next</span>
         </button>
         <button type="button" class="menu-item" onClick={() => navigate('explore')}>
           <strong>Chord explorer</strong>
