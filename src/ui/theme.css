@@ -1274,3 +1274,20 @@ input {
   color: inherit;
   text-decoration: underline;
 }
+
+/* Progress: a plain reminder line, not a card */
+.backup-reminder {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0;
+  color: var(--muted);
+}
+.backup-reminder span {
+  flex: 1;
+}
+.backup-reminder .btn {
+  flex: none;
+  min-height: 44px;
+  padding: 0 16px;
+}

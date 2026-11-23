@@ -1,4 +1,4 @@
-import { type UseStore, createStore, get, set } from 'idb-keyval';
+import { type UseStore, createStore, del, get, set } from 'idb-keyval';
 import { PREVIEW_PR, storageNames } from './env';
 
 const names = storageNames(PREVIEW_PR);
@@ -16,6 +16,10 @@ export function kvGet<T = unknown>(key: string): Promise<T | undefined> {
 
 export function kvSet(key: string, value: unknown): Promise<void> {
   return set(key, value, useStore());
+}
+
+export function kvDel(key: string): Promise<void> {
+  return del(key, useStore());
 }
 
 /** localStorage key with the app's (or preview's) prefix. */

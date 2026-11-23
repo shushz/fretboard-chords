@@ -1,7 +1,17 @@
 import { Fragment } from 'preact';
 import { useState } from 'preact/hooks';
 import { prefs, setPreferences } from '../../prefs/store';
-import { answerLog, daily, replaceProgress, stats } from '../../progress/store';
+import {
+  answerLog,
+  daily,
+  history,
+  lastBackup,
+  markBackedUp,
+  replaceProgress,
+  rollups,
+  stats,
+  storagePersisted,
+} from '../../progress/store';
 import {
   type ItemStats,
   aggAccuracy,
@@ -17,15 +27,15 @@ import {
   weakest,
 } from '../../progress/stats';
 import { makeBackup, parseBackup, withoutKey } from '../../progress/backup';
+import { type ChordFunction, functionKey, functionOf } from '../../progress/log';
 import {
-  type ChordFunction,
+  type Comparison,
+  type Period,
   type TrendFilter,
   type TrendPoint,
-  compareRecent,
-  dailyTrend,
-  functionKey,
-  functionOf,
-} from '../../progress/log';
+  compare,
+  trend,
+} from '../../progress/history';
 import { MODE_NAMES, itemLabel, keyLabel } from '../../progress/labels';
 import { type ModeId, parseItemKey } from '../../progress/types';
 import type { Preferences } from '../../prefs/model';
@@ -97,7 +107,7 @@ export function Stats() {
   const total = items.reduce((a, x) => a + x.attempts, 0);
   const [mode, setMode] = useState<ModeId | null>(null);
   const [fn, setFn] = useState<ChordFunction | null>(null);
-  const filter: TrendFilter = { mode: mode ?? undefined, fn: fn ?? undefined };
+  const filter: TrendFilter = { mode: mode ?? undefined, fn: fn ? functionKey(fn) : undefined };
   const modesUsed = MODES.filter((m) => items.some((x) => parseItemKey(x.key).mode === m.id));
 
   return (
@@ -125,6 +135,7 @@ export function Stats() {
           under {(p.practice.masteryTimeTriadMs / 1000).toFixed(1)} s.
         </p>
       </section>
+      <BackupReminder now={now} />
       {total === 0 ? (
         <p class="muted empty">
           No practice recorded yet. Finish a few questions and your progress shows up here.
@@ -174,17 +185,49 @@ function Improvement(props: {
   fn: ChordFunction | null;
   onClearFn: () => void;
 }) {
-  const pts = dailyTrend(answerLog.value, props.filter, 30);
-  const cmp = compareRecent(answerLog.value, props.filter, 7);
+  const h = history.value;
+  const [range, setRange] = useState<'recent' | 'all'>('recent');
   const [picked, setPicked] = useState<number | null>(null);
+  const days = trend(h, props.filter, 'day');
+  // More than 30 practice days: "All time" shows every week since the start.
+  const long = days.length > 30;
+  const all = range === 'all' && long;
+  const period: Period = all ? 'week' : 'day';
+  const pts = all ? trend(h, props.filter, 'week') : days.slice(-30);
+  const cmp = all
+    ? compare(h, props.filter, 4, 'week', 'first')
+    : compare(h, props.filter, 7, 'day', 'previous');
   const sel = picked !== null && picked < pts.length ? pts[picked] : null;
   return (
     <Section title="Getting better?">
       <p class="explain">
-        How you did on each day you practised (days off are skipped): the share of right answers,
-        and how long your right answers took.
+        How you did on each {all ? 'week' : 'day'} you practised (days off are skipped): the share
+        of right answers, and how long your right answers took.
         {props.fn ? ' Showing one chord across all keys.' : ''}
       </p>
+      {long && (
+        <div class="filter-row" role="group" aria-label="Time range">
+          {(
+            [
+              ['recent', 'Last 30 days'],
+              ['all', 'All time'],
+            ] as const
+          ).map(([v, label]) => (
+            <button
+              type="button"
+              key={v}
+              class={`chip${range === v ? ' on' : ''}`}
+              aria-pressed={range === v}
+              onClick={() => {
+                setRange(v);
+                setPicked(null);
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
       {props.fn && (
         <button type="button" class="chip on fn-chip" onClick={props.onClearFn}>
           {functionLabel(props.fn)} ✕
@@ -196,7 +239,11 @@ function Improvement(props: {
         </p>
       ) : (
         <>
-          {cmp && <p class="trend-summary">{describeComparison(cmp)}</p>}
+          {cmp && (
+            <p class="trend-summary">
+              {describeComparison(cmp, period, all ? 'first' : 'previous')}
+            </p>
+          )}
           <LineChart
             title="Right answers"
             points={pts}
@@ -219,8 +266,8 @@ function Improvement(props: {
           />
           <p class="chart-readout" aria-live="polite">
             {sel
-              ? `${formatDay(sel.day)}: ${sel.answers} answers, ${pct(sel.accuracy)} right, ${secs(sel.medianMs)} per right answer`
-              : 'Tap a point to see that day.'}
+              ? `${all ? 'Week of ' : ''}${formatDay(sel.day)}: ${sel.answers} answers, ${pct(sel.accuracy)} right, ${secs(sel.medianMs)} per right answer`
+              : `Tap a point to see that ${all ? 'week' : 'day'}.`}
           </p>
         </>
       )}
@@ -228,9 +275,22 @@ function Improvement(props: {
   );
 }
 
-function describeComparison(c: NonNullable<ReturnType<typeof compareRecent>>): string {
-  const span = c.days === 1 ? 'your last practice day' : `your last ${c.days} practice days`;
-  const prev = c.days === 1 ? 'the day before' : `the ${c.days} before`;
+function describeComparison(c: Comparison, period: Period, against: 'previous' | 'first'): string {
+  const unit = (n: number) =>
+    period === 'week'
+      ? n === 1
+        ? 'week'
+        : `${n} weeks`
+      : n === 1
+        ? 'practice day'
+        : `${n} practice days`;
+  const span = c.count === 1 ? `your last ${unit(1)}` : `your last ${unit(c.count)}`;
+  const prev =
+    against === 'first'
+      ? `your first ${unit(c.count)}`
+      : c.count === 1
+        ? `the ${period} before`
+        : `the ${c.count} before`;
   const acc = Math.round((c.after.accuracy - c.before.accuracy) * 100);
   const parts = [`${pct(c.after.accuracy)} right (${acc >= 0 ? '+' : '−'}${Math.abs(acc)} points)`];
   if (c.after.medianMs !== null && c.before.medianMs !== null) {
@@ -247,9 +307,13 @@ function niceMax(v: number): number {
   return Math.ceil(v / 10) * 10;
 }
 
-function formatDay(day: string): string {
+function formatDay(day: string, withYear = false): string {
   const [y, m, dd] = day.split('-').map(Number);
-  return new Date(y, m - 1, dd).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  return new Date(y, m - 1, dd).toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'short',
+    ...(withYear ? { year: 'numeric' } : {}),
+  });
 }
 
 /** One series, one axis. Points are tappable; the readout below names the picked day. */
@@ -273,6 +337,8 @@ function LineChart(props: {
   const x = (i: number) => (n === 1 ? (L + W - R) / 2 : L + (i * (W - L - R)) / (n - 1));
   const y = (v: number) => T + (1 - v / props.max) * (H - T - B);
   const ticks = props.ticks ?? [0, props.max / 2, props.max];
+  // Show years when the chart spans more than one.
+  const years = n > 0 && props.points[0].day.slice(0, 4) !== props.points[n - 1].day.slice(0, 4);
   const vals = props.points.map(props.value);
   const path = vals
     .map((v, i) => (v === null ? null : `${x(i).toFixed(1)},${y(v).toFixed(1)}`))
@@ -281,7 +347,7 @@ function LineChart(props: {
   return (
     <figure class="line-chart">
       <figcaption>{props.title}</figcaption>
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${props.title} per practice day`}>
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={props.title}>
         {ticks.map((t) => (
           <g key={t}>
             <line class="grid" x1={L} x2={W - R} y1={y(t)} y2={y(t)} />
@@ -291,11 +357,11 @@ function LineChart(props: {
           </g>
         ))}
         <text class="tick" x={x(0)} y={H - 6} text-anchor={n === 1 ? 'middle' : 'start'}>
-          {formatDay(props.points[0].day)}
+          {formatDay(props.points[0].day, years)}
         </text>
         {n > 1 && (
           <text class="tick" x={x(n - 1)} y={H - 6} text-anchor="end">
-            {formatDay(props.points[n - 1].day)}
+            {formatDay(props.points[n - 1].day, years)}
           </text>
         )}
         <polyline class="series" points={path} />
@@ -308,7 +374,7 @@ function LineChart(props: {
                 class={`dot${props.picked === i ? ' picked' : ''}${pt.answers < 5 ? ' thin' : ''}`}
                 cx={x(i)}
                 cy={y(v)}
-                r={props.picked === i ? 6 : 4}
+                r={props.picked === i ? 6 : n > 40 ? 2.5 : 4}
               />
               <circle class="hit" cx={x(i)} cy={y(v)} r="14" onClick={() => props.onPick(i)}>
                 <title>
@@ -525,6 +591,53 @@ function Weakest(props: { stats: Record<string, ItemStats>; p: Preferences }) {
   );
 }
 
+/** Download everything as JSON and remember when. */
+function exportProgress(): void {
+  const now = Date.now();
+  const b = makeBackup(prefs.value, stats.value, daily.value, now, answerLog.value, rollups.value);
+  const blob = new Blob([JSON.stringify(b)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `fretboard-chords-backup-${b.exportedAt.slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  markBackedUp(now);
+}
+
+const DAY_MS = 86_400_000;
+
+function lastBackupText(now: number): string {
+  const t = lastBackup.value;
+  if (t === null) return 'never';
+  const days = Math.floor((now - t) / DAY_MS);
+  return days === 0 ? 'today' : days === 1 ? 'yesterday' : `${days} days ago`;
+}
+
+/**
+ * A plain line (not a dismissible card) once there are a few weeks of practice and no
+ * backup in the last month: browser storage can be cleared, an export can't.
+ */
+function BackupReminder(props: { now: number }) {
+  const first = Object.keys(daily.value).sort()[0];
+  if (!first) return null;
+  const [y, m, d] = first.split('-').map(Number);
+  const weeksOfData = props.now - new Date(y, m - 1, d).getTime() >= 14 * DAY_MS;
+  const t = lastBackup.value;
+  if (!weeksOfData || (t !== null && props.now - t < 30 * DAY_MS)) return null;
+  return (
+    <p class="backup-reminder">
+      <span>
+        Last backup: <b>{lastBackupText(props.now)}</b>. Your progress lives only in this browser.
+      </span>
+      <button type="button" class="btn secondary" onClick={exportProgress}>
+        Export
+      </button>
+    </p>
+  );
+}
+
 function Backup() {
   const [msg, setMsg] = useState<string | null>(null);
   const p = prefs.value;
@@ -532,15 +645,7 @@ function Backup() {
   const [resetKey, setResetKey] = useState('');
 
   const doExport = () => {
-    const b = makeBackup(prefs.value, stats.value, daily.value, Date.now(), answerLog.value);
-    const blob = new Blob([JSON.stringify(b, null, 1)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `fretboard-chords-backup-${b.exportedAt.slice(0, 10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    exportProgress();
     setMsg('Backup downloaded.');
   };
 
@@ -551,7 +656,7 @@ function Backup() {
       return;
     }
     if (!confirm('Replace your current progress and preferences with this backup?')) return;
-    replaceProgress(r.backup.stats, r.backup.daily, r.backup.log ?? []);
+    replaceProgress(r.backup.stats, r.backup.daily, r.backup.log ?? [], r.backup.rollups ?? []);
     setPreferences(r.backup.preferences);
     setMsg(
       `Imported ${Object.keys(r.backup.stats).length} items${r.skipped ? `, skipped ${r.skipped} invalid entries` : ''}.`,
@@ -560,6 +665,12 @@ function Backup() {
 
   return (
     <Section title="Backup & reset">
+      <p class="explain">
+        Last backup: {lastBackupText(Date.now())}.{' '}
+        {storagePersisted.value === true
+          ? 'This browser has agreed to keep your progress.'
+          : 'The browser may clear site data when space runs low, so export now and then.'}
+      </p>
       <div class="actions wrap">
         <button type="button" class="btn secondary" onClick={doExport}>
           Export JSON

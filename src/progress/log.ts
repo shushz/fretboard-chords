@@ -3,11 +3,9 @@
  * the log keeps every answer, so we can show improvement over time for any slice
  * (a mode, or one chord function on one string set).
  */
-import { median } from '../exercises/session';
 import { parseKeyName } from '../theory/keys';
 import type { StringSetId } from '../fretboard/regions';
-import { dayKey } from './stats';
-import { type Attempt, type Item, type ModeId, itemKey, parseItemKey } from './types';
+import { type Attempt, type Item, itemKey } from './types';
 
 export interface LogEntry {
   /** Epoch ms. */
@@ -19,8 +17,11 @@ export interface LogEntry {
   ms: number;
 }
 
-/** Keep the log bounded (~1–2 MB): the oldest answers go first. */
-export const LOG_CAP = 20_000;
+/**
+ * Safety bound on raw answers. Normally the raw log holds only the last RAW_DAYS days
+ * (older days are summarised, see history.ts); this only guards against runaway data.
+ */
+export const LOG_CAP = 100_000;
 
 export function appendLog(
   log: readonly LogEntry[],
@@ -60,96 +61,6 @@ export function functionOf(item: Item): ChordFunction {
 
 export function functionKey(f: ChordFunction): string {
   return `${f.keyMode}|${f.degree}|${f.quality}|${f.stringSet}`;
-}
-
-export interface TrendFilter {
-  mode?: ModeId;
-  fn?: ChordFunction;
-}
-
-const parsed = new Map<string, Item>();
-function itemOf(k: string): Item {
-  let i = parsed.get(k);
-  if (!i) {
-    i = parseItemKey(k);
-    parsed.set(k, i);
-  }
-  return i;
-}
-
-export function matchesFilter(item: Item, f: TrendFilter): boolean {
-  if (f.mode && item.mode !== f.mode) return false;
-  if (f.fn && functionKey(functionOf(item)) !== functionKey(f.fn)) return false;
-  return true;
-}
-
-export interface TrendPoint {
-  day: string;
-  answers: number;
-  accuracy: number;
-  /** Median time of correct answers (ms), null if none. */
-  medianMs: number | null;
-}
-
-/** One point per practice day (days without practice are skipped), the latest `maxDays`. */
-export function dailyTrend(log: readonly LogEntry[], f: TrendFilter, maxDays = 30): TrendPoint[] {
-  const days = new Map<string, LogEntry[]>();
-  for (const e of log) {
-    if (!matchesFilter(itemOf(e.k), f)) continue;
-    const d = dayKey(e.t);
-    const arr = days.get(d) ?? [];
-    arr.push(e);
-    days.set(d, arr);
-  }
-  const pts = [...days.entries()]
-    .sort(([a], [b]) => (a < b ? -1 : 1))
-    .map(([day, es]) => {
-      const ok = es.filter((e) => e.ok);
-      return {
-        day,
-        answers: es.length,
-        accuracy: ok.length / es.length,
-        medianMs: ok.length ? median(ok.map((e) => e.ms)) : null,
-      };
-    });
-  return pts.slice(-maxDays);
-}
-
-export interface Comparison {
-  /** Practice days in each half. */
-  days: number;
-  before: { accuracy: number; medianMs: number | null };
-  after: { accuracy: number; medianMs: number | null };
-}
-
-/**
- * Recent practice vs. earlier practice: the last `n` practice days against the `n`
- * before them (or, with fewer days, the later half against the earlier half).
- * Weighted by answers, so a day with 3 answers doesn't count as much as one with 60.
- */
-export function compareRecent(log: readonly LogEntry[], f: TrendFilter, n = 7): Comparison | null {
-  const byDay = new Map<string, LogEntry[]>();
-  for (const e of log) {
-    if (!matchesFilter(itemOf(e.k), f)) continue;
-    const d = dayKey(e.t);
-    byDay.set(d, [...(byDay.get(d) ?? []), e]);
-  }
-  const days = [...byDay.keys()].sort();
-  if (days.length < 2) return null;
-  const half = Math.min(n, Math.floor(days.length / 2));
-  const pick = (ds: string[]) => ds.flatMap((d) => byDay.get(d)!);
-  const summarize = (es: LogEntry[]) => {
-    const ok = es.filter((e) => e.ok);
-    return {
-      accuracy: ok.length / es.length,
-      medianMs: ok.length ? median(ok.map((e) => e.ms)) : null,
-    };
-  };
-  return {
-    days: half,
-    before: summarize(pick(days.slice(-2 * half, -half))),
-    after: summarize(pick(days.slice(-half))),
-  };
 }
 
 /** Parse untrusted log entries (backup import). Invalid ones are dropped. */

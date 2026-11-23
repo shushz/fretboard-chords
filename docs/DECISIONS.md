@@ -319,3 +319,23 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   turns it off; a github-script step puts the link in a marked block at the top of the PR
   description instead (description edits send no notification). Idempotent; re-added on
   each push if a later edit dropped it.
+
+## Long-term progress history (progress-history)
+
+- Owner question: a year of an hour a day (~150–200k answers). Size and speed were fine,
+  but the 20,000-answer cap meant charts only covered the last ~6 weeks.
+- Raw answers: last `RAW_DAYS` = 60 days, one IndexedDB key per day (`log:YYYY-MM-DD`,
+  listed in `logDays`), so a save writes only today's answers. The old single `log` key is
+  migrated on load and deleted after the new keys are written.
+- Older days: one rollup per day × mode × chord function: answers, right answers and the
+  10/30/50/70/90 % quantiles of right-answer times (all times when ≤ 5). Medians across
+  rollups use a weighted median of those samples; on a simulated year they stay within
+  0.3 s of the exact daily medians, and the year takes ~400 KB.
+- Rollups keep mode and chord function only (not key, inversion…): that's what the charts
+  filter by. Item stats (last 10 tries per item) are unaffected.
+- "All time" appears once there are more than 30 practice days; it plots weeks (Monday
+  start) and compares the last 4 weeks with the first 4.
+- `navigator.storage.persist()` on the first answer of a session (not in previews; same
+  origin as the live app). Its result is shown in Backup & reset.
+- Backup reminder: a plain line at the top of Progress (no dismissible card) when the first
+  practice day is ≥ 14 days ago and there's no export in the last 30 days.
