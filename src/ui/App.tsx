@@ -81,8 +81,8 @@ function SessionStatus() {
   const h = sessionHeader.value!;
   return (
     <>
-      {/* "Practice" alone gives way to the status on narrow screens; a drill title stays. */}
-      <h1 class={h.title ? 'with-status' : 'with-status plain'}>{h.title ?? TITLES.practice}</h1>
+      {/* Narrow screens hide this (CSS); a drill title then shows under the bar instead. */}
+      <h1 class="with-status">{h.title ?? TITLES.practice}</h1>
       <span class="session-status">
         <span class="session-progress">{h.progress}</span>
         <span class="session-score">{h.correct} ✓</span>

@@ -138,5 +138,5 @@ test('progress: trend charts, chord-by-string-set map, practice a cell', async (
   await cell.click();
   await expect(page.locator('.fn-chip')).toContainText('in minor keys');
   await page.getByRole('button', { name: 'Practice this' }).click();
-  await expect(page.locator('.topbar h1')).toBeVisible();
+  await expect(page.locator('.drill-title')).toBeVisible();
 });

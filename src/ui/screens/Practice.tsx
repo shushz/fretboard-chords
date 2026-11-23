@@ -201,7 +201,13 @@ export function Practice() {
 
   return (
     <div class="practice">
-      {drill && current.item && <div class="drill-item muted">{itemLabel(current.item, p)}</div>}
+      {drill && current.item && (
+        <div class="drill-item muted">
+          {/* On narrow screens the drill's title lives here instead of the top bar. */}
+          <b class="drill-title">{drill.title} · </b>
+          {itemLabel(current.item, p)}
+        </div>
+      )}
       {mode && cfg && (
         <mode.Runner
           key={`${session.index}:${retry}:${regen}`}
