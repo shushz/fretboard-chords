@@ -69,7 +69,7 @@ describe('find the chord', () => {
       ...defaultConfig('find', fsm, p),
       degrees: [0 as const],
       stringSets: ['2-4' as const],
-      anchor: 'required' as const,
+      tapRoot: true,
       anchorStrings: [5 as const],
     };
     const q = generateFindQuestion(cfg, opts())!;
@@ -94,7 +94,7 @@ describe('find the chord', () => {
     const cfg = {
       ...defaultConfig('find', fsm, p),
       stringSets: ['4-6' as const],
-      anchor: 'required' as const,
+      tapRoot: true,
     };
     expect(generateFindQuestion(cfg, opts())).toBeNull();
   });

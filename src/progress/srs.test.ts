@@ -62,7 +62,7 @@ describe('drilling', () => {
     const c = drillConfig(item({ anchor: 6 }), p)!;
     expect(c.degrees).toEqual([3]);
     expect(c.stringSets).toEqual(['2-4']);
-    expect(c.anchor).toBe('required');
+    expect(c.tapRoot).toBe(true);
     expect(c.anchorStrings).toEqual([6]);
     const t = drillConfig(item({ mode: 'nameTones', stringSet: '*', variant: 'tap b3 s2' }), p)!;
     expect(t.variant).toBe('tap');

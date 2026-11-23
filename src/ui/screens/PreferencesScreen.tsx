@@ -104,26 +104,6 @@ export function PreferencesScreen() {
           max={6}
           onChange={(v) => editPreferences((d) => void (d.fretboard.maxSpan = v))}
         />
-        <Segmented
-          label="Root anchor"
-          value={p.fretboard.anchor}
-          options={[
-            { value: 'off', label: 'Off' },
-            { value: 'ghost', label: 'Ghost' },
-            { value: 'required', label: 'Required' },
-          ]}
-          onChange={(v) => editPreferences((d) => void (d.fretboard.anchor = v))}
-        />
-        <Segmented
-          label="Anchor string"
-          value={p.fretboard.anchorStrings}
-          options={[
-            { value: '6', label: '6' },
-            { value: '5', label: '5' },
-            { value: 'both', label: 'Both' },
-          ]}
-          onChange={(v) => editPreferences((d) => void (d.fretboard.anchorStrings = v))}
-        />
         <Toggle
           label="Left-handed"
           checked={p.fretboard.leftHanded}
@@ -153,6 +133,20 @@ export function PreferencesScreen() {
           checked={p.practice.givenShapeRoles}
           onChange={(v) => editPreferences((d) => void (d.practice.givenShapeRoles = v))}
         />
+        <Segmented
+          label="Root on string 6 / 5"
+          value={p.fretboard.rootHint}
+          options={[
+            { value: 'never', label: 'Never' },
+            { value: 'after', label: 'After answering' },
+            { value: 'during', label: 'While answering' },
+          ]}
+          onChange={(v) => editPreferences((d) => void (d.fretboard.rootHint = v))}
+        />
+        <p class="hint field-hint">
+          A faded R on string 6 or 5 near the chord: the bass root you probably know best, as a
+          landmark. In Find the chord and the chord explorer.
+        </p>
       </Section>
 
       <Section title="Sevenths">

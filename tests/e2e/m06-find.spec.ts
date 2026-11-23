@@ -57,7 +57,7 @@ test('anchored variant asks for the root on string 6/5', async ({ page }) => {
   const strings = page.getByRole('group', { name: 'Strings' });
   await strings.getByRole('button', { name: '2–4' }).click();
   await strings.getByRole('button', { name: '1–3' }).click(); // only 2–4
-  await page.getByRole('radio', { name: 'Required' }).click();
+  await page.getByRole('switch', { name: /Also tap the root/ }).check();
   await page.getByRole('button', { name: /^Start/ }).click();
   const hint = page.locator('.prompt-hint');
   await expect(hint).toContainText('Tap the root on string');

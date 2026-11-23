@@ -67,7 +67,8 @@ R–3–7 shells), in **one key or a random key** per question.
 - **Plucked-string sound**, synthesized in the browser: you hear each note you tap, a
   strum when you're right, a muted thunk when you're not.
 - **Hints you control.** Role labels and colors on a given shape can be hidden, since
-  they give the answer away.
+  they give the answer away; the chord's root on string 6/5 can be shown as a landmark
+  after answering (default), while answering, or never.
 - **Help built in.** _Help & about_ explains getting started, the main ideas (roles,
   numerals, string sets, inversions, anchors…) and every mode; each mode's setup has a
   short _How it works_.

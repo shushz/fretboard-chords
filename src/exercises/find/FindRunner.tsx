@@ -3,15 +3,19 @@ import { chordNumeral, chordSymbol } from '../../theory/chords';
 import { formatKey } from '../../theory/keys';
 import { formatStringSet, formatWindow } from '../../fretboard/regions';
 import { pairAnchors } from '../../fretboard/anchors';
-import { anchorStringList, numeralOptions, symbolOptions } from '../../prefs/model';
+import { ANCHOR_STRINGS, numeralOptions, symbolOptions } from '../../prefs/model';
+import { fretted } from '../../fretboard/voicings';
+import { Toggle } from '../../ui/controls';
 import { chordToneName } from '../../ui/markers';
-import { voicingOptions } from '../config';
+import { type PracticeConfig, voicingOptions } from '../config';
 import type { RunnerProps } from '../types';
 import { TapQuestion, inversionName } from '../TapQuestion';
 import {
   type FindQuestion,
   findItem,
   generateFindQuestion,
+  anchorCandidates,
+  anchorFrets,
   gradeFind,
   requiredStrings,
 } from './logic';
@@ -37,6 +41,19 @@ export function FindRunner(props: RunnerProps) {
   const maxFret = p.fretboard.fretRange;
   const numeral = chordNumeral(q.chord, numeralOptions(p));
   const symbol = chordSymbol(q.chord, symbolOptions(p));
+  const rootHint = p.fretboard.rootHint;
+  // "While answering": the roots on 6/5 near the region, as a landmark. Not when the root
+  // tap is part of the question (that would give it away).
+  const hints =
+    rootHint === 'during' && !q.anchorString
+      ? anchorCandidates(q.region, ANCHOR_STRINGS).flatMap((s) =>
+          anchorFrets(q, s, maxFret).map((f) => ({
+            ...fretted(s, f),
+            tone: q.chord.tones[0],
+            role: 'R' as const,
+          })),
+        )
+      : [];
 
   return (
     <TapQuestion
@@ -51,13 +68,14 @@ export function FindRunner(props: RunnerProps) {
       }}
       chord={q.chord}
       region={q.region}
+      hints={hints}
       requiredStrings={requiredStrings(q)}
       grade={(taps) => {
         const g = gradeFind(q, taps, maxFret);
-        const anchorWanted =
-          p.fretboard.anchor === 'ghost' || config.anchor !== 'off' || q.anchorString;
+        // After answering: the root on 6/5 next to the shape (unless the hint is off).
+        const anchorWanted = rootHint !== 'never' || q.anchorString;
         const shown = g.matched ? [g.matched] : q.valid;
-        const strings = q.anchorString ? [q.anchorString] : anchorStringList(p);
+        const strings = q.anchorString ? [q.anchorString] : ANCHOR_STRINGS;
         const ghosts = anchorWanted
           ? pairAnchors(q.chord, shown, strings, maxFret, q.region.window).map((a) => a.anchor.note)
           : [];
@@ -95,6 +113,20 @@ export function FindRunner(props: RunnerProps) {
         ])
       }
       onNext={props.onNext}
+    />
+  );
+}
+
+export function FindSetup(props: {
+  config: PracticeConfig;
+  onChange: (c: PracticeConfig) => void;
+}) {
+  return (
+    <Toggle
+      label="Also tap the root on string 6 or 5"
+      hint="Tap the chord's root on a bass string first, then the chord. The app picks the string; not possible on strings 4–6."
+      checked={props.config.tapRoot}
+      onChange={(tapRoot) => props.onChange({ ...props.config, tapRoot })}
     />
   );
 }
