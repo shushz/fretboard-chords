@@ -32,6 +32,15 @@ export default defineConfig({
   },
   plugins: [
     preact(),
+    {
+      // PR previews must never show up in search results (the canonical link already points
+      // at the live app; this makes it explicit).
+      name: 'preview-noindex',
+      transformIndexHtml: (html) =>
+        previewPr
+          ? html.replace('<head>', '<head>\n    <meta name="robots" content="noindex" />')
+          : html,
+    },
     VitePWA({
       // Previews are for trying things out: no offline install, no cache to go stale.
       disable: previewPr !== '',
@@ -57,8 +66,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],
-        // Search Console's ownership file: for Google's crawler only, not the app.
-        globIgnores: ['**/google*.html'],
+        // For crawlers and link previews only, not the app: Search Console's ownership file
+        // and the link-preview image.
+        globIgnores: ['**/google*.html', '**/og-image.png'],
         navigateFallback: `${base}index.html`,
         // Previews live under the live app's path: never answer them with the live app.
         navigateFallbackDenylist: [/\/pr-preview\//],

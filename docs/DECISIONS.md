@@ -346,3 +346,16 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   HTML file in `public/`. Keep it: Google re-checks and drops verification if it's gone.
 - It's static and only read by Google's crawler; the app sends nothing anywhere (privacy
   promise unchanged). Excluded from the service worker precache and from Prettier.
+
+## Search and link previews (fix-seo)
+
+- All static text in `index.html`; nothing is fetched by the app (offline/privacy rules hold).
+  `og-image.png` and `sitemap.xml` are excluded from the service worker precache.
+- The description for crawlers is a `<noscript>` block, not visible text replaced by the app:
+  that would flash on every launch. Googlebot renders the app anyway; the block also helps
+  the rare no-JS visitor.
+- No `robots.txt`: crawlers only read it at the domain root (shushz.github.io/robots.txt),
+  which belongs to a different repository and is absent (everything allowed).
+- Canonical link → live app; PR previews add `noindex` at build time.
+- `og-image.png` was composed from the README find-the-chord screenshot; regenerate it if
+  the app's look changes a lot.
