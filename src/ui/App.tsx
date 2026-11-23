@@ -30,9 +30,8 @@ export function App() {
             ‹
           </button>
         ) : (
-          <span class="logo" aria-hidden="true">
-            ◉
-          </span>
+          // The app icon (same as the favicon and the installed app), precached with the app.
+          <img class="logo" src={`${import.meta.env.BASE_URL}icon.svg`} alt="" aria-hidden="true" />
         )}
         {r === 'practice' && sessionHeader.value ? <SessionStatus /> : <h1>{TITLES[r]}</h1>}
         <button

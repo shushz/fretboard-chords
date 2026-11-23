@@ -131,10 +131,10 @@ input {
   font-weight: 650;
 }
 .logo {
-  width: 44px;
-  text-align: center;
-  color: var(--accent);
-  font-size: 1.4rem;
+  width: 36px;
+  height: 36px;
+  margin: 0 4px;
+  flex: none;
 }
 .icon-btn {
   min-width: 44px;

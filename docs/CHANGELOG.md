@@ -38,3 +38,4 @@
 - Progress history: answers stored one key per day; days older than 60 folded into compact daily summaries (no more 20,000-answer cap), with an "All time" weekly view; the app asks for persistent storage; Progress shows the last backup and a plain reminder line after two weeks without one.
 - Google Search Console ownership file (`public/google74972c4ba0213d6f.html`), served by Pages, not precached; the app still makes no network requests.
 - Search and link previews: descriptive title and meta description, canonical link, Open Graph/Twitter tags with a 1200×630 preview image, schema.org WebApplication data, a <noscript> description, sitemap.xml; PR previews are noindex.
+- Home: the top bar shows the app icon (as in the favicon and installed app) instead of a blue dot.
