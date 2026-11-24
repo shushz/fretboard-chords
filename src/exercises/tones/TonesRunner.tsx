@@ -1,4 +1,5 @@
 import { BoardFrame } from '../../ui/BoardFrame';
+import { clockNow } from '../answerClock';
 import { formatNote } from '../../theory/notes';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { feedback, playNote, revealSound, strum } from '../../audio/engine';
@@ -53,8 +54,8 @@ export function TonesRunner(props: RunnerProps) {
 }
 
 function useTimer() {
-  const t = useRef(performance.now());
-  return () => performance.now() - t.current;
+  const t = useRef(clockNow());
+  return () => clockNow() - t.current;
 }
 
 function LabelView(props: RunnerProps & { q: LabelQuestion }) {

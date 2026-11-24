@@ -73,7 +73,9 @@ export function Fretboard(props: FretboardProps) {
   let regionRect: { x: number; y: number; w: number; h: number } | null = null;
   if (region) {
     const ss = props.regionStrings ?? stringsOf(region.stringSet);
-    const lo = Math.max(region.window.start, fromFret);
+    // Open strings count as inside a window starting at fret 1: include their column.
+    const start = region.window.start === 1 && fromFret === 0 ? 0 : region.window.start;
+    const lo = Math.max(start, fromFret);
     const hi = Math.min(windowEnd(region.window), toFret);
     if (lo <= hi) {
       const a = fretCell(g, lo);

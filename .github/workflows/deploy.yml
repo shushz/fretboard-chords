@@ -33,3 +33,43 @@ jobs:
           branch: gh-pages
           folder: dist
           clean-exclude: pr-preview/
+
+  prune-previews:
+    # Previews of closed PRs. preview.yml removes a PR's preview when it closes, but a merge
+    # also starts this deploy, which can push from a gh-pages checkout taken just before
+    # that removal and so restore the folder. Remove whatever is left, after the deploy.
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+      - name: Remove previews of closed PRs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          [ -d pr-preview ] || exit 0
+          removed=0
+          for d in pr-preview/pr-*/; do
+            n="${d%/}"; n="${n##*/pr-}"
+            state=$(gh api "repos/$REPO/pulls/$n" --jq .state 2>/dev/null || echo unknown)
+            if [ "$state" = "closed" ]; then
+              git rm -rq "${d%/}"
+              removed=1
+              echo "Removed preview of closed PR $n"
+            fi
+          done
+          [ "$removed" = 1 ] || exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -qm "Remove previews of closed PRs"
+          for i in 1 2 3; do
+            if git pull -q --rebase origin gh-pages && git push -q origin HEAD:gh-pages; then exit 0; fi
+            sleep 5
+          done
+          exit 1

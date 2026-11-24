@@ -16,6 +16,7 @@ import {
 } from '../../exercises/session';
 import { drillQueue, occurrence } from '../../exercises/drill';
 import { reviewConfig, reviewWeight } from '../../exercises/review';
+import { pauseClock, resumeClock } from '../../exercises/answerClock';
 import { pendingDrill } from '../../exercises/drillState';
 import { PROGRESSIONS } from '../../exercises/progression/logic';
 import { makeItemWeight } from '../../progress/srs';
@@ -65,6 +66,12 @@ export function Practice() {
     prefsWhenLeft.current = null;
     if (before && before !== prefs.value && session?.phase === 'answering') setRegen((x) => x + 1);
   }, [visible]);
+  // Answer times stand still while Preferences or Help is open on top of a question.
+  useEffect(() => {
+    if (visible) resumeClock('route');
+    else pauseClock('route');
+  }, [visible]);
+  useEffect(() => () => resumeClock('route'), []);
   // Session status lives in the top bar while a question is on screen.
   const running = visible && session !== null && session.phase !== 'done';
   useEffect(() => {
@@ -148,6 +155,20 @@ export function Practice() {
       ),
     };
   }, [index, retry, regen, drill, session === null]);
+
+  // A review item that can't be turned into a question (e.g. a damaged key in an imported
+  // backup) is skipped instead of leaving an empty screen.
+  const unaskable = !!drill && !!session && session.phase !== 'done' && !current.config;
+  useEffect(() => {
+    if (!unaskable) return;
+    setSession((s) =>
+      !s
+        ? s
+        : isSessionOver(s, Date.now())
+          ? finishSession(s)
+          : nextQuestion(s, s.index + 1, Date.now()),
+    );
+  }, [unaskable, index]);
 
   if (!session) {
     return (

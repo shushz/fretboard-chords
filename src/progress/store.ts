@@ -125,10 +125,25 @@ async function flush(): Promise<void> {
       else byDay.set(d, [e]);
     }
     const days = [...byDay.keys()].sort();
-    for (const d of dirtyDays) if (byDay.has(d)) await set(dayLogKey(d), byDay.get(d));
+    // Take the dirty days now: an answer recorded while this save awaits marks its day
+    // again, for the next save (clearing afterwards would lose that mark).
+    const todo = [...dirtyDays];
     dirtyDays.clear();
-    if (rollupsDirty) await set(ROLLUPS_KEY, rollups.value);
-    rollupsDirty = false;
+    try {
+      for (const d of todo) if (byDay.has(d)) await set(dayLogKey(d), byDay.get(d));
+    } catch (e) {
+      for (const d of todo) dirtyDays.add(d);
+      throw e;
+    }
+    if (rollupsDirty) {
+      rollupsDirty = false;
+      try {
+        await set(ROLLUPS_KEY, rollups.value);
+      } catch (e) {
+        rollupsDirty = true;
+        throw e;
+      }
+    }
     if (days.join() !== storedDays.join()) await set(DAYS_KEY, days);
     // Only now that the new keys are written: remove what's no longer needed.
     for (const d of storedDays) if (!byDay.has(d)) await del(dayLogKey(d));

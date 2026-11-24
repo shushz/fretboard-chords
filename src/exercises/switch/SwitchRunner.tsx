@@ -1,4 +1,5 @@
 import { BoardFrame } from '../../ui/BoardFrame';
+import { clockNow } from '../answerClock';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { feedback, playNote, revealSound, strum } from '../../audio/engine';
 import { buildChord, chordSymbol, qualityName } from '../../theory/chords';
@@ -40,7 +41,7 @@ export function SwitchRunner(props: RunnerProps) {
       }),
     [],
   );
-  const started = useRef(performance.now());
+  const started = useRef(clockNow());
   const [selected, setSelected] = useState(false);
   const [result, setResult] = useState<{
     ok: boolean;
@@ -77,7 +78,7 @@ export function SwitchRunner(props: RunnerProps) {
       {
         item: switchItem(q),
         correct: ok,
-        timeMs: performance.now() - started.current,
+        timeMs: clockNow() - started.current,
         at: Date.now(),
         window: q.region.window,
         sevenths: config.sevenths,

@@ -417,3 +417,17 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
 - Timing: intervals 0 / 1 / 3 / 7 / 21 days (the 10-minute box made items return within
   the hour). Speed now counts: a right answer slower than the mastery time moves up but not
   past box 3, so it keeps coming back every few days until it's quick.
+
+## Code-review fixes (fix-review-findings)
+
+- Whole-project review found 9 issues; each fix has a test that fails without it.
+- Saving: `flush` takes the dirty days before writing (and re-marks them on failure).
+- Answer clock (`exercises/answerClock.ts`): pauses while Practice is hidden under an
+  overlay and while the page is hidden; all runners measure with it.
+- Reset one key also drops that key's raw answers; rollups (days older than 60) have no
+  key and stay.
+- `App` renders an empty shell until preferences have loaded (a few ms), so no screen
+  builds state from defaults.
+- Previews: deploy.yml's `prune-previews` job removes `pr-preview/pr-N` for closed PRs
+  after each deploy (the deploy could restore a folder the preview workflow had just
+  removed). The first run cleans up pr-28 … pr-42.
