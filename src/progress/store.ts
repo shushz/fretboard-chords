@@ -220,3 +220,11 @@ export function markBackedUp(now = Date.now()): void {
   lastBackup.value = now;
   set(BACKUP_KEY, now).catch(() => undefined);
 }
+
+/** An item that can no longer be asked leaves reviews and the weakest list (see ItemStats). */
+export function retireItem(key: string): void {
+  const s = stats.value[key];
+  if (!s || s.retired) return;
+  stats.value = { ...stats.value, [key]: { ...s, retired: true } };
+  persist();
+}

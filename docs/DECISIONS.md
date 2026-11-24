@@ -431,3 +431,14 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
 - Previews: deploy.yml's `prune-previews` job removes `pr-preview/pr-N` for closed PRs
   after each deploy (the deploy could restore a folder the preview workflow had just
   removed). The first run cleans up pr-28 … pr-42.
+
+## Retiring items that can't be asked (fix-retire-unaskable)
+
+- Owner report: "In E, what is vi?" kept coming back and the count stayed at 1. The due
+  item was `nameChord|E|0|maj|…|forward` ("what is I?"), saved before Name the chord
+  stopped asking about the tonic. With no matching candidate, the review's exact weights
+  were all 0 and `weightedPick` returned the last candidate (vi), recorded under vi.
+- `reviewConfig` now returns null when no window can ask the item; Practice then marks it
+  `retired` (`retireItem`) and skips it. Retired items leave `dueItems` and `weakest`;
+  `updateStats` clears the flag, so a preference turned back on brings them back on the
+  next answer.

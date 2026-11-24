@@ -85,6 +85,10 @@ describe('item stats', () => {
       2,
     );
   });
+  it('answering a retired item un-retires it', () => {
+    const s = { ...updateStats(undefined, att(false)), retired: true };
+    expect(updateStats(s, att(true)).retired).toBeFalsy();
+  });
   it('remembers the window of the last attempt', () => {
     const s = updateStats(undefined, { ...att(true), window: { start: 1, width: 5 } });
     expect(s.window).toEqual({ start: 1, width: 5 });

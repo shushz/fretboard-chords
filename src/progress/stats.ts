@@ -23,6 +23,11 @@ export interface ItemStats {
    * shape (inversion, anchor string…) may not exist in other windows.
    */
   window?: FretWindow;
+  /**
+   * The item can't be asked any more (the mode changed, or a preference turned it off):
+   * left out of reviews and the weakest list. Cleared by the next answer to it.
+   */
+  retired?: boolean;
 }
 
 const DAY = 86_400_000;
@@ -70,6 +75,7 @@ export function updateStats(
       : Math.max(base.box, Math.min(SLOW_MAX_BOX, base.box + 1));
   return {
     ...base,
+    retired: undefined, // answering it again un-retires it
     attempts: base.attempts + 1,
     correct: base.correct + (a.correct ? 1 : 0),
     recent: [...base.recent, { ok: a.correct, ms: Math.round(a.timeMs) }].slice(-RECENT),
@@ -226,7 +232,7 @@ export function groupBy(
  */
 export function weakest(stats: Record<string, ItemStats>, n = 10, triadMs = 3000): ItemStats[] {
   return Object.values(stats)
-    .filter((s) => s.attempts >= 3)
+    .filter((s) => s.attempts >= 3 && !s.retired)
     .map((s) => ({
       s,
       score: (1 - rollingAccuracy(s)) * 2 + Math.min(2, medianTime(s) / triadMs / 2),

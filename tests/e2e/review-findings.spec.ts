@@ -150,8 +150,11 @@ test('a review item that cannot be asked is skipped, not a blank screen', async 
   await page.waitForTimeout(500); // saved
   await page.goto('./');
   await page.getByRole('button', { name: /^Review due items/ }).click();
-  // The bad item is skipped; the session carries on to the other items or finishes.
+  // The bad item is skipped and retired: the session ends, and it's no longer due.
   await expect(page.locator('.prompt-main, .summary').first()).toBeVisible();
+  await page.waitForTimeout(500);
+  await page.goto('./');
+  await expect(page.getByRole('button', { name: /^Review due items/ })).toHaveCount(0);
 });
 
 test('opening the app directly on Practice uses the saved preferences', async ({ page }) => {
@@ -194,4 +197,33 @@ test('a window starting at fret 1 includes the open-string column in its box', a
     .boundingBox())!;
   expect(after.x).toBeLessThan(fret1.x - 10); // reaches into the open-string column
   expect(before.x).toBeGreaterThan(after.x);
+});
+
+test('an item that can no longer be asked leaves the review instead of staying due', async ({
+  page,
+}) => {
+  // Saved before Name the chord stopped asking about the tonic: "In E, what is I?"
+  const old: ItemStats = {
+    key: 'nameChord|E|0|maj|*|*|-|forward',
+    attempts: 3,
+    correct: 1,
+    recent: [{ ok: false, ms: 3000 }],
+    firstSeen: 0,
+    lastSeen: 0,
+    box: 1,
+    due: 0,
+  };
+  await importBackup(page, backupFile(1, { [old.key]: old }));
+  await page.waitForTimeout(500); // saved
+  await page.goto('./');
+  await page.getByRole('button', { name: /^Review due items \(1\)/ }).click();
+  // No substitute question ("In E, what is vi?") is asked for it.
+  await expect(page.getByText('In E, what is vi?')).toHaveCount(0);
+  await expect(page.getByText('Session complete')).toBeVisible();
+  await page.waitForTimeout(500);
+  await page.goto('./');
+  await expect(page.getByRole('button', { name: /^Review due items/ })).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole('button', { name: /^Practice/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Review due items/ })).toHaveCount(0);
 });
