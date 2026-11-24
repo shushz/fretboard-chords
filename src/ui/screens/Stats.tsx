@@ -712,7 +712,13 @@ function Backup() {
             disabled={!resetKey}
             onClick={() => {
               if (!confirm(`Reset all progress for ${keyLabel(resetKey, p)}?`)) return;
-              replaceProgress(withoutKey(stats.value, resetKey), daily.value);
+              // Its answers leave the charts too. (Days older than 60 are kept only as
+              // summaries without keys; those stay.)
+              replaceProgress(
+                withoutKey(stats.value, resetKey),
+                daily.value,
+                answerLog.value.filter((e) => parseItemKey(e.k).key !== resetKey),
+              );
               setMsg(`Progress for ${keyLabel(resetKey, p)} reset.`);
               setResetKey('');
             }}
@@ -727,7 +733,7 @@ function Backup() {
         onClick={() => {
           if (!confirm('Reset ALL progress? This cannot be undone (export a backup first).'))
             return;
-          replaceProgress({}, {}, []);
+          replaceProgress({}, {}, [], []);
           setMsg('All progress reset.');
         }}
       >

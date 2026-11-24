@@ -112,10 +112,11 @@ export function About() {
             Each thing you practice (a chord, in a key, on a string set, in a mode) is tracked. A
             mistake makes it due again right away (<b>Review due items</b> on the home screen). A
             quick right answer spaces it out: 1 day, then 3, 7 and 21 days. A right but slow answer
-            (slower than the mastery time below) brings it back within 3 days until you're quick. A
-            review asks each item where you last practiced it. It counts as mastered at 90% right
-            over the last 10 tries with a median answer under 3 s (5 s for seventh chords).
-            Thresholds are in Preferences.
+            (slower than the mastery time below) brings it back within 3 days until you're quick.
+            Time spent in Preferences or Help, or with the app in the background, doesn't count
+            toward an answer. A review asks each item where you last practiced it. It counts as
+            mastered at 90% right over the last 10 tries with a median answer under 3 s (5 s for
+            seventh chords). Thresholds are in Preferences.
           </dd>
         </dl>
       </Section>

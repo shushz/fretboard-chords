@@ -1,5 +1,5 @@
 import { route, navigate, goBack, isKeptAlive, type Route } from './router';
-import { prefs, editPreferences } from '../prefs/store';
+import { prefs, prefsLoaded, editPreferences } from '../prefs/store';
 import { IS_PREVIEW, PREVIEW_PR } from '../env';
 import { resetDemoData } from '../progress/store';
 import { Home } from './screens/Home';
@@ -21,6 +21,9 @@ const TITLES: Record<Route, string> = {
 
 export function App() {
   const r = route.value;
+  // Screens build their state from the preferences (e.g. Practice's setup): wait for them.
+  // Loading takes a few milliseconds; if storage fails, defaults load just the same.
+  if (!prefsLoaded.value) return <div class="app" />;
   return (
     <div class="app">
       {IS_PREVIEW && <PreviewBar />}

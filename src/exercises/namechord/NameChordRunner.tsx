@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { clockNow } from '../answerClock';
 import { feedback } from '../../audio/engine';
 import { chordNumeral, chordSymbol } from '../../theory/chords';
 import { formatKey } from '../../theory/keys';
@@ -31,7 +32,7 @@ export function NameChordRunner(props: RunnerProps) {
       }),
     [],
   );
-  const started = useRef(performance.now());
+  const started = useRef(clockNow());
   const [picked, setPicked] = useState<string | null>(null);
   useEffect(() => {
     if (!q) props.onImpossible();
@@ -56,7 +57,7 @@ export function NameChordRunner(props: RunnerProps) {
       {
         item: nameChordItem(q),
         correct: ok,
-        timeMs: performance.now() - started.current,
+        timeMs: clockNow() - started.current,
         at: Date.now(),
         sevenths: config.sevenths,
       },

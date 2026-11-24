@@ -1,4 +1,5 @@
 import { BoardFrame } from '../ui/BoardFrame';
+import { clockNow } from './answerClock';
 /** Shared UI for questions answered by tapping a voicing on the fretboard. */
 import type { ComponentChildren } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
@@ -81,7 +82,7 @@ export interface TapQuestionProps {
 
 export function TapQuestion(props: TapQuestionProps) {
   const p = props.prefs;
-  const started = useRef(performance.now());
+  const started = useRef(clockNow());
   const [taps, setTaps] = useState<Taps>(new Map());
   const [grade, setGrade] = useState<TapGrade | null>(null);
   const [timedOut, setTimedOut] = useState(false);
@@ -119,7 +120,7 @@ export function TapQuestion(props: TapQuestionProps) {
     const g0 = props.grade(t);
     const g: TapGrade = gaveUp ? { ...g0, correct: false, matched: null } : g0;
     setGrade(g);
-    const timeMs = performance.now() - started.current;
+    const timeMs = clockNow() - started.current;
     const v = g.matched ?? g.reveal[0];
     const midis = v ? v.notes.map((n) => n.midi) : [];
     const vo = voicingOptions(p);

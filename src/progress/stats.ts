@@ -142,12 +142,13 @@ export function updateDaily(daily: Record<string, DayStats>, a: Attempt): Record
 
 /** Consecutive days with practice, ending today (or yesterday if not yet today). */
 export function streak(daily: Record<string, DayStats>, now: number): number {
+  // Step by calendar day, not 24 h: a 23-hour day (clocks going forward) would be skipped.
+  const d = new Date(now);
   let n = 0;
-  let t = now;
-  if (!daily[dayKey(t)]) t -= 86_400_000;
-  while (daily[dayKey(t)]?.attempts) {
+  if (!daily[dayKey(d.getTime())]) d.setDate(d.getDate() - 1);
+  while (daily[dayKey(d.getTime())]?.attempts) {
     n++;
-    t -= 86_400_000;
+    d.setDate(d.getDate() - 1);
   }
   return n;
 }
@@ -160,7 +161,9 @@ export function totalMinutes(daily: Record<string, DayStats>): number {
 export function trend(daily: Record<string, DayStats>, now: number, days = 14) {
   const out: { day: string; attempts: number; accuracy: number | null }[] = [];
   for (let i = days - 1; i >= 0; i--) {
-    const k = dayKey(now - i * 86_400_000);
+    const date = new Date(now);
+    date.setDate(date.getDate() - i);
+    const k = dayKey(date.getTime());
     const d = daily[k];
     out.push({
       day: k,
