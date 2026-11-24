@@ -402,3 +402,18 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
 - Below 480 px the top bar in a session shows only Back, the counter, End session, sound
   and Preferences. A review/drill title ("Review", "Weak spots", "iv") moves to the
   existing line under the bar, before the item. Wider screens are unchanged.
+
+## Reviews that actually clear (fix-review-due)
+
+- Owner report: the due count never reached 0 after a perfect review, and the same items
+  kept coming back. A simulation (`src/exercises/review.test.ts`) over every mode, with
+  practice in random windows, found the review question recorded a _different_ item for
+  12–100 % of items: progression steps (drilled as Find the chord, recorded as `find`),
+  and items whose shape (inversion, anchor string, moving note) doesn't exist in the
+  default window the review used.
+- Fixes: ItemStats remembers the last attempt's window; `reviewConfig` asks the item there
+  (or, for stats saved before, the nearest window where `canAsk` finds it); `reviewWeight`
+  makes only the exact item eligible (was 0.001 for others); `recordAs: 'progression'`.
+- Timing: intervals 0 / 1 / 3 / 7 / 21 days (the 10-minute box made items return within
+  the hour). Speed now counts: a right answer slower than the mastery time moves up but not
+  past box 3, so it keeps coming back every few days until it's quick.

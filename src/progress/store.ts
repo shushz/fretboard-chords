@@ -2,6 +2,7 @@ import { computed, signal } from '@preact/signals';
 import { kvDel as del, kvGet as get, kvSet as set } from '../storage';
 import { onAttempts, recordAttempts } from './record';
 import { IS_PREVIEW } from '../env';
+import { prefs } from '../prefs/store';
 import { makeDemoAttempts } from './demo';
 import { type DayStats, type ItemStats, dayKey, updateDaily, updateStats } from './stats';
 import { itemKey } from './types';
@@ -164,7 +165,13 @@ export function installProgressRecorder(): void {
     let d = daily.value;
     for (const a of attempts) {
       const k = itemKey(a.item);
-      s = { ...s, [k]: updateStats(s[k], a) };
+      s = {
+        ...s,
+        [k]: updateStats(s[k], a, {
+          triadMs: prefs.value.practice.masteryTimeTriadMs,
+          seventhMs: prefs.value.practice.masteryTimeSeventhMs,
+        }),
+      };
       d = updateDaily(d, a);
       dirtyDays.add(dayKey(a.at));
     }
