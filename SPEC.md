@@ -215,7 +215,14 @@ key reaches the threshold).
   if any). The fret window is recorded but isn't part of the item's identity.
   Quality-switch items also record the source and target quality.
 - Per item: attempts, correct, rolling accuracy (last 10), median response time,
-  last-seen timestamp, spaced-repetition state (Leitner boxes 1–5 or SM-2-lite).
+  last-seen timestamp, spaced-repetition state (Leitner boxes 1–5 or SM-2-lite), and the
+  fret window of the last attempt.
+- **Review timing** (Leitner boxes 1–5, due after 0 / 1 / 3 / 7 / 21 days): wrong → box 1
+  (due now); right and within the mastery time → one box up; right but slower → one box up
+  but no higher than box 3. A review or drill must update the item it asks about: it is
+  asked in the item's last window (or the nearest window where that shape exists), only
+  that item is eligible, and a progression step reviewed as Find the chord is recorded as a
+  progression step.
 - **Mastery**: ≥ 90 % over the last 10 attempts and median time ≤ 3 s (triads) /
   ≤ 5 s (sevenths). Thresholds configurable.
 - Question selection: weighted toward due and weak items, with ~20 % fresh/random items.

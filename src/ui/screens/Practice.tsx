@@ -14,18 +14,13 @@ import {
   startSession,
   summarize,
 } from '../../exercises/session';
-import {
-  drillConfig,
-  drillQueue,
-  drillWeight,
-  drillWindow,
-  occurrence,
-} from '../../exercises/drill';
+import { drillQueue, occurrence } from '../../exercises/drill';
+import { reviewConfig, reviewWeight } from '../../exercises/review';
 import { pendingDrill } from '../../exercises/drillState';
 import { PROGRESSIONS } from '../../exercises/progression/logic';
 import { makeItemWeight } from '../../progress/srs';
 import { recordAttempts } from '../../progress/record';
-import type { Attempt, Item } from '../../progress/types';
+import { type Attempt, type Item, itemKey } from '../../progress/types';
 import { keyFromAscii } from '../pickers';
 import { navigate, route } from '../router';
 import type { Preferences } from '../../prefs/model';
@@ -103,27 +98,27 @@ export function Practice() {
   useEffect(() => () => void (sessionHeader.value = null), []);
   const prev = useRef<unknown>(null);
   const prevKey = useRef<Key | null>(null);
-  const lastWindow = useRef<number | undefined>(undefined);
+  /** Window start each drilled item last had in this session (a repeat goes elsewhere). */
+  const drillStarts = useRef(new Map<string, number>());
 
   // Per-question config and selection weights
   const index = session?.index ?? 0;
   const current = useMemo(() => {
     if (drill) {
       const item = drill.items[index % drill.items.length];
-      const c = drillConfig(item, p);
-      if (c) {
-        // A repeated item gets a different fret window, so it's never the identical question.
-        const occ = occurrence(drill.items, index % drill.items.length) + retry;
-        c.window = drillWindow(
-          c.window,
-          occ,
-          p.fretboard.fretRange,
-          Math.random,
-          lastWindow.current,
-        );
-        lastWindow.current = c.window.start;
-      }
-      return { config: c, itemWeight: drillWeight(item), item };
+      const k = itemKey(item);
+      // First time: where the item was last practiced (or a window it fits in). A repeat,
+      // or a retry, goes to another window, so it's never the identical question.
+      const again = occurrence(drill.items, index % drill.items.length) > 0 || retry > 0;
+      const c = reviewConfig(
+        item,
+        p,
+        stats.value[k]?.window,
+        Math.random,
+        again ? drillStarts.current.get(k) : undefined,
+      );
+      if (c) drillStarts.current.set(k, c.window.start);
+      return { config: c, itemWeight: reviewWeight(item), item };
     }
     // Random key: a new key per question (only once a session is running).
     let qConfig = config;

@@ -62,6 +62,34 @@ describe('item stats', () => {
     s = updateStats(s, att(false));
     expect(isMastered(s, T, false)).toBe(false);
   });
+  it('review timing: wrong → now, fast right → up a box, slow right → at most 3 days', () => {
+    const DAY = 86_400_000;
+    let s = updateStats(undefined, att(true, 1500, 0));
+    expect(s.box).toBe(2);
+    expect(s.due).toBe(DAY); // not 10 minutes: tomorrow
+    for (let i = 0; i < 4; i++) s = updateStats(s, att(true, 1500, 0));
+    expect(s.box).toBe(5);
+    expect(s.due).toBe(21 * DAY);
+    s = updateStats(s, att(false, 1500, 0));
+    expect(s.box).toBe(1);
+    expect(s.due).toBe(0); // due again right away
+    // right but slow (over the 3 s mastery time): climbs only to box 3
+    for (let i = 0; i < 5; i++) s = updateStats(s, att(true, 6000, 0));
+    expect(s.box).toBe(3);
+    expect(s.due).toBe(3 * DAY);
+    // a slow right answer never moves an item down
+    s = updateStats({ ...s, box: 5 }, att(true, 6000, 0));
+    expect(s.box).toBe(5);
+    // the fast threshold follows the mastery times passed in
+    expect(updateStats(undefined, att(true, 4000, 0), { triadMs: 5000, seventhMs: 8000 }).box).toBe(
+      2,
+    );
+  });
+  it('remembers the window of the last attempt', () => {
+    const s = updateStats(undefined, { ...att(true), window: { start: 1, width: 5 } });
+    expect(s.window).toEqual({ start: 1, width: 5 });
+    expect(updateStats(s, att(true)).window).toEqual({ start: 1, width: 5 });
+  });
   it('mastery needs speed', () => {
     let s: ItemStats | undefined;
     for (let i = 0; i < 10; i++) s = updateStats(s, att(true, 4000));

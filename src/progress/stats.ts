@@ -1,6 +1,7 @@
 /** Item statistics, mastery, daily log and aggregation (pure). */
 import { median } from '../exercises/session';
 import { type Attempt, type Item, itemKey, parseItemKey } from './types';
+import type { FretWindow } from '../fretboard/regions';
 
 export const RECENT = 10;
 export const MAX_BOX = 5;
@@ -17,12 +18,39 @@ export interface ItemStats {
   box: number;
   /** Epoch ms when the item is due again. */
   due: number;
+  /**
+   * Fret window of the last attempt. A review asks the item there again: a particular
+   * shape (inversion, anchor string…) may not exist in other windows.
+   */
+  window?: FretWindow;
 }
 
-/** Leitner intervals per box (ms): 0, 10 min, 1 day, 3 days, 7 days. */
-export const BOX_INTERVALS = [0, 10 * 60_000, 86_400_000, 3 * 86_400_000, 7 * 86_400_000];
+const DAY = 86_400_000;
+/**
+ * Leitner intervals per box (ms): box 1 is due now (a mistake comes back in the next
+ * review), then 1, 3, 7 and 21 days.
+ */
+export const BOX_INTERVALS = [0, DAY, 3 * DAY, 7 * DAY, 21 * DAY];
+/** A right but slow answer moves up, but no further than this box (3 days). */
+export const SLOW_MAX_BOX = 3;
 
-export function updateStats(prev: ItemStats | undefined, a: Attempt): ItemStats {
+/** Answer time that counts as fast: the mastery time for triads or sevenths. */
+export interface FastTimes {
+  triadMs: number;
+  seventhMs: number;
+}
+const DEFAULT_FAST: FastTimes = { triadMs: 3000, seventhMs: 5000 };
+
+/**
+ * Add an answer. Box: wrong → 1; right and fast → one box up (to 5, 21 days); right but
+ * slower than the mastery time → one box up but at most SLOW_MAX_BOX, so slow answers keep
+ * coming back every few days until they're quick.
+ */
+export function updateStats(
+  prev: ItemStats | undefined,
+  a: Attempt,
+  fast: FastTimes = DEFAULT_FAST,
+): ItemStats {
   const key = itemKey(a.item);
   const base: ItemStats = prev ?? {
     key,
@@ -34,7 +62,12 @@ export function updateStats(prev: ItemStats | undefined, a: Attempt): ItemStats 
     box: 1,
     due: a.at,
   };
-  const box = a.correct ? Math.min(MAX_BOX, base.box + 1) : 1;
+  const quick = a.timeMs <= (a.sevenths ? fast.seventhMs : fast.triadMs);
+  const box = !a.correct
+    ? 1
+    : quick
+      ? Math.min(MAX_BOX, base.box + 1)
+      : Math.max(base.box, Math.min(SLOW_MAX_BOX, base.box + 1));
   return {
     ...base,
     attempts: base.attempts + 1,
@@ -43,6 +76,7 @@ export function updateStats(prev: ItemStats | undefined, a: Attempt): ItemStats 
     lastSeen: a.at,
     box,
     due: a.at + BOX_INTERVALS[box - 1],
+    window: a.window ?? base.window,
   };
 }
 

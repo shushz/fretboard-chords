@@ -24,6 +24,11 @@ export interface PracticeConfig {
   anchorStrings: (5 | 6)[];
   /** Mode-specific options. */
   variant?: string;
+  /**
+   * Record answers under this mode instead (a review of a Progression walk step is asked
+   * as Find the chord but must update the progression item).
+   */
+  recordAs?: ModeId;
   /** Progression walk: find each chord within the beat limit. */
   tempo?: boolean;
   /**

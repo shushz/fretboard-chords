@@ -103,7 +103,7 @@ export function FindRunner(props: RunnerProps) {
       onGraded={(correct, timeMs) =>
         props.onGraded([
           {
-            item: findItem(q),
+            item: findItem(q, config.recordAs ?? 'find'),
             correct,
             timeMs,
             at: Date.now(),

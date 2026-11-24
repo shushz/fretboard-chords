@@ -3,7 +3,9 @@ import { DEFAULT_PREFERENCES } from '../prefs/model';
 import { type ItemStats, updateStats } from './stats';
 import { dueItems, makeItemWeight, matchesItem, srsWeight } from './srs';
 import type { Attempt, Item } from './types';
-import { drillConfig, drillQueue, drillWeight, drillWindow, occurrence } from '../exercises/drill';
+import { drillConfig, drillQueue, occurrence } from '../exercises/drill';
+import { reviewConfig, reviewWeight } from '../exercises/review';
+import { itemKey } from './types';
 
 const item = (o: Partial<Item> = {}): Item => ({
   mode: 'find',
@@ -70,14 +72,21 @@ describe('drilling', () => {
     expect(drillConfig(item({ mode: 'progression' }), p)!.mode).toBe('find');
     expect(drillConfig(item({ key: 'Gbm' }), p)!.key.tonic.letter).toBe('G');
   });
-  it('drill weight prefers the exact item', () => {
+  it('review weight only accepts the exact item', () => {
     const target = item({ mode: 'fromTonic', inversion: 'first' });
-    const w = drillWeight(target);
+    const w = reviewWeight(target);
     expect(w(target)).toBe(1);
-    expect(w({ ...target, inversion: 'root' })).toBeLessThan(0.01);
-    const tw = drillWeight(item({ mode: 'nameTones', stringSet: '*', variant: 'tap b3 s2' }));
+    expect(w({ ...target, inversion: 'root' })).toBe(0);
+    const tw = reviewWeight(item({ mode: 'nameTones', stringSet: '*', variant: 'tap b3 s2' }));
     expect(tw(item({ mode: 'nameTones', stringSet: '*', variant: 'tap b3 s2' }))).toBe(1);
-    expect(tw(item({ mode: 'nameTones', stringSet: '*', variant: 'tap R s2' }))).toBeLessThan(0.01);
+    expect(tw(item({ mode: 'nameTones', stringSet: '*', variant: 'tap R s2' }))).toBe(0);
+    // a progression step is asked as Find the chord but recorded as a progression step
+    const prog = drillConfig(item({ mode: 'progression', inversion: '*' }), p)!;
+    expect(prog.mode).toBe('find');
+    expect(prog.recordAs).toBe('progression');
+    expect(
+      reviewWeight(item({ mode: 'progression', inversion: '*' }))(item({ inversion: '*' })),
+    ).toBe(1);
   });
 });
 
@@ -104,14 +113,19 @@ describe('drill queues', () => {
       expect(occurrence(q, q.lastIndexOf(a))).toBe(1);
     }
   });
-  it('a repeated item gets a different fret window', () => {
-    const base = { start: 5, width: 5 };
-    expect(drillWindow(base, 0, 15, seeded())).toBe(base);
-    for (let seed = 1; seed < 50; seed++) {
-      const w = drillWindow(base, 1, 15, seeded(seed), 7);
-      expect(w.start).not.toBe(5);
-      expect(w.start).not.toBe(7);
-      expect(w.start + w.width - 1).toBeLessThanOrEqual(15);
+  it('first review in the stored window; a repeat in a different window that still fits', () => {
+    const p = DEFAULT_PREFERENCES;
+    const it = item({ mode: 'find', inversion: '*', degree: 0 });
+    expect(reviewConfig(it, p, { start: 2, width: 5 }, seeded())!.window).toEqual({
+      start: 2,
+      width: 5,
+    });
+    expect(reviewConfig(it, p, undefined, seeded())!.window).toEqual(p.fretboard.window);
+    for (let seed = 1; seed < 20; seed++) {
+      const w = reviewConfig(it, p, { start: 2, width: 5 }, seeded(seed), 2)!.window;
+      expect(w.start).not.toBe(2);
+      expect(w.start + w.width - 1).toBeLessThanOrEqual(p.fretboard.fretRange);
     }
+    expect(itemKey(it)).toContain('find|');
   });
 });
