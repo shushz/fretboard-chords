@@ -222,7 +222,9 @@ key reaches the threshold).
   but no higher than box 3. A review or drill must update the item it asks about: it is
   asked in the item's last window (or the nearest window where that shape exists), only
   that item is eligible, and a progression step reviewed as Find the chord is recorded as a
-  progression step.
+  progression step. An item that can't be asked in any window any more (a mode changed,
+  a preference turned it off, a damaged key) is never replaced by another question: it is
+  marked retired and leaves the due list and the weakest list until it's answered again.
 - **Mastery**: ≥ 90 % over the last 10 attempts and median time ≤ 3 s (triads) /
   ≤ 5 s (sevenths). Thresholds configurable.
 - Question selection: weighted toward due and weak items, with ~20 % fresh/random items.

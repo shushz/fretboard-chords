@@ -61,6 +61,6 @@ export function matchesItem(pattern: Item, item: Item): boolean {
 /** Items that are due now, most overdue first. */
 export function dueItems(stats: Record<string, ItemStats>, now: number): ItemStats[] {
   return Object.values(stats)
-    .filter((s) => s.due <= now)
+    .filter((s) => s.due <= now && !s.retired)
     .sort((a, b) => a.due - b.due);
 }

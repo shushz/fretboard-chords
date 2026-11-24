@@ -49,6 +49,11 @@ describe('spaced repetition', () => {
     expect(makeItemWeight(stats, o, () => 0.1)(item())).toBe(1);
     expect(makeItemWeight(stats, o, () => 0.5)(item())).toBeGreaterThan(1);
   });
+  it('retired items leave the due list until answered again', () => {
+    const a = { ...run([false]), due: 0, retired: true };
+    expect(dueItems({ [a.key]: a }, 10)).toEqual([]);
+    expect(dueItems({ [a.key]: { ...a, retired: false } }, 10)).toHaveLength(1);
+  });
   it('due list and matching', () => {
     const a = { ...run([true]), due: 5 };
     const b = { ...run([true], 1, 0, item({ degree: 1 })), due: 2 };

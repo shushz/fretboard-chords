@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_PREFERENCES } from '../prefs/model';
 import { selectableKeys } from '../theory/keys';
 import type { FretWindow } from '../fretboard/regions';
-import { type Item, type ModeId, itemKey } from '../progress/types';
+import { type Item, type ModeId, itemKey, parseItemKey } from '../progress/types';
 import { defaultConfig } from './config';
 import { recordedItems, reviewConfig, reviewWeight } from './review';
 
@@ -70,4 +70,15 @@ describe('a review question updates the item it reviews', () => {
       expect(misses, `${misses.length} of ${items.length * 2} reviews miss their item`).toEqual([]);
     });
   }
+});
+
+describe('items that can no longer be asked', () => {
+  it('get no question rather than a different one (Name the chord no longer asks the tonic)', () => {
+    const tonic = parseItemKey('nameChord|E|0|maj|*|*|-|forward');
+    expect(reviewConfig(tonic, P, undefined, seeded(1))).toBeNull();
+    // the vi of the same key is fine
+    const vi = parseItemKey('nameChord|E|5|min|*|*|-|forward');
+    const cfg = reviewConfig(vi, P, undefined, seeded(1))!;
+    expect(recordedItems(cfg, P, seeded(2), reviewWeight(vi))!.map(itemKey)).toEqual([itemKey(vi)]);
+  });
 });

@@ -100,7 +100,8 @@ function isWindow(w: unknown): w is FretWindow {
  * The practice config for one review/drill question of `item`. Window: where the item was
  * last practiced (`stored`) for its first appearance, else the default window, else the
  * nearest other window in which the item can be asked. A repeat of the item in the same
- * session (`avoidStart` = the window it just had) gets a different such window.
+ * session (`avoidStart` = the window it just had) gets a different such window. Null when
+ * the item can't be asked in any window (see `retireItem`).
  */
 export function reviewConfig(
   item: Item,
@@ -138,5 +139,8 @@ export function reviewConfig(
     const cfg = { ...c, window: { start, width } };
     if (canAsk(cfg, item, p)) return cfg;
   }
-  return { ...c, window: { start: def.start, width } };
+  // The item can't be asked any more (e.g. Name the chord no longer asks about the tonic,
+  // or a quality-switch extension is off): no question, rather than a different one that
+  // would be recorded under another item.
+  return null;
 }

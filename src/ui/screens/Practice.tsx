@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { prefs } from '../../prefs/store';
-import { stats } from '../../progress/store';
+import { retireItem, stats } from '../../progress/store';
 import { type PracticeConfig, concreteConfig, defaultConfig } from '../../exercises/config';
 import type { Key } from '../../theory/keys';
 import { Setup } from '../../exercises/Setup';
@@ -156,11 +156,13 @@ export function Practice() {
     };
   }, [index, retry, regen, drill, session === null]);
 
-  // A review item that can't be turned into a question (e.g. a damaged key in an imported
-  // backup) is skipped instead of leaving an empty screen.
+  // A review item that can't be turned into a question any more (the mode changed, a
+  // preference turned it off, a damaged key in an imported backup) is retired and skipped,
+  // instead of asking something else or leaving an empty screen.
   const unaskable = !!drill && !!session && session.phase !== 'done' && !current.config;
   useEffect(() => {
     if (!unaskable) return;
+    if (current.item) retireItem(itemKey(current.item));
     setSession((s) =>
       !s
         ? s
