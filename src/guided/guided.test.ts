@@ -17,7 +17,7 @@ import {
   stepProgress,
   targetState,
 } from './progress';
-import { NEW_FIRST, chooseTarget, newShare, sessionKinds } from './plan';
+import { NEW_FIRST, WARMUP, chooseTarget, needsWarmup, newShare, sessionKinds } from './plan';
 
 const P = DEFAULT_PREFERENCES;
 
@@ -301,5 +301,45 @@ describe('the full path', () => {
     expect(skipStep(EMPTY_GUIDED, 5)).toEqual(EMPTY_GUIDED);
     // survives storage
     expect(sanitizeGuided(JSON.parse(JSON.stringify(skipped)))).toEqual(skipped);
+  });
+});
+
+describe('warm-up', () => {
+  const step = CURRICULUM[0];
+  const learned = { passed: { [step.id]: 1 } };
+  const DAY = 86_400_000;
+  const now = new Date(2026, 10, 27, 18).getTime();
+
+  it('opens the first session of the day, once something is learned', () => {
+    const yesterday = [answer(step.targets[0], true, now - DAY)];
+    expect(needsWarmup(yesterday, learned, now)).toBe(true);
+    expect(needsWarmup([], learned, now)).toBe(true);
+    // already practiced today (any mode): no warm-up
+    expect(
+      needsWarmup([...yesterday, answer(step.targets[1], true, now - 3_600_000)], learned, now),
+    ).toBe(false);
+    // nothing learned yet: nothing to warm up on
+    expect(needsWarmup(yesterday, EMPTY_GUIDED, now)).toBe(false);
+  });
+
+  it('comes first, then the usual mix', () => {
+    const k = sessionKinds(20, 0.6, WARMUP);
+    expect(k).toHaveLength(20);
+    expect(k.slice(0, WARMUP).every((x) => x === 'warmup')).toBe(true);
+    expect(k.slice(WARMUP, WARMUP + NEW_FIRST).every((x) => x === 'new')).toBe(true);
+    expect(k.filter((x) => x === 'warmup')).toHaveLength(WARMUP);
+  });
+
+  it('picks what is slipping from learned material', () => {
+    const misses = [0, 1, 2, 3, 4].map((i) => answer(step.targets[1], false, now - DAY + i));
+    const hits = [0, 1, 2, 3, 4].map((i) => answer(step.targets[0], true, now - DAY + 10 + i));
+    const rand = seeded(2);
+    let missed = 0;
+    for (let i = 0; i < 50; i++) {
+      const c = chooseTarget('warmup', [...misses, ...hits], learned, now, rand)!;
+      expect(c.kind).toBe('warmup');
+      if (targetId(c.target) === targetId(step.targets[1])) missed++;
+    }
+    expect(missed).toBeGreaterThan(35); // mostly the one that's been going wrong
   });
 });

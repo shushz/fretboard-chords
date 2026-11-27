@@ -51,6 +51,7 @@ export function targetLabel(t: Target): string {
 }
 
 export const KIND_LABEL: Record<SlotKind, string> = {
+  warmup: 'Warm-up',
   new: 'New',
   review: 'Review',
   check: 'Check',

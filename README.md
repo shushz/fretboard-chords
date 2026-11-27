@@ -29,7 +29,8 @@ takes away the role hints, then moves to _Find the chord_ in each inversion and 
 walks, string set by string set (with optional challenges: tap the root too, progressions in
 time). Then strings 4–6, iii and vii°, minor keys, and seventh chords.
 
-Each session is about 60% new material from the current step, 25% reviews of what you got
+The day's first session opens with a 4-question **warm-up** on learned material that's slipping
+or overdue. Each session is then about 60% new material from the current step, 25% reviews of what you got
 wrong or haven't seen lately, and 15% spot checks of earlier steps; when the old material
 slips, fewer new questions come in. A step is passed when each of its questions has been right
 4 of the last 5 times without being slow. The home screen shows the current step, a progress

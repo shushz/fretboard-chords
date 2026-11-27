@@ -1405,3 +1405,6 @@ input {
   min-height: 44px;
   margin-top: 4px;
 }
+.guided-kind.warmup {
+  color: var(--good);
+}

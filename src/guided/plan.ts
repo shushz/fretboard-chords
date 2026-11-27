@@ -10,6 +10,7 @@
  * every question is new; once the path is done, every question is review or check.
  */
 import type { LogEntry } from '../progress/log';
+import { dayKey } from '../progress/stats';
 import { CURRICULUM, type Step, type Target, targetId } from './curriculum';
 import {
   type GuidedState,
@@ -20,7 +21,31 @@ import {
   targetState,
 } from './progress';
 
-export type SlotKind = 'new' | 'review' | 'check';
+/** 'warmup': a review at the start of the day's first session. */
+export type SlotKind = 'warmup' | 'new' | 'review' | 'check';
+
+/** Warm-up questions opening the first session of the day. */
+export const WARMUP = 4;
+
+/**
+ * The day's first session (no answers yet today, in any mode) starts with a warm-up, once
+ * something has been learned to warm up on.
+ */
+export function needsWarmup(
+  log: readonly LogEntry[],
+  s: GuidedState,
+  now: number,
+  steps: readonly Step[] = CURRICULUM,
+): boolean {
+  if (!learnedTargets(s, steps).length) return false;
+  const today = dayKey(now);
+  for (let i = log.length - 1; i >= 0; i--) {
+    const d = dayKey(log[i].t);
+    if (d === today) return false;
+    if (d < today) break;
+  }
+  return true;
+}
 
 export const NEW_SHARE = 0.6;
 export const NEW_SHARE_SHAKY = 0.4;
@@ -42,13 +67,22 @@ export function newShare(
   return r !== null && r < SHAKY_BELOW ? NEW_SHARE_SHAKY : NEW_SHARE;
 }
 
-/** The kinds of a session's `n` questions, in order. */
-export function sessionKinds(n: number, share: number): SlotKind[] {
+/**
+ * The kinds of a session's `n` questions, in order: `warmup` warm-up questions first, then
+ * the rest mixed by `share`.
+ */
+export function sessionKinds(n: number, share: number, warmup = 0): SlotKind[] {
+  const w = Math.min(warmup, n);
+  return [...Array<SlotKind>(w).fill('warmup'), ...mixKinds(n - w, share)];
+}
+
+function mixKinds(n: number, share: number): SlotKind[] {
   const nNew = Math.round(n * share);
   const nReview = Math.round((n - nNew) * REVIEW_OF_OLD);
-  const want: Record<SlotKind, number> = { new: nNew, review: nReview, check: n - nNew - nReview };
+  type Mixed = 'new' | 'review' | 'check';
+  const want: Record<Mixed, number> = { new: nNew, review: nReview, check: n - nNew - nReview };
   const out: SlotKind[] = [];
-  const placed: Record<SlotKind, number> = { new: 0, review: 0, check: 0 };
+  const placed: Record<Mixed, number> = { new: 0, review: 0, check: 0 };
   // Learn first: a block of new questions…
   for (let i = 0; i < Math.min(NEW_FIRST, nNew); i++) {
     out.push('new');
@@ -57,7 +91,7 @@ export function sessionKinds(n: number, share: number): SlotKind[] {
   // …then spread the rest evenly: always place the kind that's furthest behind its share.
   const rest = n - out.length;
   for (let i = 0; i < rest; i++) {
-    let best: SlotKind | null = null;
+    let best: Mixed | null = null;
     let lag = -Infinity;
     for (const k of ['new', 'review', 'check'] as const) {
       const left = want[k] - placed[k];
@@ -105,6 +139,7 @@ export function chooseTarget(
   const learned = learnedTargets(s, steps);
   const k: SlotKind =
     kind === 'new' && !fresh.length ? 'review' : kind !== 'new' && !learned.length ? 'new' : kind;
+  // A warm-up question is picked like a review: what's slipping or overdue.
   const pool = k === 'new' ? fresh : learned;
   if (!pool.length) return null;
   const notPrev = pool.length > 1 ? pool.filter((t) => targetId(t) !== previous) : pool;

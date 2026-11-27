@@ -110,3 +110,47 @@ test('optional challenges can be skipped from the home screen', async ({ page })
   await page.getByText('All steps', { exact: true }).click();
   await expect(page.locator('.guided-steps li.done').nth(first)).toContainText('– Challenge');
 });
+
+test('the first session of the day starts with a warm-up; the next one does not', async ({
+  page,
+}) => {
+  // Step 1 passed, practiced yesterday
+  const step = CURRICULUM[0];
+  const yesterday = Date.now() - 86_400_000;
+  const as: Attempt[] = step.targets.map((t, i) => ({
+    item: {
+      mode: t.mode,
+      key: 'E',
+      degree: t.degree,
+      quality: 'maj',
+      stringSet: t.stringSet,
+      inversion: t.inversion ?? 'root',
+      anchor: null,
+    },
+    correct: true,
+    timeMs: 2000,
+    at: yesterday + i * 1000,
+    sevenths: false,
+  }));
+  mkdirSync('test-results', { recursive: true });
+  writeFileSync(
+    'test-results/guided-warmup.json',
+    JSON.stringify(
+      makeBackup(DEFAULT_PREFERENCES, {}, {}, Date.now(), appendLog([], as), [], {
+        passed: { [step.id]: yesterday },
+      }),
+    ),
+  );
+  await importBackup(page, 'test-results/guided-warmup.json');
+  await page.goto('./');
+  await page.getByRole('button', { name: /^Guided practice/ }).click();
+  for (let i = 0; i < 4; i++) {
+    await expect(page.locator('.drill-item')).toContainText('Warm-up');
+    await page.getByRole('button', { name: 'Show answer' }).click();
+    await page.getByRole('button', { name: 'Next' }).click();
+  }
+  await expect(page.locator('.drill-item')).toContainText('New');
+  await page.getByRole('button', { name: 'End session' }).click();
+  await page.getByRole('button', { name: 'Next session' }).click();
+  await expect(page.locator('.drill-item')).toContainText('New'); // already warmed up today
+});
