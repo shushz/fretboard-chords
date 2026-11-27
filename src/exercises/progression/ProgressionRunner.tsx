@@ -145,7 +145,7 @@ export function ProgressionRunner(props: RunnerProps) {
         });
         props.onGraded([
           {
-            item: stepItem(q, step),
+            item: stepItem(q, step, !!config.tempo),
             correct,
             timeMs,
             at: Date.now(),

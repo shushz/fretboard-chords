@@ -460,3 +460,20 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
 - New config options used by guided practice and also available to other code:
   `PracticeConfig.inversion` (tonic shape / find target / label shape) and `givenRoles`.
   Find the chord in one inversion records that inversion in its item.
+
+## Guided practice covers every mode (guided-full)
+
+- Owner chose to merge the first path and then add all seven missing pieces. Order per
+  string set: tonic steps → next/previous shape → name tones (label, tap) → quality switch
+  → no hints → find by inversion → progression → optional challenges. Name the chord once
+  per key mode, early. Then 4–6 (short block), rare chords, minor keys (shorter per set),
+  sevenths (drop-2 on 2–5 and 1–4; shells left to manual practice since they depend on a
+  preference).
+- Questions use target-only weights (`targetWeight`) and `guidedConfig` checks up to 12
+  random key/shape picks so the question can produce its target (e.g. the top shape has no
+  next shape up).
+- Tempo-mode progression answers are recorded with variant `tempo` (their own item), so
+  the tempo challenge measures answers in time; reviews of them record the same variant.
+- Optional steps: `GuidedState.skipped`; skipped steps don't feed reviews or checks.
+- New steps inserted earlier in the path send someone who passed later steps back to the
+  first new step (the passed ones stay passed).

@@ -3,7 +3,7 @@ import { signal } from '@preact/signals';
 import { kvGet, kvSet } from '../storage';
 import { answerLog } from '../progress/store';
 import type { Step } from './curriculum';
-import { EMPTY_GUIDED, type GuidedState, advance, sanitizeGuided } from './progress';
+import { EMPTY_GUIDED, type GuidedState, advance, sanitizeGuided, skipStep } from './progress';
 
 const KEY = 'guided';
 
@@ -33,4 +33,10 @@ export function advanceGuided(now = Date.now()): Step[] {
   const r = advance(answerLog.value, guided.value, now);
   if (r.passed.length) setGuided(r.state);
   return r.passed;
+}
+
+/** Skip the current step (optional challenges only). */
+export function skipGuidedStep(now = Date.now()): void {
+  setGuided(skipStep(guided.value, now));
+  advanceGuided(now);
 }

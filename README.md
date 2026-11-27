@@ -20,12 +20,14 @@ fully offline.
 
 ## Guided practice
 
-Not sure what to practice? **Guided practice** picks for you. It follows a path of 45 small
-steps organized by shape, not key: one string set and one shape of the tonic at a time, with a
-random key on every question (a move between shapes is the same in every key). It starts with
-_From the tonic_ in root position on strings 2–4, adds the other inversions, names the tones,
+Not sure what to practice? **Guided practice** picks for you. It follows a path of 107 small
+steps through every mode, organized by shape, not key: one string set and one shape of the
+tonic at a time, with a random key on every question (a move between shapes is the same in
+every key). It starts with _From the tonic_ in root position on strings 2–4, adds the other
+inversions, chord names, next/previous shape, naming and tapping chord tones, quality switch,
 takes away the role hints, then moves to _Find the chord_ in each inversion and progression
-walks, string set by string set, then minor keys.
+walks, string set by string set (with optional challenges: tap the root too, progressions in
+time). Then strings 4–6, iii and vii°, minor keys, and seventh chords.
 
 Each session is about 60% new material from the current step, 25% reviews of what you got
 wrong or haven't seen lately, and 15% spot checks of earlier steps; when the old material

@@ -20,9 +20,9 @@ import { pauseClock, resumeClock } from '../../exercises/answerClock';
 import { pendingDrill } from '../../exercises/drillState';
 import { advanceGuided, guided, pendingGuided } from '../../guided/store';
 import { type SlotKind, chooseTarget, newShare, sessionKinds } from '../../guided/plan';
-import { guidedConfig } from '../../guided/config';
+import { guidedConfig, targetWeight } from '../../guided/config';
 import { type Step, type Target, targetId } from '../../guided/curriculum';
-import { GuidedProgress, KIND_LABEL, targetLabel } from '../../guided/GuidedStatus';
+import { GuidedProgress, KIND_LABEL, SkipChallenge, targetLabel } from '../../guided/GuidedStatus';
 import { PROGRESSIONS } from '../../exercises/progression/logic';
 import { makeItemWeight } from '../../progress/srs';
 import { recordAttempts } from '../../progress/record';
@@ -165,7 +165,7 @@ export function Practice() {
       return {
         config: guidedConfig(g.target, p, Math.random),
         item: null,
-        itemWeight: () => 1,
+        itemWeight: targetWeight(g.target),
         guided: g,
       };
     }
@@ -380,6 +380,7 @@ function Summary(props: {
             </ul>
           )}
           <GuidedProgress />
+          <SkipChallenge />
         </section>
       )}
       <section class="card summary-card">

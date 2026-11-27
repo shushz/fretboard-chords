@@ -3,7 +3,7 @@ import { Section } from '../ui/controls';
 import { CURRICULUM } from './curriculum';
 import { currentIndex } from './progress';
 import { guided } from './store';
-import { GuidedProgress } from './GuidedStatus';
+import { GuidedProgress, SkipChallenge } from './GuidedStatus';
 
 export function GuidedSteps() {
   const s = guided.value;
@@ -13,18 +13,21 @@ export function GuidedSteps() {
       <div class="guided-steps">
         <p class="explain">
           Guided practice follows a path of {CURRICULUM.length} small steps, from the tonic on
-          strings 2–4 to minor keys on every string set. A step is passed when each of its questions
-          has been right at least 4 of the last 5 times, in any keys, without being slow.{' '}
-          <i>Still solid</i> is how often you've been right lately on what's already passed.
+          strings 2–4 through every mode, string set, minor keys and seventh chords. Challenge steps
+          are optional and can be skipped. A step is passed when each of its questions has been
+          right at least 4 of the last 5 times, in any keys, without being slow. <i>Still solid</i>{' '}
+          is how often you've been right lately on what's already passed.
         </p>
         <GuidedProgress />
+        <SkipChallenge />
         <details>
           <summary>All steps</summary>
           <ol>
             {CURRICULUM.map((st, i) => (
               <li key={st.id} class={i < cur ? 'done' : i === cur ? 'current' : 'later'}>
-                {i < cur ? '✓ ' : ''}
+                {i < cur ? (st.id in (s.skipped ?? {}) ? '– ' : '✓ ') : ''}
                 {st.title}
+                {st.optional ? ' (optional)' : ''}
               </li>
             ))}
           </ol>

@@ -2,7 +2,7 @@
 import { answerLog } from '../progress/store';
 import { CURRICULUM, type Target } from './curriculum';
 import { currentIndex, retention, stepProgress } from './progress';
-import { guided } from './store';
+import { guided, skipGuidedStep } from './store';
 import type { SlotKind } from './plan';
 
 const NUMERALS = {
@@ -16,20 +16,37 @@ const INV = {
   third: '3rd inversion',
 };
 
+const SEVENTH_SUFFIX = {
+  major: ['maj7', 'm7', 'm7', 'maj7', '7', 'm7', 'ø7'],
+  minor: ['m7', 'ø7', 'maj7', 'm7', '7', 'maj7', '7'],
+} as const;
+
 /** "I (root position) → IV · strings 2–4" */
 export function targetLabel(t: Target): string {
-  const n = NUMERALS[t.keyMode];
-  const set = `strings ${t.stringSet.replace('-', '–')}`;
+  const base = NUMERALS[t.keyMode];
+  const n = (d: number) => {
+    // seventh chords: the numeral with its quality (IVmaj7, V7, iiø7…)
+    if (!t.sevenths) return base[d];
+    const r = base[d].replace('°', '');
+    return `${r}${SEVENTH_SUFFIX[t.keyMode][d]}`;
+  };
+  const set = t.stringSet === '*' ? 'names only' : `strings ${t.stringSet.replace('-', '–')}`;
   const inv = t.inversion ? ` (${INV[t.inversion]})` : '';
   switch (t.mode) {
     case 'fromTonic':
-      return `${n[0]}${inv} → ${n[t.degree]}${t.roles === false ? ', no hints' : ''} · ${set}`;
+      return `${n(0)}${inv} → ${n(t.degree)}${t.roles === false ? ', no hints' : ''} · ${set}`;
     case 'find':
-      return `Find ${n[t.degree]}${inv} · ${set}`;
+      return `Find ${n(t.degree)}${inv}${t.anchor ? ' + its root on 6/5' : ''} · ${set}`;
     case 'nameTones':
-      return `Name the tones of ${n[t.degree]} · ${set}`;
+      return `${t.variant === 'tap' ? 'Tap a tone of' : 'Name the tones of'} ${n(t.degree)} · ${set}`;
+    case 'nextShape':
+      return `${n(t.degree)}: ${t.variant === 'down' ? 'previous' : 'next'} shape · ${set}`;
+    case 'qualitySwitch':
+      return `${n(t.degree)}: ${t.variant === 'min>maj' ? 'minor → major' : 'major → minor'} · ${set}`;
+    case 'nameChord':
+      return `Name ${n(t.degree)} · ${set}`;
     case 'progression':
-      return `Progressions with ${n[t.degree]} · ${set}`;
+      return `Progressions with ${n(t.degree)}${t.variant === 'tempo' ? ', in time' : ''} · ${set}`;
   }
 }
 
@@ -80,5 +97,17 @@ export function GuidedProgress(props: { compact?: boolean }) {
         {sp.solid} of {sp.total} solid{r !== null ? ` · still solid ${pct(r)}` : ''}
       </span>
     </div>
+  );
+}
+
+/** For an optional challenge step: a way past it. */
+export function SkipChallenge() {
+  const i = currentIndex(guided.value);
+  const step = CURRICULUM[i];
+  if (!step?.optional) return null;
+  return (
+    <button type="button" class="btn secondary skip-challenge" onClick={() => skipGuidedStep()}>
+      Skip this challenge
+    </button>
   );
 }

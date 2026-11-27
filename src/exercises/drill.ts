@@ -43,6 +43,7 @@ export function drillConfig(item: Item, p: Preferences): PracticeConfig | null {
     // Find the chord in one shape (guided practice) is reviewed in that shape.
     inversion: item.mode === 'find' && item.inversion !== '*' ? item.inversion : undefined,
     recordAs: item.mode === 'progression' ? 'progression' : undefined,
+    recordVariant: item.mode === 'progression' ? item.variant : undefined,
   };
 }
 

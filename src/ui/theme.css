@@ -1400,3 +1400,8 @@ input {
   color: var(--muted);
   opacity: 0.8;
 }
+.skip-challenge {
+  align-self: flex-start;
+  min-height: 44px;
+  margin-top: 4px;
+}
