@@ -85,3 +85,28 @@ test('practice done earlier counts: a solid first step is passed when guided pra
   await page.goto('./');
   await expect(page.getByRole('button', { name: /^Guided practice/ })).toContainText('Step 2 of');
 });
+
+test('optional challenges can be skipped from the home screen', async ({ page }) => {
+  const first = CURRICULUM.findIndex((s) => s.optional);
+  const guidedState = {
+    passed: Object.fromEntries(CURRICULUM.slice(0, first).map((s) => [s.id, Date.now() - 1000])),
+  };
+  mkdirSync('test-results', { recursive: true });
+  writeFileSync(
+    'test-results/guided-challenge.json',
+    JSON.stringify(makeBackup(DEFAULT_PREFERENCES, {}, {}, Date.now(), [], [], guidedState)),
+  );
+  await importBackup(page, 'test-results/guided-challenge.json');
+  await page.goto('./');
+  const entry = page.getByRole('button', { name: /^Guided practice/ });
+  await expect(entry).toContainText(`Step ${first + 1} of ${CURRICULUM.length}: Challenge`);
+  await page.getByRole('button', { name: 'Skip this challenge' }).click();
+  await expect(entry).toContainText(`Step ${first + 2} of`);
+  await page.getByRole('button', { name: 'Skip this challenge' }).click();
+  await expect(entry).toContainText(`Step ${first + 3} of`);
+  await expect(page.getByRole('button', { name: 'Skip this challenge' })).toHaveCount(0);
+  // the skipped steps are marked in Progress
+  await page.goto('./#/stats');
+  await page.getByText('All steps', { exact: true }).click();
+  await expect(page.locator('.guided-steps li.done').nth(first)).toContainText('– Challenge');
+});

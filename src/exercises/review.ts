@@ -30,7 +30,7 @@ export function recordedItems(
   switch (cfg.mode) {
     case 'find': {
       const q = generateFindQuestion(cfg, base);
-      return q && [findItem(q, cfg.recordAs ?? 'find')];
+      return q && [findItem(q, cfg.recordAs ?? 'find', cfg.recordVariant)];
     }
     case 'fromTonic': {
       const q = generateTonicQuestion(cfg, base);
@@ -57,7 +57,7 @@ export function recordedItems(
     }
     case 'progression': {
       const q = generateProgressionQuestion(cfg, base);
-      return q && q.chords.map((_, i) => stepItem(q, i));
+      return q && q.chords.map((_, i) => stepItem(q, i, !!cfg.tempo));
     }
     case 'nameChord': {
       const q = generateNameChordQuestion(cfg, {

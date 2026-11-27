@@ -137,12 +137,16 @@ export function About() {
 
       <Section title="Guided practice">
         <p>
-          A path of small steps, organized by shape rather than key: each step is one string set and
-          one shape of the tonic (root position, first or second inversion), and every question is
-          in a random key, because a move between shapes is the same in every key. It starts with{' '}
-          <i>From the tonic</i> (the I chord is a hint), then names the tones of those chords, drops
-          the role labels on the I chord, moves on to <i>Find the chord</i> in each inversion (no
-          shape to start from) and the progression walk, string set by string set, then minor keys.
+          A path of small steps through every mode, organized by shape rather than key: each step is
+          one string set and one shape of the tonic (root position, first or second inversion), and
+          every question is in a random key, because a move between shapes is the same in every key.
+          On each string set it starts with <i>From the tonic</i> (the I chord is a hint), then next
+          and previous shape, naming and tapping the tones, quality switch, drops the role labels on
+          the I chord, and moves on to <i>Find the chord</i> in each inversion (no shape to start
+          from) and the progression walk. Chord names (<i>Name the chord</i>) come early. Challenge
+          steps (tap the root on 6 or 5 too, progressions in time) are optional:{' '}
+          <b>Skip this challenge</b> moves on. After strings 2–4, 1–3 and 3–5 come strings 4–6, iii
+          and vii°, minor keys, then seventh chords.
         </p>
         <p>
           Each session mixes about 60% <b>new</b> questions from the current step (a few in a row at

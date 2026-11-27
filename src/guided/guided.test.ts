@@ -4,7 +4,7 @@ import { itemKey, type Item } from '../progress/types';
 import type { LogEntry } from '../progress/log';
 import { recordedItems } from '../exercises/review';
 import { CURRICULUM, type Target, targetId } from './curriculum';
-import { guidedConfig, keysFor } from './config';
+import { guidedConfig, keysFor, targetWeight } from './config';
 import {
   EMPTY_GUIDED,
   advance,
@@ -12,6 +12,8 @@ import {
   learnedTargets,
   matchesTarget,
   retention,
+  sanitizeGuided,
+  skipStep,
   stepProgress,
   targetState,
 } from './progress';
@@ -68,7 +70,7 @@ describe('the path', () => {
         for (let seed = 1; seed <= 6; seed++) {
           const rand = seeded(seed * 31 + t.degree);
           const cfg = guidedConfig(t, P, rand);
-          const got = recordedItems(cfg, P, rand);
+          const got = recordedItems(cfg, P, rand, targetWeight(t));
           if (!got?.some((i) => matchesTarget(t, i))) misses.push(`${step.id} ${targetId(t)}`);
         }
     expect(misses).toEqual([]);
@@ -178,5 +180,126 @@ describe('sessions', () => {
     }
     // nothing learned yet: review falls back to new
     expect(chooseTarget('review', [], EMPTY_GUIDED, 0, rand)!.kind).toBe('new');
+  });
+});
+
+describe('the full path', () => {
+  it('covers every mode, string set and chord type', () => {
+    const all = CURRICULUM.flatMap((s) => s.targets);
+    const modes = new Set(all.map((t) => t.mode));
+    expect([...modes].sort()).toEqual(
+      [
+        'find',
+        'fromTonic',
+        'nameChord',
+        'nameTones',
+        'nextShape',
+        'progression',
+        'qualitySwitch',
+      ].sort(),
+    );
+    const sets = new Set(all.map((t) => t.stringSet));
+    for (const s of ['1-3', '2-4', '3-5', '4-6', '1-4', '2-5', '*'])
+      expect(sets.has(s as never)).toBe(true);
+    expect(all.some((t) => t.mode === 'nameTones' && t.variant === 'tap')).toBe(true);
+    expect(all.some((t) => t.anchor)).toBe(true);
+    expect(all.some((t) => t.variant === 'tempo')).toBe(true);
+    expect(all.some((t) => t.sevenths)).toBe(true);
+    expect(all.some((t) => t.keyMode === 'major' && (t.degree === 2 || t.degree === 6))).toBe(true);
+    expect(all.some((t) => t.keyMode === 'minor' && t.degree === 2)).toBe(true);
+    // a theory step early, before any Find the chord
+    const nameChord = CURRICULUM.findIndex((s) => s.targets[0].mode === 'nameChord');
+    const find = CURRICULUM.findIndex((s) => s.targets[0].mode === 'find');
+    expect(nameChord).toBeLessThan(find);
+    // challenges are optional; nothing else is
+    for (const s of CURRICULUM)
+      expect(!!s.optional).toBe(s.targets.some((t) => t.anchor || t.variant === 'tempo'));
+    // triads before sevenths
+    const firstSeventh = CURRICULUM.findIndex((s) => s.targets.some((t) => t.sevenths));
+    expect(CURRICULUM.slice(firstSeventh).every((s) => s.targets.every((t) => t.sevenths))).toBe(
+      true,
+    );
+  });
+
+  it('matches answers to the new kinds of target', () => {
+    const tap: Target = {
+      mode: 'nameTones',
+      keyMode: 'major',
+      degree: 4,
+      stringSet: '2-4',
+      variant: 'tap',
+    };
+    const item = (o: Partial<Item>): Item => ({
+      mode: 'nameTones',
+      key: 'E',
+      degree: 4,
+      quality: 'maj',
+      stringSet: '*',
+      inversion: '*',
+      anchor: null,
+      ...o,
+    });
+    expect(matchesTarget(tap, item({ variant: 'tap 3 s3' }))).toBe(true);
+    expect(matchesTarget(tap, item({ variant: 'tap 3 s1' }))).toBe(false); // string 1 isn't in 2–4
+    const sw: Target = {
+      mode: 'qualitySwitch',
+      keyMode: 'major',
+      degree: 5,
+      stringSet: '1-3',
+      variant: 'min>maj',
+    };
+    const swItem = item({
+      mode: 'qualitySwitch',
+      degree: 5,
+      quality: 'min',
+      stringSet: '1-3',
+      inversion: 'root',
+    });
+    expect(matchesTarget(sw, { ...swItem, variant: 'min>maj s2' })).toBe(true);
+    expect(matchesTarget(sw, { ...swItem, variant: 'min>dim s2' })).toBe(false);
+    const tempo: Target = {
+      mode: 'progression',
+      keyMode: 'major',
+      degree: 0,
+      stringSet: '2-4',
+      variant: 'tempo',
+    };
+    const prog = item({ mode: 'progression', degree: 0, stringSet: '2-4', variant: undefined });
+    expect(matchesTarget(tempo, prog)).toBe(false);
+    expect(matchesTarget(tempo, { ...prog, variant: 'tempo' })).toBe(true);
+    const root: Target = {
+      mode: 'find',
+      keyMode: 'major',
+      degree: 0,
+      stringSet: '2-4',
+      anchor: true,
+    };
+    const findItem = item({ mode: 'find', degree: 0, stringSet: '2-4' });
+    expect(matchesTarget(root, findItem)).toBe(false);
+    expect(matchesTarget(root, { ...findItem, anchor: 6 })).toBe(true);
+    const sev: Target = {
+      mode: 'find',
+      keyMode: 'major',
+      degree: 4,
+      stringSet: '2-5',
+      sevenths: true,
+    };
+    const sevItem = item({ mode: 'find', degree: 4, stringSet: '2-5' });
+    expect(matchesTarget(sev, sevItem)).toBe(false); // a triad
+    expect(matchesTarget(sev, { ...sevItem, quality: '7' })).toBe(true);
+  });
+
+  it('optional challenges can be skipped; other steps cannot; skipped ones are not reviewed', () => {
+    const i = CURRICULUM.findIndex((s) => s.optional);
+    const before = Object.fromEntries(CURRICULUM.slice(0, i).map((s) => [s.id, 1]));
+    const s = { passed: before };
+    expect(currentIndex(s)).toBe(i);
+    const skipped = skipStep(s, 5);
+    expect(currentIndex(skipped)).toBe(i + 1);
+    expect(learnedTargets(skipped).some((t) => t.anchor || t.variant === 'tempo')).toBe(false);
+    // a normal step can't be skipped
+    expect(skipStep(EMPTY_GUIDED, 5)).toEqual(EMPTY_GUIDED);
+    // survives storage
+    expect(sanitizeGuided(JSON.parse(JSON.stringify(skipped)))).toEqual(skipped);
   });
 });

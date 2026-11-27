@@ -36,6 +36,8 @@ export interface PracticeConfig {
    * as Find the chord but must update the progression item).
    */
   recordAs?: ModeId;
+  /** With `recordAs`: the variant to record (a tempo-mode progression step). */
+  recordVariant?: string;
   /** Progression walk: find each chord within the beat limit. */
   tempo?: boolean;
   /**

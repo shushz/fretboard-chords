@@ -44,7 +44,7 @@ export interface GenerateOptions {
   previous?: unknown;
 }
 
-export function findItem(q: FindQuestion, mode: Item['mode'] = 'find'): Item {
+export function findItem(q: FindQuestion, mode: Item['mode'] = 'find', variant?: string): Item {
   return {
     mode,
     key: keyToAscii(q.chord.key),
@@ -53,6 +53,7 @@ export function findItem(q: FindQuestion, mode: Item['mode'] = 'find'): Item {
     stringSet: q.region.stringSet,
     inversion: q.inversion ?? '*',
     anchor: q.anchorString,
+    ...(variant ? { variant } : {}),
   };
 }
 

@@ -56,7 +56,8 @@ export interface ProgressionQuestion {
   accepted: Voicing[][];
 }
 
-export function stepItem(q: ProgressionQuestion, step: number): Item {
+/** `tempo`: answered against the beat (tempo mode), recorded as its own variant. */
+export function stepItem(q: ProgressionQuestion, step: number, tempo = false): Item {
   const c = q.chords[step];
   return {
     mode: 'progression',
@@ -66,6 +67,7 @@ export function stepItem(q: ProgressionQuestion, step: number): Item {
     stringSet: q.region.stringSet,
     inversion: '*',
     anchor: null,
+    ...(tempo ? { variant: 'tempo' } : {}),
   };
 }
 

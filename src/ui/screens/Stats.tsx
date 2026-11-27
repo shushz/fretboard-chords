@@ -139,6 +139,7 @@ export function Stats() {
         </p>
       </section>
       <BackupReminder now={now} />
+      <GuidedSteps />
       {total === 0 ? (
         <p class="muted empty">
           No practice recorded yet. Finish a few questions and your progress shows up here.
@@ -174,7 +175,6 @@ export function Stats() {
           </div>
           <Improvement filter={filter} fn={fn} onClearFn={() => setFn(null)} />
           <WhatToPractice stats={s} mode={mode} selected={fn} onSelect={setFn} />
-          <GuidedSteps />
           <Weakest stats={s} p={p} />
           <ByKey stats={s} p={p} />
         </>

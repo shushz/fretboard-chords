@@ -1,6 +1,6 @@
 import { navigate } from '../router';
 import { pendingGuided } from '../../guided/store';
-import { GuidedProgress } from '../../guided/GuidedStatus';
+import { GuidedProgress, SkipChallenge } from '../../guided/GuidedStatus';
 import { REPO_URL, versionLabel } from '../../version';
 import { stats } from '../../progress/store';
 import { dueItems } from '../../progress/srs';
@@ -27,6 +27,7 @@ export function Home() {
           <strong>Guided practice</strong>
           <GuidedProgress compact />
         </button>
+        <SkipChallenge />
         <button type="button" class="menu-item" onClick={() => navigate('practice')}>
           <strong>Practice</strong>
           <span>Choose a mode and set it up yourself</span>

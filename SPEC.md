@@ -213,16 +213,22 @@ key reaches the threshold).
 
 An automatic, progress-based path for learners who'd rather not set up sessions.
 
-- **Path** (`src/guided/curriculum.ts`): ordered steps organized by **shape, not key**: a
-  string set and the tonic's inversion. Keys are random on every question. Per string set
-  (2–4, 1–3, 3–5), major keys: From the tonic from root position (IV, V; then ii, vi), from
-  first and second inversion; Name the tones of I, IV, V, ii, vi; From the tonic without
-  role hints; Find the chord in root position, first, second inversion; Progression walk.
-  Then minor keys per string set: from i to iv, V; to ♭VI, ♭VII, ii°; without hints; find;
-  progression walk. From the tonic comes before Find the chord (the tonic shape is a hint).
+- **Path** (`src/guided/curriculum.ts`): ordered steps through every mode, organized by
+  **shape, not key**: a string set and the tonic's inversion. Keys are random on every
+  question. Per string set (2–4, 1–3, 3–5), major keys: From the tonic from root position
+  (IV, V; then ii, vi), from first and second inversion; Next/previous shape (I, IV, V);
+  Name the tones (label, then tap a tone); Quality switch (major ↔ minor by the 3rd); From
+  the tonic without role hints; Find the chord in root position, first, second inversion;
+  Progression walk; optional challenges (Find the chord tapping the root on 6/5 too;
+  progressions in tempo mode). Name the chord (theory, no fretboard) comes early, once per
+  key mode. Then strings 4–6 (shorter), iii and vii° on 2–4 and 1–3; minor keys per string
+  set (from i to iv, V; to ♭VI, ♭VII, ii°; quality switch; without hints; find; progression
+  walk), 4–6, ♭III; then seventh chords (drop-2 on 2–5 and 1–4, major then minor). From the
+  tonic comes before Find the chord (the tonic shape is a hint). Optional steps can be
+  skipped and aren't reviewed.
 - **Targets**: each step lists targets (mode, major/minor, chord, string set, inversion,
   hints). A target is **solid** when its last 5 answers in any key have ≥ 4 right and a
-  median right-answer time ≤ 6 s (9 s for labeling tones). A step is **passed** when all its
+  median right-answer time ≤ 6 s (9 s for labeling tones; 8 s / 12 s with seventh chords). A step is **passed** when all its
   targets are solid; passing is remembered. Steps without hints count only answers given
   since the step opened. Answers from normal practice count too.
 - **Session mix** (20 questions, or the session length): about 60 % new (current step; the
