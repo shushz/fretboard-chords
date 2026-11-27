@@ -1,4 +1,6 @@
 import { navigate } from '../router';
+import { pendingGuided } from '../../guided/store';
+import { GuidedProgress } from '../../guided/GuidedStatus';
 import { REPO_URL, versionLabel } from '../../version';
 import { stats } from '../../progress/store';
 import { dueItems } from '../../progress/srs';
@@ -14,9 +16,20 @@ export function Home() {
         how they connect. Works offline.
       </p>
       <nav class="menu">
-        <button type="button" class="menu-item primary" onClick={() => navigate('practice')}>
+        <button
+          type="button"
+          class="menu-item primary guided-entry"
+          onClick={() => {
+            pendingGuided.value = true;
+            navigate('practice');
+          }}
+        >
+          <strong>Guided practice</strong>
+          <GuidedProgress compact />
+        </button>
+        <button type="button" class="menu-item" onClick={() => navigate('practice')}>
           <strong>Practice</strong>
-          <span>Find chords, name tones, walk progressions</span>
+          <span>Choose a mode and set it up yourself</span>
         </button>
         {due.length > 0 && (
           <button

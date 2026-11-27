@@ -8,7 +8,7 @@ import {
   type StringSetId,
   randomWindow,
 } from '../fretboard/regions';
-import type { VoicingOptions } from '../fretboard/voicings';
+import type { Inversion, VoicingOptions } from '../fretboard/voicings';
 import type { ModeId } from '../progress/types';
 
 export interface PracticeConfig {
@@ -24,6 +24,13 @@ export interface PracticeConfig {
   anchorStrings: (5 | 6)[];
   /** Mode-specific options. */
   variant?: string;
+  /**
+   * Only this shape: the tonic's inversion (From the tonic), the chord's inversion to find
+   * (Find the chord) or the shape to label (Name the tones). Unset = any.
+   */
+  inversion?: Inversion;
+  /** Show roles on the given shape: overrides the `givenShapeRoles` preference. */
+  givenRoles?: boolean;
   /**
    * Record answers under this mode instead (a review of a Progression walk step is asked
    * as Find the chord but must update the progression item).

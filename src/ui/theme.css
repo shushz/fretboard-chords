@@ -1318,3 +1318,85 @@ input {
   white-space: nowrap;
   padding: 0 2px;
 }
+
+/* Guided practice */
+.guided-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+.guided-step {
+  font-weight: 600;
+}
+.menu-item .guided-progress span {
+  color: inherit;
+}
+.menu-item.primary .guided-step {
+  opacity: 1;
+}
+.guided-bar {
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: color-mix(in srgb, currentColor 22%, transparent);
+  overflow: hidden;
+}
+.guided-bar > span {
+  display: block;
+  height: 100%;
+  background: currentColor;
+  border-radius: 4px;
+}
+.guided-summary .guided-bar > span,
+.guided-steps .guided-bar > span {
+  background: var(--good);
+}
+.guided-summary .guided-bar,
+.guided-steps .guided-bar {
+  background: color-mix(in srgb, var(--good) 18%, var(--surface-2));
+}
+.guided-meta {
+  font-size: 0.85rem;
+}
+.guided-summary h2 {
+  margin-top: 0;
+}
+.guided-passed-list {
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+  color: var(--good);
+  font-weight: 600;
+}
+.guided-passed {
+  margin: 4px 0 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--good) 14%, var(--surface));
+  color: var(--text);
+  font-weight: 600;
+}
+.guided-kind {
+  font-weight: 700;
+}
+.guided-kind.new {
+  color: var(--accent);
+}
+.guided-steps ol {
+  margin: 8px 0 0;
+  padding-left: 1.6em;
+}
+.guided-steps li {
+  margin: 4px 0;
+}
+.guided-steps li.done {
+  color: var(--muted);
+}
+.guided-steps li.current {
+  font-weight: 700;
+}
+.guided-steps li.later {
+  color: var(--muted);
+  opacity: 0.8;
+}

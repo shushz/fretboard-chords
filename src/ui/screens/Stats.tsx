@@ -48,6 +48,9 @@ import { readableTextOn } from '../contrast';
 import { pendingDrill } from '../../exercises/drillState';
 import { MODES } from '../../exercises/modes';
 import { navigate } from '../router';
+import { GuidedSteps } from '../../guided/GuidedSteps';
+import { guided, setGuided } from '../../guided/store';
+import { EMPTY_GUIDED } from '../../guided/progress';
 
 function pct(x: number | null): string {
   return x === null ? '–' : `${Math.round(x * 100)}%`;
@@ -171,6 +174,7 @@ export function Stats() {
           </div>
           <Improvement filter={filter} fn={fn} onClearFn={() => setFn(null)} />
           <WhatToPractice stats={s} mode={mode} selected={fn} onSelect={setFn} />
+          <GuidedSteps />
           <Weakest stats={s} p={p} />
           <ByKey stats={s} p={p} />
         </>
@@ -598,7 +602,15 @@ function Weakest(props: { stats: Record<string, ItemStats>; p: Preferences }) {
 /** Download everything as JSON and remember when. */
 function exportProgress(): void {
   const now = Date.now();
-  const b = makeBackup(prefs.value, stats.value, daily.value, now, answerLog.value, rollups.value);
+  const b = makeBackup(
+    prefs.value,
+    stats.value,
+    daily.value,
+    now,
+    answerLog.value,
+    rollups.value,
+    guided.value,
+  );
   const blob = new Blob([JSON.stringify(b)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -661,6 +673,7 @@ function Backup() {
     }
     if (!confirm('Replace your current progress and preferences with this backup?')) return;
     replaceProgress(r.backup.stats, r.backup.daily, r.backup.log ?? [], r.backup.rollups ?? []);
+    if (r.backup.guided) setGuided(r.backup.guided);
     setPreferences(r.backup.preferences);
     setMsg(
       `Imported ${Object.keys(r.backup.stats).length} items${r.skipped ? `, skipped ${r.skipped} invalid entries` : ''}.`,
@@ -734,6 +747,7 @@ function Backup() {
           if (!confirm('Reset ALL progress? This cannot be undone (export a backup first).'))
             return;
           replaceProgress({}, {}, [], []);
+          setGuided(EMPTY_GUIDED);
           setMsg('All progress reset.');
         }}
       >

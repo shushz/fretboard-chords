@@ -1,10 +1,10 @@
 import { useEffect, useMemo } from 'preact/hooks';
 import { chordNumeral, chordSymbol } from '../../theory/chords';
 import { formatKey } from '../../theory/keys';
-import { formatStringSet, formatWindow } from '../../fretboard/regions';
+import { formatStringSet, formatWindow, stringsOf } from '../../fretboard/regions';
 import { pairAnchors } from '../../fretboard/anchors';
 import { ANCHOR_STRINGS, numeralOptions, symbolOptions } from '../../prefs/model';
-import { fretted } from '../../fretboard/voicings';
+import { fretted, matchVoicing } from '../../fretboard/voicings';
 import { Toggle } from '../../ui/controls';
 import { chordToneName } from '../../ui/markers';
 import { type PracticeConfig, voicingOptions } from '../config';
@@ -19,6 +19,9 @@ import {
   gradeFind,
   requiredStrings,
 } from './logic';
+
+/** Which chord tone is lowest in each inversion. */
+const BASS_NOTE = { root: 'R', first: '3rd', second: '5th', third: '7th' } as const;
 
 export function FindRunner(props: RunnerProps) {
   const { config, prefs: p } = props;
@@ -64,7 +67,9 @@ export function FindRunner(props: RunnerProps) {
         sub: `${formatStringSet(q.region.stringSet)} · ${formatWindow(q.region.window)}`,
         hint: q.anchorString
           ? `Tap the root on string ${q.anchorString}, then the chord on ${q.region.stringSet.replace('-', '–')}`
-          : undefined,
+          : q.inversion
+            ? `In ${inversionName(q.inversion)} (${BASS_NOTE[q.inversion]} at the bottom).`
+            : undefined,
       }}
       chord={q.chord}
       region={q.region}
@@ -72,6 +77,15 @@ export function FindRunner(props: RunnerProps) {
       requiredStrings={requiredStrings(q)}
       grade={(taps) => {
         const g = gradeFind(q, taps, maxFret);
+        // The right chord in another shape, when one shape was asked for.
+        const set = stringsOf(q.region.stringSet);
+        const otherShape =
+          !g.correct && q.otherShapes?.length && set.every((s) => taps.has(s))
+            ? matchVoicing(
+                set.map((s) => fretted(s, taps.get(s)!)),
+                q.otherShapes,
+              )
+            : null;
         // After answering: the root on 6/5 next to the shape (unless the hint is off).
         const anchorWanted = rootHint !== 'never' || q.anchorString;
         const shown = g.matched ? [g.matched] : q.valid;
@@ -93,6 +107,9 @@ export function FindRunner(props: RunnerProps) {
             <>
               {numeral} = {symbol} ({chordToneName(q.chord, p)})
               {g.matched && ` · ${inversionName(g.matched.inversion)}`}
+              {otherShape &&
+                q.inversion &&
+                ` · that's the ${inversionName(otherShape.inversion)}, not the ${inversionName(q.inversion)}`}
               {!g.correct &&
                 ` · ${q.valid.length} valid shape${q.valid.length > 1 ? 's' : ''} shown`}
               {g.anchorOk === false && ' · anchor root missed'}

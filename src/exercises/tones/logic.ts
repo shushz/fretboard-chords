@@ -86,7 +86,8 @@ export function generateTonesQuestion(
           const fit = fittingRegion([chord], stringSet, cfg.window, o.voicing);
           if (!fit) continue;
           const region = fit.region;
-          for (const voicing of fit.valid[0]) {
+          const only = cfg.inversion;
+          for (const voicing of fit.valid[0].filter((v) => !only || v.inversion === only)) {
             const q: LabelQuestion = { kind: 'label', chord, region, voicing };
             cands.push({ q, item: tonesItem(q), w: stringSetWeight(stringSet) });
           }

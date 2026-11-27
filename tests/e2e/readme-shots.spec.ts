@@ -131,6 +131,17 @@ test.describe('phone', () => {
   });
 });
 
+test.describe('phone guided', () => {
+  test.use({ viewport: { width: 412, height: 915 }, colorScheme: 'light' });
+
+  test('guided practice question', async ({ page }) => {
+    await page.goto('./');
+    await page.getByRole('button', { name: /^Guided practice/ }).click();
+    await expect(page.locator('.drill-item')).toContainText('New');
+    await page.screenshot({ path: `${DIR}/guided.png` });
+  });
+});
+
 test.describe('phone dark', () => {
   test.use({ viewport: { width: 412, height: 915 }, colorScheme: 'dark' });
 

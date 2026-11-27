@@ -7,6 +7,7 @@ import { type StringNum, fretsForPitchClass } from '../../fretboard/tuning';
 import { pitchClass } from '../../theory/notes';
 import {
   type FrettedNote,
+  type Inversion,
   type Voicing,
   type VoicingOptions,
   fretted,
@@ -25,6 +26,10 @@ export interface FindQuestion {
   valid: Voicing[];
   /** String on which the root anchor must be tapped (anchor = required), else null. */
   anchorString: 5 | 6 | null;
+  /** Only shapes in this inversion count (`cfg.inversion`). */
+  inversion?: Inversion;
+  /** With `inversion`: the chord's shapes in the region in other inversions. */
+  otherShapes?: Voicing[];
 }
 
 export type { Taps };
@@ -46,7 +51,7 @@ export function findItem(q: FindQuestion, mode: Item['mode'] = 'find'): Item {
     degree: q.chord.degree,
     quality: q.chord.quality,
     stringSet: q.region.stringSet,
-    inversion: '*',
+    inversion: q.inversion ?? '*',
     anchor: q.anchorString,
   };
 }
@@ -78,7 +83,10 @@ export function generateFindQuestion(cfg: PracticeConfig, o: GenerateOptions): F
       const fit = fittingRegion([chord], stringSet, cfg.window, o.voicing);
       if (!fit) continue;
       const region = fit.region;
-      const valid = fit.valid[0];
+      const all = fit.valid[0];
+      const inv = cfg.inversion;
+      const valid = inv ? all.filter((v) => v.inversion === inv) : all;
+      if (!valid.length) continue;
       let anchorOpts: (5 | 6 | null)[] = [null];
       if (cfg.tapRoot) {
         const a = anchorCandidates(region, cfg.anchorStrings).filter(
@@ -88,7 +96,16 @@ export function generateFindQuestion(cfg: PracticeConfig, o: GenerateOptions): F
         anchorOpts = a;
       }
       for (const anchorString of anchorOpts) {
-        const q: FindQuestion = { chord, region, valid, anchorString };
+        const q: FindQuestion = inv
+          ? {
+              chord,
+              region,
+              valid,
+              anchorString,
+              inversion: inv,
+              otherShapes: all.filter((v) => v.inversion !== inv),
+            }
+          : { chord, region, valid, anchorString };
         cands.push({ q, item: findItem(q) });
       }
     }
