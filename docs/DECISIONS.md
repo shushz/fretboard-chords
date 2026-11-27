@@ -477,3 +477,10 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
 - Optional steps: `GuidedState.skipped`; skipped steps don't feed reviews or checks.
 - New steps inserted earlier in the path send someone who passed later steps back to the
   first new step (the passed ones stay passed).
+
+## Guided warm-up (guided-warmup)
+
+- Owner's idea ("starting with a reminder"): the day's first session opens with 4 warm-up
+  questions, chosen like reviews (recent misses, time since last asked), before the new
+  block. "First of the day" = no answers yet today in any mode (practice elsewhere counts
+  as warming up). No warm-up until something has been learned.

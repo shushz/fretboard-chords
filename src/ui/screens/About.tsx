@@ -149,14 +149,16 @@ export function About() {
           and vii°, minor keys, then seventh chords.
         </p>
         <p>
-          Each session mixes about 60% <b>new</b> questions from the current step (a few in a row at
-          the start, then spread out), 25% <b>reviews</b> of earlier steps you got wrong or haven't
-          seen for a while, and 15% <b>checks</b> of random earlier steps. If the old material slips
-          (under 75% right), fewer new questions come in until it's solid again. A step is passed
-          when each of its questions has been right at least 4 of the last 5 times, in any keys,
-          with a typical answer under 6 s (9 s for naming three tones); practice outside Guided
-          practice counts too. <i>Still solid</i> is your recent score on what's already passed. The
-          line under the top bar says whether a question is new, a review or a check.
+          The day's first session opens with a short <b>warm-up</b>: 4 questions on what you've
+          already learned that's slipping or overdue. Then each session mixes about 60% <b>new</b>{' '}
+          questions from the current step (a few in a row at the start, then spread out), 25%{' '}
+          <b>reviews</b> of earlier steps you got wrong or haven't seen for a while, and 15%{' '}
+          <b>checks</b> of random earlier steps. If the old material slips (under 75% right), fewer
+          new questions come in until it's solid again. A step is passed when each of its questions
+          has been right at least 4 of the last 5 times, in any keys, with a typical answer under 6
+          s (9 s for naming three tones); practice outside Guided practice counts too.{' '}
+          <i>Still solid</i> is your recent score on what's already passed. The line under the top
+          bar says whether a question is new, a review or a check.
         </p>
       </Section>
 

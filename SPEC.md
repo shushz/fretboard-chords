@@ -236,6 +236,8 @@ An automatic, progress-based path for learners who'd rather not set up sessions.
   time since last asked), 15 % check (random learned targets). New drops to 40 % while
   "still solid" is under 75 %; 100 % before anything is learned; 0 % once the path is done.
   Never the same target twice in a row.
+- **Warm-up**: the day's first session (no answers yet today, in any mode) opens with 4
+  questions picked like reviews (recent misses, overdue), once something is learned.
 - **Progress**: home screen shows "Step N of M", the step's solid targets as a bar, and
   **still solid**: the share right in the latest 20 answers to learned targets. The
   session summary lists steps passed; Progress lists every step.

@@ -19,7 +19,14 @@ import { reviewConfig, reviewWeight } from '../../exercises/review';
 import { pauseClock, resumeClock } from '../../exercises/answerClock';
 import { pendingDrill } from '../../exercises/drillState';
 import { advanceGuided, guided, pendingGuided } from '../../guided/store';
-import { type SlotKind, chooseTarget, newShare, sessionKinds } from '../../guided/plan';
+import {
+  type SlotKind,
+  WARMUP,
+  chooseTarget,
+  needsWarmup,
+  newShare,
+  sessionKinds,
+} from '../../guided/plan';
 import { guidedConfig, targetWeight } from '../../guided/config';
 import { type Step, type Target, targetId } from '../../guided/curriculum';
 import { GuidedProgress, KIND_LABEL, SkipChallenge, targetLabel } from '../../guided/GuidedStatus';
@@ -45,7 +52,9 @@ interface GuidedRun {
 function newGuidedRun(p: Preferences): GuidedRun {
   advanceGuided();
   const n = p.practice.sessionLength.kind === 'questions' ? p.practice.sessionLength.count : 20;
-  return { kinds: sessionKinds(n, newShare(answerLog.value, guided.value)), passed: [] };
+  const log = answerLog.value;
+  const warmup = needsWarmup(log, guided.value, Date.now()) ? WARMUP : 0;
+  return { kinds: sessionKinds(n, newShare(log, guided.value), warmup), passed: [] };
 }
 
 interface Drill {
