@@ -51,14 +51,15 @@ export function TonicRunner(props: RunnerProps) {
           </>
         ),
         sub: `${formatStringSet(q.region.stringSet)} · ${formatWindow(q.region.window)}`,
-        hint: p.practice.givenShapeRoles
-          ? `Here's the ${tonicNum} (${inversionName(q.tonicVoicing.inversion)}). Find the ${numeral} nearby.`
-          : `Here's the ${tonicNum}. Find the ${numeral} nearby.`,
+        hint:
+          (config.givenRoles ?? p.practice.givenShapeRoles)
+            ? `Here's the ${tonicNum} (${inversionName(q.tonicVoicing.inversion)}). Find the ${numeral} nearby.`
+            : `Here's the ${tonicNum}. Find the ${numeral} nearby.`,
       }}
       chord={q.target}
       region={q.region}
       shown={q.tonicVoicing.notes}
-      shownRoles={p.practice.givenShapeRoles}
+      shownRoles={config.givenRoles ?? p.practice.givenShapeRoles}
       legend={{ given: `${tonicNum} (given)`, answer: numeral }}
       playOnShow={q.tonicVoicing.notes.map((n) => n.midi)}
       nearby

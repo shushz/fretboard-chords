@@ -442,3 +442,21 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   `retired` (`retireItem`) and skips it. Retired items leave `dueItems` and `weakest`;
   `updateStats` clears the flag, so a preference turned back on brings them back on the
   next answer.
+
+## Guided practice (guided-practice)
+
+- Owner's request: an automatic, progress-based mode that adds material gradually, keeps
+  testing old material without drowning the new, with a simple progress measure. Owner's
+  refinements: From the tonic before Find the chord (the tonic is a hint); organize by the
+  tonic's inversion and string set rather than key; drop the role hints after Name the
+  tones.
+- Progress is measured per target across keys from the answer log (item stats are per key
+  and would rarely reach enough answers with random keys). Passing a step is persisted
+  (IndexedDB `guided`, included in backups) so forgetting doesn't move the learner back;
+  reviews handle forgetting.
+- Thresholds: 4 of the last 5 right, median ≤ 6 s (9 s labeling): looser than the 90 % / 3 s
+  mastery rule, which stays as the long-term goal on Progress.
+- Mix 60/25/15 with a 5-question new block first; new drops to 40 % when still-solid < 75 %.
+- New config options used by guided practice and also available to other code:
+  `PracticeConfig.inversion` (tonic shape / find target / label shape) and `givenRoles`.
+  Find the chord in one inversion records that inversion in its item.

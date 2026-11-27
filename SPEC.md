@@ -209,6 +209,31 @@ and the item it tested (see §6).
 Introduce sevenths only after triads (global toggle; suggested when triad mastery for a
 key reaches the threshold).
 
+### 5.8 Guided practice
+
+An automatic, progress-based path for learners who'd rather not set up sessions.
+
+- **Path** (`src/guided/curriculum.ts`): ordered steps organized by **shape, not key**: a
+  string set and the tonic's inversion. Keys are random on every question. Per string set
+  (2–4, 1–3, 3–5), major keys: From the tonic from root position (IV, V; then ii, vi), from
+  first and second inversion; Name the tones of I, IV, V, ii, vi; From the tonic without
+  role hints; Find the chord in root position, first, second inversion; Progression walk.
+  Then minor keys per string set: from i to iv, V; to ♭VI, ♭VII, ii°; without hints; find;
+  progression walk. From the tonic comes before Find the chord (the tonic shape is a hint).
+- **Targets**: each step lists targets (mode, major/minor, chord, string set, inversion,
+  hints). A target is **solid** when its last 5 answers in any key have ≥ 4 right and a
+  median right-answer time ≤ 6 s (9 s for labeling tones). A step is **passed** when all its
+  targets are solid; passing is remembered. Steps without hints count only answers given
+  since the step opened. Answers from normal practice count too.
+- **Session mix** (20 questions, or the session length): about 60 % new (current step; the
+  first 5 in a row, then spread), 25 % review (learned targets weighted by recent misses and
+  time since last asked), 15 % check (random learned targets). New drops to 40 % while
+  "still solid" is under 75 %; 100 % before anything is learned; 0 % once the path is done.
+  Never the same target twice in a row.
+- **Progress**: home screen shows "Step N of M", the step's solid targets as a bar, and
+  **still solid**: the share right in the latest 20 answers to learned targets. The
+  session summary lists steps passed; Progress lists every step.
+
 ## 6. Progress tracking
 
 - **Item** = (mode, key, degree, chord quality, string set, inversion, anchor string

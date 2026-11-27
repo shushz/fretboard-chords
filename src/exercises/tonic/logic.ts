@@ -96,7 +96,8 @@ export function generateTonicQuestion(
         window: windowAround(tv, cfg.window.width, o.voicing.maxFret),
       }));
     }
-    for (const { tv, window } of shapes) {
+    const only = cfg.inversion;
+    for (const { tv, window } of only ? shapes.filter((x) => x.tv.inversion === only) : shapes) {
       for (const target of targets) {
         // Widen (keeping the tonic inside) if the target has no shape near it.
         const fit = fittingRegion([target], stringSet, window, o.voicing);

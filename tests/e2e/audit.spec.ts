@@ -224,6 +224,16 @@ for (const vp of VIEWPORTS) {
         await page.getByRole('radio', { name: 'Sevenths' }).click();
         await visit(page, problems, pre, 'explore-sevenths');
 
+        // Guided practice: a question, its feedback, and the summary
+        await page.goto('./');
+        await page.getByRole('button', { name: /^Guided practice/ }).click();
+        await visit(page, problems, pre, 'guided question');
+        await answer(page);
+        await visit(page, problems, pre, 'guided feedback');
+        await page.getByRole('button', { name: 'End session' }).click();
+        await expect(page.locator('.guided-summary')).toBeVisible();
+        await visit(page, problems, pre, 'guided summary');
+
         for (const mode of MODES) {
           await page.goto('./'); // via Home, as a user would (re-opens Practice fresh)
           await page.getByRole('button', { name: /^Practice/ }).click();

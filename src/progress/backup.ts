@@ -4,6 +4,7 @@ import type { DayStats, ItemStats } from './stats';
 import { parseItemKey } from './types';
 import { type LogEntry, sanitizeLog } from './log';
 import { type Rollup, sanitizeRollups } from './history';
+import { type GuidedState, sanitizeGuided } from '../guided/progress';
 
 export interface Backup {
   app: 'fretboard-chords';
@@ -16,6 +17,8 @@ export interface Backup {
   log?: LogEntry[];
   /** Per-day summaries of older practice (optional: older backups have none). */
   rollups?: Rollup[];
+  /** Guided practice: steps passed (optional: older backups have none). */
+  guided?: GuidedState;
 }
 
 export function makeBackup(
@@ -25,6 +28,7 @@ export function makeBackup(
   now: number,
   log: LogEntry[] = [],
   rollups: Rollup[] = [],
+  guided?: GuidedState,
 ): Backup {
   return {
     app: 'fretboard-chords',
@@ -35,6 +39,7 @@ export function makeBackup(
     daily,
     log,
     rollups,
+    ...(guided ? { guided } : {}),
   };
 }
 
@@ -109,6 +114,7 @@ export function parseBackup(text: string): ParseResult {
       daily,
       log: sanitizeLog(b.log),
       rollups: sanitizeRollups(b.rollups),
+      guided: b.guided === undefined ? undefined : sanitizeGuided(b.guided),
     },
   };
 }

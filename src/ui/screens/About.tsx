@@ -23,11 +23,13 @@ export function About() {
       <Section title="Getting started">
         <ol class="steps">
           <li>
-            Open <b>Practice</b>, pick a mode (start with <i>Find the chord</i>) and a key.
+            The easiest start is <b>Guided practice</b> on the home screen: it picks the questions
+            for you and moves on as you get better (see below). Or open <b>Practice</b>, pick a mode
+            and a key yourself.
           </li>
           <li>
-            Choose which chords to practice, a group of strings (e.g. 1–3, the three highest) and a
-            fret window. The dashed box on the board marks this region.
+            In Practice, choose which chords to practice, a group of strings (e.g. 1–3, the three
+            highest) and a fret window. The dashed box on the board marks this region.
           </li>
           <li>
             Read the question, find the chord on your guitar, then tap its notes on the board.
@@ -131,6 +133,27 @@ export function About() {
             </div>
           ))}
         </dl>
+      </Section>
+
+      <Section title="Guided practice">
+        <p>
+          A path of small steps, organized by shape rather than key: each step is one string set and
+          one shape of the tonic (root position, first or second inversion), and every question is
+          in a random key, because a move between shapes is the same in every key. It starts with{' '}
+          <i>From the tonic</i> (the I chord is a hint), then names the tones of those chords, drops
+          the role labels on the I chord, moves on to <i>Find the chord</i> in each inversion (no
+          shape to start from) and the progression walk, string set by string set, then minor keys.
+        </p>
+        <p>
+          Each session mixes about 60% <b>new</b> questions from the current step (a few in a row at
+          the start, then spread out), 25% <b>reviews</b> of earlier steps you got wrong or haven't
+          seen for a while, and 15% <b>checks</b> of random earlier steps. If the old material slips
+          (under 75% right), fewer new questions come in until it's solid again. A step is passed
+          when each of its questions has been right at least 4 of the last 5 times, in any keys,
+          with a typical answer under 6 s (9 s for naming three tones); practice outside Guided
+          practice counts too. <i>Still solid</i> is your recent score on what's already passed. The
+          line under the top bar says whether a question is new, a review or a check.
+        </p>
       </Section>
 
       <Section title="Your progress">

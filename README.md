@@ -18,6 +18,26 @@ fully offline.
   <img src="docs/screenshots/readme/chord-explorer-dark.png" width="24%" alt="Chord explorer in dark mode showing a C♯7 drop-2 voicing">
 </p>
 
+## Guided practice
+
+Not sure what to practice? **Guided practice** picks for you. It follows a path of 45 small
+steps organized by shape, not key: one string set and one shape of the tonic at a time, with a
+random key on every question (a move between shapes is the same in every key). It starts with
+_From the tonic_ in root position on strings 2–4, adds the other inversions, names the tones,
+takes away the role hints, then moves to _Find the chord_ in each inversion and progression
+walks, string set by string set, then minor keys.
+
+Each session is about 60% new material from the current step, 25% reviews of what you got
+wrong or haven't seen lately, and 15% spot checks of earlier steps; when the old material
+slips, fewer new questions come in. A step is passed when each of its questions has been right
+4 of the last 5 times without being slow. The home screen shows the current step, a progress
+bar and **still solid**, your recent score on what's already passed.
+
+<p>
+  <img src="docs/screenshots/readme/home.png" width="24%" alt="Home screen: Guided practice with the current step, its progress bar and how many targets are solid">
+  <img src="docs/screenshots/readme/guided.png" width="24%" alt="A guided question: a new From-the-tonic question, I in root position to IV on strings 2–4, in a random key">
+</p>
+
 ## What you practice
 
 Pick a key, the chords you care about (the core set by default, e.g. i, iv, V, ii°, ♭VI,
@@ -75,7 +95,6 @@ R–3–7 shells), in **one key or a random key** per question.
 
 <p>
   <img src="docs/screenshots/readme/quality-switch-dark.png" width="24%" alt="Quality switch in dark mode: D major turned minor by moving the 3rd down a fret">
-  <img src="docs/screenshots/readme/home.png" width="24%" alt="Home screen">
   <img src="docs/screenshots/readme/help.png" width="24%" alt="Help & about: getting started, the main ideas, every mode">
 </p>
 

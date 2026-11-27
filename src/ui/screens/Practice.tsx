@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { prefs } from '../../prefs/store';
-import { retireItem, stats } from '../../progress/store';
+import { answerLog, retireItem, stats } from '../../progress/store';
 import { type PracticeConfig, concreteConfig, defaultConfig } from '../../exercises/config';
 import type { Key } from '../../theory/keys';
 import { Setup } from '../../exercises/Setup';
@@ -18,6 +18,11 @@ import { drillQueue, occurrence } from '../../exercises/drill';
 import { reviewConfig, reviewWeight } from '../../exercises/review';
 import { pauseClock, resumeClock } from '../../exercises/answerClock';
 import { pendingDrill } from '../../exercises/drillState';
+import { advanceGuided, guided, pendingGuided } from '../../guided/store';
+import { type SlotKind, chooseTarget, newShare, sessionKinds } from '../../guided/plan';
+import { guidedConfig } from '../../guided/config';
+import { type Step, type Target, targetId } from '../../guided/curriculum';
+import { GuidedProgress, KIND_LABEL, targetLabel } from '../../guided/GuidedStatus';
 import { PROGRESSIONS } from '../../exercises/progression/logic';
 import { makeItemWeight } from '../../progress/srs';
 import { recordAttempts } from '../../progress/record';
@@ -28,6 +33,20 @@ import type { Preferences } from '../../prefs/model';
 import { loadSetup, saveSetup } from '../../exercises/lastSetup';
 import { itemLabel } from '../../progress/labels';
 import { sessionHeader } from '../sessionHeader';
+
+interface GuidedRun {
+  kinds: SlotKind[];
+  passed: Step[];
+  /** Shown until the next question: steps just passed. */
+  justPassed?: string;
+}
+
+/** Plan a guided session (passing any steps already solid from earlier practice first). */
+function newGuidedRun(p: Preferences): GuidedRun {
+  advanceGuided();
+  const n = p.practice.sessionLength.kind === 'questions' ? p.practice.sessionLength.count : 20;
+  return { kinds: sessionKinds(n, newShare(answerLog.value, guided.value)), passed: [] };
+}
 
 interface Drill {
   title: string;
@@ -47,8 +66,19 @@ export function Practice() {
       ? { title: d.title, items: drillQueue(d.items, d.passes, Math.random) }
       : null;
   });
+  // Guided practice: the kinds of question this session asks (new / review / check), and
+  // the steps passed during it.
+  const [guidedRun, setGuidedRun] = useState<GuidedRun | null>(() => {
+    if (!pendingGuided.value) return null;
+    pendingGuided.value = false;
+    return newGuidedRun(p);
+  });
   const [session, setSession] = useState<SessionState<number> | null>(() =>
-    drill ? startSession({ kind: 'questions', count: drill.items.length }, 0, Date.now()) : null,
+    drill
+      ? startSession({ kind: 'questions', count: drill.items.length }, 0, Date.now())
+      : guidedRun
+        ? startSession({ kind: 'questions', count: guidedRun.kinds.length }, 0, Date.now())
+        : null,
   );
   const [notice, setNotice] = useState<string | null>(null);
   const [retry, setRetry] = useState(0);
@@ -80,7 +110,7 @@ export function Practice() {
       return;
     }
     const sl = session.length;
-    const byChords = !drill && config.mode === 'progression';
+    const byChords = !drill && !guidedRun && config.mode === 'progression';
     const next = {
       progress:
         sl.kind === 'questions'
@@ -89,7 +119,7 @@ export function Practice() {
             : `${session.index + 1}/${sl.count}`
           : `${Math.max(0, Math.ceil((sl.minutes * 60_000 - (Date.now() - session.startedAt)) / 60_000))} min left`,
       correct: session.attempts.filter((a) => a.correct).length,
-      title: drill?.title,
+      title: drill?.title ?? (guidedRun ? 'Guided' : undefined),
       finish: () => setSession((s) => (s ? finishSession(s) : s)),
     };
     // Only on change: App re-renders on this signal, which re-renders this screen.
@@ -107,10 +137,38 @@ export function Practice() {
   const prevKey = useRef<Key | null>(null);
   /** Window start each drilled item last had in this session (a repeat goes elsewhere). */
   const drillStarts = useRef(new Map<string, number>());
+  /** The guided target asked last (not asked twice in a row). */
+  const prevTarget = useRef<string | undefined>(undefined);
 
   // Per-question config and selection weights
   const index = session?.index ?? 0;
-  const current = useMemo(() => {
+  const current = useMemo<{
+    config: PracticeConfig | null;
+    item: Item | null;
+    itemWeight: (i: Item) => number;
+    guided?: { target: Target; kind: SlotKind };
+  }>(() => {
+    if (guidedRun) {
+      // The target is chosen when the question comes up, from the latest progress: a step
+      // passed mid-session brings in the next one.
+      const kind = guidedRun.kinds[index] ?? 'check';
+      const g = chooseTarget(
+        kind,
+        answerLog.value,
+        guided.value,
+        Date.now(),
+        Math.random,
+        prevTarget.current,
+      );
+      if (!g) return { config: null, item: null, itemWeight: () => 1 };
+      prevTarget.current = targetId(g.target);
+      return {
+        config: guidedConfig(g.target, p, Math.random),
+        item: null,
+        itemWeight: () => 1,
+        guided: g,
+      };
+    }
     if (drill) {
       const item = drill.items[index % drill.items.length];
       const k = itemKey(item);
@@ -154,12 +212,13 @@ export function Practice() {
         Math.random,
       ),
     };
-  }, [index, retry, regen, drill, session === null]);
+  }, [index, retry, regen, drill, guidedRun?.kinds, session === null]);
 
   // A review item that can't be turned into a question any more (the mode changed, a
   // preference turned it off, a damaged key in an imported backup) is retired and skipped,
   // instead of asking something else or leaving an empty screen.
-  const unaskable = !!drill && !!session && session.phase !== 'done' && !current.config;
+  const unaskable =
+    (!!drill || !!guidedRun) && !!session && session.phase !== 'done' && !current.config;
   useEffect(() => {
     if (!unaskable) return;
     if (current.item) retireItem(itemKey(current.item));
@@ -197,8 +256,16 @@ export function Practice() {
       <Summary
         attempts={session.attempts}
         durationMs={Date.now() - session.startedAt}
+        guidedPassed={guidedRun?.passed}
         onAgain={() => {
           setDrill(null);
+          if (guidedRun) {
+            // another guided session, planned from the progress made so far
+            const g = newGuidedRun(p);
+            setGuidedRun(g);
+            setSession(startSession({ kind: 'questions', count: g.kinds.length }, 0, Date.now()));
+            return;
+          }
           setSession(null);
         }}
       />
@@ -206,7 +273,7 @@ export function Practice() {
   }
 
   // The progression walk counts chords, not progressions (20 ≈ 5 progressions).
-  const byChords = !drill && config.mode === 'progression';
+  const byChords = !drill && !guidedRun && config.mode === 'progression';
   const advance = () =>
     setSession((s) => {
       if (!s) return s;
@@ -226,6 +293,21 @@ export function Practice() {
           {itemLabel(current.item, p)}
         </div>
       )}
+      {guidedRun && current.guided && (
+        <div class="drill-item muted">
+          <b class="drill-title">Guided · </b>
+          <span class={`guided-kind ${current.guided.kind}`}>
+            {KIND_LABEL[current.guided.kind]}
+          </span>
+          {' · '}
+          {targetLabel(current.guided.target)}
+        </div>
+      )}
+      {guidedRun && guidedRun.justPassed && (
+        <p class="guided-passed" role="status">
+          ✓ Step passed: {guidedRun.justPassed}. New material from the next step comes in now.
+        </p>
+      )}
       {mode && cfg && (
         <mode.Runner
           key={`${session.index}:${retry}:${regen}`}
@@ -236,13 +318,28 @@ export function Practice() {
           onGraded={(a: Attempt[]) => {
             recordAttempts(a);
             setSession((s) => (s ? recordAttempt(s, a) : s));
+            if (guidedRun) {
+              const passed = advanceGuided();
+              if (passed.length)
+                setGuidedRun((g) =>
+                  g
+                    ? {
+                        ...g,
+                        passed: [...g.passed, ...passed],
+                        justPassed: passed.map((x) => x.title).join('; '),
+                      }
+                    : g,
+                );
+            }
           }}
           onNext={() => {
             setRetry(0);
+            if (guidedRun?.justPassed)
+              setGuidedRun((g) => (g ? { ...g, justPassed: undefined } : g));
             advance();
           }}
           onImpossible={() => {
-            if (drill || config.randomKey) {
+            if (drill || guidedRun || config.randomKey) {
               // drills: try other windows; random keys: try other keys — then skip
               if (retry < 5) setRetry(retry + 1);
               else {
@@ -262,10 +359,29 @@ export function Practice() {
   );
 }
 
-function Summary(props: { attempts: Attempt[]; durationMs: number; onAgain: () => void }) {
+function Summary(props: {
+  attempts: Attempt[];
+  durationMs: number;
+  onAgain: () => void;
+  /** Guided practice: the steps passed this session. */
+  guidedPassed?: Step[];
+}) {
   const s = summarize(props.attempts, props.durationMs);
   return (
     <div class="summary">
+      {props.guidedPassed && (
+        <section class="card guided-summary">
+          <h2>Guided practice</h2>
+          {props.guidedPassed.length > 0 && (
+            <ul class="guided-passed-list">
+              {props.guidedPassed.map((st) => (
+                <li key={st.id}>✓ Passed: {st.title}</li>
+              ))}
+            </ul>
+          )}
+          <GuidedProgress />
+        </section>
+      )}
       <section class="card summary-card">
         <h2>Session complete</h2>
         <div class="big-stats">
@@ -287,7 +403,7 @@ function Summary(props: { attempts: Attempt[]; durationMs: number; onAgain: () =
       </section>
       <div class="actions">
         <button type="button" class="btn" onClick={props.onAgain}>
-          Practice again
+          {props.guidedPassed ? 'Next session' : 'Practice again'}
         </button>
         <button type="button" class="btn secondary" onClick={() => navigate('stats')}>
           Progress

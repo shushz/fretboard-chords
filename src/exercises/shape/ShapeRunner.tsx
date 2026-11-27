@@ -52,13 +52,13 @@ export function ShapeRunner(props: RunnerProps) {
           </>
         ),
         sub: `${formatStringSet(q.stringSet)} · ${numeral} in ${formatKey(q.chord.key)}`,
-        hint: `${p.practice.givenShapeRoles ? `This is ${inversionName(q.shown.inversion)}. ` : ''}Find the ${up ? 'next' : 'previous'} shape ${up ? 'up' : 'down'} the neck.`,
+        hint: `${(config.givenRoles ?? p.practice.givenShapeRoles) ? `This is ${inversionName(q.shown.inversion)}. ` : ''}Find the ${up ? 'next' : 'previous'} shape ${up ? 'up' : 'down'} the neck.`,
       }}
       chord={q.chord}
       region={{ stringSet: q.stringSet, window: view }}
       view={view}
       shown={q.shown.notes}
-      shownRoles={p.practice.givenShapeRoles}
+      shownRoles={config.givenRoles ?? p.practice.givenShapeRoles}
       legend={{ given: 'this shape (given)', answer: up ? 'next shape' : 'previous shape' }}
       playOnShow={q.shown.notes.map((n) => n.midi)}
       requiredStrings={shapeRequiredStrings(q)}
