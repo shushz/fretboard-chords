@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { prefs } from '../../prefs/store';
-import { answerLog, countReview, retireItem, stats } from '../../progress/store';
+import { answerLog, countReview, families, retireItem, stats } from '../../progress/store';
+import { dueFamilies } from '../../progress/families';
+import { matchesTarget } from '../../guided/progress';
 import { type PracticeConfig, concreteConfig, defaultConfig } from '../../exercises/config';
 import type { Key } from '../../theory/keys';
 import { Setup } from '../../exercises/Setup';
@@ -29,23 +31,29 @@ import {
 } from '../../guided/plan';
 import { guidedConfig, targetWeight } from '../../guided/config';
 import { type Step, type Target, targetId } from '../../guided/curriculum';
-import { GuidedProgress, KIND_LABEL, SkipChallenge, targetLabel } from '../../guided/GuidedStatus';
+import { GuidedProgress, KIND_LABEL, SkipChallenge } from '../../guided/GuidedStatus';
 import { PROGRESSIONS } from '../../exercises/progression/logic';
 import { makeItemWeight } from '../../progress/srs';
 import { recordAttempts } from '../../progress/record';
-import { type Attempt, type Item, itemKey } from '../../progress/types';
+import { type Attempt, type Item, itemKey, parseItemKey } from '../../progress/types';
 import { keyFromAscii } from '../pickers';
 import { navigate, route } from '../router';
 import type { Preferences } from '../../prefs/model';
 import { loadSetup, saveSetup } from '../../exercises/lastSetup';
 import { itemLabel } from '../../progress/labels';
-import { sessionHeader } from '../sessionHeader';
+import { screenTitle, sessionHeader } from '../sessionHeader';
 
 interface GuidedRun {
   kinds: SlotKind[];
   passed: Step[];
   /** Shown until the next question: steps just passed. */
   justPassed?: string;
+}
+
+/** Whether a guided target's question type is due in Review due items. */
+function dueTargetCheck(): (t: Target) => boolean {
+  const due = dueFamilies(families.value, Date.now()).map((f) => parseItemKey(f.key));
+  return (t) => due.some((it) => matchesTarget(t, it));
 }
 
 /** Plan a guided session (passing any steps already solid from earlier practice first). */
@@ -116,8 +124,18 @@ export function Practice() {
   useEffect(() => {
     if (!running || !session) {
       sessionHeader.value = null;
+      // The summary's top bar names the session it ends.
+      screenTitle.value =
+        visible && session?.phase === 'done'
+          ? guidedRun
+            ? 'Guided practice'
+            : drill?.title === 'Review'
+              ? 'Review'
+              : (drill?.title ?? null)
+          : null;
       return;
     }
+    screenTitle.value = null;
     const sl = session.length;
     const byChords = !drill && !guidedRun && config.mode === 'progression';
     const next = {
@@ -141,7 +159,13 @@ export function Practice() {
     )
       sessionHeader.value = next;
   });
-  useEffect(() => () => void (sessionHeader.value = null), []);
+  useEffect(
+    () => () => {
+      sessionHeader.value = null;
+      screenTitle.value = null;
+    },
+    [],
+  );
   const prev = useRef<unknown>(null);
   const prevKey = useRef<Key | null>(null);
   /** Window start each drilled item last had in this session (a repeat goes elsewhere). */
@@ -168,6 +192,8 @@ export function Practice() {
         Date.now(),
         Math.random,
         prevTarget.current,
+        undefined,
+        dueTargetCheck(),
       );
       if (!g) return { config: null, item: null, itemWeight: () => 1 };
       prevTarget.current = targetId(g.target);
@@ -305,11 +331,10 @@ export function Practice() {
       {guidedRun && current.guided && (
         <div class="drill-item muted">
           <b class="drill-title">Guided · </b>
+          {/* The question itself says what to do; this says what kind of question it is. */}
           <span class={`guided-kind ${current.guided.kind}`}>
             {KIND_LABEL[current.guided.kind]}
           </span>
-          {' · '}
-          {targetLabel(current.guided.target)}
         </div>
       )}
       {guidedRun && guidedRun.justPassed && (
@@ -389,7 +414,7 @@ function Summary(props: {
               ))}
             </ul>
           )}
-          <GuidedProgress />
+          <GuidedProgress details />
           <SkipChallenge />
         </section>
       )}

@@ -126,9 +126,11 @@ Each fretted note in a voicing carries its role.
   (optionally allow a note one fret outside the window, setting).
   Open strings (fret 0) count as inside a window that starts at fret 1. From the tonic and
   the progression walk, whose point is staying close, also accept shapes up to 2 frets
-  outside the window (Smooth still goes to the least movement). In other modes, the right
-  chord played outside the window gets neutral feedback ("Right chord, but outside frets
-  5–9") with no error sound; it counts as not right.
+  outside the window (Smooth still goes to the least movement); beyond that, the right chord
+  gets neutral feedback ("Right chord, but too far from frets 5–9"), counted as not right.
+- **Tap zone**: taps outside the area where an answer can count are ignored, with a note
+  ("That tap is outside frets 5–9…"): the window (± 1 fret with "allow one note outside"),
+  ± 2 frets in From the tonic / Progression walk and for a root on string 6/5.
 - If a chord has no voicing inside the window on a string set, questions widen the window
   for that chord by the fewest frets needed (shown in the prompt) instead of never asking
   for it; reference views show the nearest shapes outside the window.

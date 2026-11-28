@@ -121,9 +121,16 @@ function pickWeighted<T>(xs: readonly T[], w: (x: T) => number, rand: () => numb
 
 const DAY = 86_400_000;
 
+/** The target just asked is less likely, but not ruled out (strict alternation is mechanical). */
+export const REPEAT_WEIGHT = 0.25;
+/** Reviews and warm-ups strongly prefer question types that are actually due. */
+export const DUE_WEIGHT = 4;
+
 /**
- * The target for one question. `previous`: the target just asked (not asked twice in a
- * row when there's a choice). Falls back to another kind when a pool is empty.
+ * The target for one question. `previous`: the target just asked (less likely again).
+ * `isDue`: whether a target's question type is due for review (Review due items), so that
+ * guided reviews clear what's due instead of scheduling on their own. Falls back to another
+ * kind when a pool is empty.
  */
 export function chooseTarget(
   kind: SlotKind,
@@ -133,6 +140,7 @@ export function chooseTarget(
   rand: () => number,
   previous?: string,
   steps: readonly Step[] = CURRICULUM,
+  isDue?: (t: Target) => boolean,
 ): { target: Target; kind: SlotKind } | null {
   const i = currentIndex(s, steps);
   const fresh = i < steps.length ? steps[i].targets : [];
@@ -142,18 +150,19 @@ export function chooseTarget(
   // A warm-up question is picked like a review: what's slipping or overdue.
   const pool = k === 'new' ? fresh : learned;
   if (!pool.length) return null;
-  const notPrev = pool.length > 1 ? pool.filter((t) => targetId(t) !== previous) : pool;
-  if (k === 'check') return { target: notPrev[Math.floor(rand() * notPrev.length)], kind: k };
+  const repeat = (t: Target) => (pool.length > 1 && targetId(t) === previous ? REPEAT_WEIGHT : 1);
+  if (k === 'check') return { target: pickWeighted(pool, repeat, rand), kind: k };
   const since = k === 'new' && steps[i].fresh ? openedAt(s, i, steps) : 0;
   const target = pickWeighted(
-    notPrev,
+    pool,
     (t) => {
       const st = targetState(log, t, since);
-      if (k === 'new') return st.solid ? 1 : 3; // focus on what isn't solid yet
-      // review: wrong recent answers and time since last asked (up to two weeks)
+      if (k === 'new') return repeat(t) * (st.solid ? 1 : 3); // focus on what isn't solid yet
+      // review: wrong recent answers and time since last asked (up to two weeks); what's
+      // due for review first
       const misses = st.count ? (st.count - st.right) / st.count : 1;
       const stale = st.lastAt ? Math.min(14, (now - st.lastAt) / DAY) / 7 : 1;
-      return 0.2 + 3 * misses + stale;
+      return repeat(t) * (isDue?.(t) ? DUE_WEIGHT : 1) * (0.2 + 3 * misses + stale);
     },
     rand,
   );

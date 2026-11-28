@@ -12,3 +12,6 @@ export interface SessionHeader {
 }
 
 export const sessionHeader = signal<SessionHeader | null>(null);
+
+/** Overrides the top bar's title on Practice (e.g. "Guided practice" on its summary). */
+export const screenTitle = signal<string | null>(null);

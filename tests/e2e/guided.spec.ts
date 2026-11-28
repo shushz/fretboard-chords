@@ -55,8 +55,9 @@ test('Guided practice starts at step 1 with new questions from the tonic', async
   const entry = page.getByRole('button', { name: /^Guided practice/ });
   await expect(entry).toContainText(`Step 1 of ${CURRICULUM.length}`);
   await entry.click();
-  await expect(page.locator('.drill-item')).toContainText('New');
-  await expect(page.locator('.drill-item')).toContainText('I (root position) →');
+  // the line under the bar says what kind of question; the question says the rest
+  await expect(page.locator('.drill-item')).toHaveText('Guided · New');
+  await expect(page.locator('.prompt-main')).toContainText(/I → (IV|V)$/);
   await expect(page.locator('.prompt-hint')).toContainText("Here's the I (root position)");
   await page.getByRole('button', { name: 'Show answer' }).click();
   await page.getByRole('button', { name: 'Next' }).click();
@@ -64,6 +65,11 @@ test('Guided practice starts at step 1 with new questions from the tonic', async
   await page.getByRole('button', { name: 'End session' }).click();
   await expect(page.locator('.guided-summary')).toContainText('Step 1 of');
   await expect(page.getByRole('button', { name: 'Next session' })).toBeVisible();
+  // the summary names the session, and shows each question of the step
+  await expect(page.locator('.topbar h1')).toHaveText('Guided practice');
+  await expect(page.locator('.guided-targets li')).toHaveCount(2);
+  await expect(page.locator('.guided-targets')).toContainText('I (root position) → IV');
+  await expect(page.locator('.guided-targets')).toContainText(/needs 5|not asked yet/);
 });
 
 test('practice done earlier counts: a solid first step is passed when guided practice opens', async ({
@@ -73,7 +79,7 @@ test('practice done earlier counts: a solid first step is passed when guided pra
   await page.goto('./');
   await page.getByRole('button', { name: /^Guided practice/ }).click();
   // step 2 is current: new questions are about ii and vi
-  await expect(page.locator('.drill-item')).toContainText(/→ (ii|vi)/);
+  await expect(page.locator('.prompt-main')).toContainText(/→ (ii|vi)$/);
   await page.getByRole('button', { name: 'End session' }).click();
   await expect(page.locator('.guided-summary')).toContainText('Step 2 of');
   await page.goto('./#/stats');

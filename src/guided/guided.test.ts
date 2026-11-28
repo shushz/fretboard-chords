@@ -163,23 +163,64 @@ describe('sessions', () => {
     expect(newShare([], done)).toBe(0);
   });
 
-  it('picks new targets from the current step, old ones from passed steps, never twice in a row', () => {
+  it('picks new targets from the current step, old ones from passed steps; repeats are rare', () => {
     const step = CURRICULUM[0];
     const s = { passed: { [step.id]: 1 } };
     const rand = seeded(4);
     const cur = new Set(CURRICULUM[1].targets.map(targetId));
     const old = new Set(step.targets.map(targetId));
     let prev: string | undefined;
-    for (let i = 0; i < 30; i++) {
+    let repeats = 0;
+    for (let i = 0; i < 200; i++) {
       const n = chooseTarget('new', [], s, 0, rand, prev)!;
       expect(cur.has(targetId(n.target))).toBe(true);
-      expect(targetId(n.target)).not.toBe(prev);
+      if (targetId(n.target) === prev) repeats++;
       prev = targetId(n.target);
       const r = chooseTarget(i % 2 ? 'review' : 'check', [], s, 0, rand)!;
       expect(old.has(targetId(r.target))).toBe(true);
     }
+    // two targets: about 1 in 5 repeats (not 1 in 2, and not never)
+    expect(repeats).toBeGreaterThan(10);
+    expect(repeats).toBeLessThan(70);
     // nothing learned yet: review falls back to new
     expect(chooseTarget('review', [], EMPTY_GUIDED, 0, rand)!.kind).toBe('new');
+  });
+
+  it('reviews prefer question types that are due', () => {
+    const step = CURRICULUM[0];
+    const s = { passed: { [step.id]: 1 } };
+    const dueOne = targetId(step.targets[1]);
+    const rand = seeded(8);
+    let hits = 0;
+    for (let i = 0; i < 100; i++) {
+      const r = chooseTarget(
+        'review',
+        [],
+        s,
+        0,
+        rand,
+        undefined,
+        CURRICULUM,
+        (t) => targetId(t) === dueOne,
+      )!;
+      if (targetId(r.target) === dueOne) hits++;
+    }
+    expect(hits).toBeGreaterThan(70);
+  });
+
+  it('a question type (any key) counts for its target', () => {
+    const t = CURRICULUM[0].targets[0];
+    const fam: Item = {
+      mode: 'fromTonic',
+      key: '@major',
+      degree: t.degree,
+      quality: 'maj',
+      stringSet: t.stringSet,
+      inversion: 'root',
+      anchor: null,
+    };
+    expect(matchesTarget(t, fam)).toBe(true);
+    expect(matchesTarget(t, { ...fam, key: '@minor' })).toBe(false);
   });
 });
 
