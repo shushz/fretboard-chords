@@ -105,7 +105,9 @@ export function Stats() {
     triadMs: p.practice.masteryTimeTriadMs,
     seventhMs: p.practice.masteryTimeSeventhMs,
   };
-  const mastered = items.filter((x) =>
+  // Mastery by question type (any key), like reviews and the weakest list.
+  const types = Object.values(families.value).filter((x) => !x.retired);
+  const mastered = types.filter((x) =>
     isMastered(x, thresholds, isSeventhItem(parseItemKey(x.key))),
   ).length;
   const total = items.reduce((a, x) => a + x.attempts, 0);
@@ -128,13 +130,14 @@ export function Stats() {
           </div>
           <div>
             <strong>
-              {mastered}/{items.length}
+              {mastered}/{types.length}
             </strong>
-            <span>items mastered</span>
+            <span>question types mastered</span>
           </div>
         </div>
         <p class="explain">
-          An <i>item</i> is one chord in one key, on one string set, in one mode. It's mastered at{' '}
+          A <i>question type</i> is one kind of question in any key, e.g. “I in root position → IV
+          on strings 2–4, major keys”. It's mastered at{' '}
           {Math.round(p.practice.masteryAccuracy * 100)}% right over its last 10 tries, answered in
           under {(p.practice.masteryTimeTriadMs / 1000).toFixed(1)} s.
         </p>

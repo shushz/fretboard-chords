@@ -11,16 +11,9 @@ export function GuidedSteps() {
   return (
     <Section title="Guided practice">
       <div class="guided-steps">
-        <p class="explain">
-          Guided practice follows a path of {CURRICULUM.length} small steps, from the tonic on
-          strings 2–4 through every mode, string set, minor keys and seventh chords. Challenge steps
-          are optional and can be skipped. A step is passed when each of its questions has been
-          right at least 4 of the last 5 times, in any keys, without being slow. <i>Still solid</i>{' '}
-          is how often you've been right lately on what's already passed.
-        </p>
-        <GuidedProgress />
+        <GuidedProgress details />
         <SkipChallenge />
-        <details>
+        <details class="fold">
           <summary>All steps</summary>
           <ol>
             {CURRICULUM.map((st, i) => (
@@ -31,6 +24,16 @@ export function GuidedSteps() {
               </li>
             ))}
           </ol>
+        </details>
+        <details class="fold">
+          <summary>How it works</summary>
+          <p class="explain">
+            Guided practice follows a path of {CURRICULUM.length} small steps, from the tonic on
+            strings 2–4 through every mode, string set, minor keys and seventh chords. Challenge
+            steps are optional and can be skipped. A step is passed when each of its questions has
+            been right at least 4 of the last 5 times, in any keys, without being slow.{' '}
+            <i>Still solid</i> is how often you've been right lately on what's already passed.
+          </p>
         </details>
       </div>
     </Section>

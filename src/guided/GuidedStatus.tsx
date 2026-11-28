@@ -1,7 +1,7 @@
 /** Guided practice: labels and the progress block (Home, session summary, Progress). */
 import { answerLog } from '../progress/store';
 import { CURRICULUM, type Target } from './curriculum';
-import { currentIndex, retention, stepProgress } from './progress';
+import { SOLID_LAST, currentIndex, retention, stepProgress } from './progress';
 import { guided, skipGuidedStep } from './store';
 import type { SlotKind } from './plan';
 
@@ -61,8 +61,8 @@ export function pct(x: number | null): string {
   return x === null ? '–' : `${Math.round(x * 100)}%`;
 }
 
-/** Current step, its progress bar, and "still solid". */
-export function GuidedProgress(props: { compact?: boolean }) {
+/** Current step, its progress bar, and "still solid"; `details`: each question's state. */
+export function GuidedProgress(props: { compact?: boolean; details?: boolean }) {
   const s = guided.value;
   const log = answerLog.value;
   const i = currentIndex(s);
@@ -97,6 +97,27 @@ export function GuidedProgress(props: { compact?: boolean }) {
       <span class="guided-meta">
         {sp.solid} of {sp.total} solid{r !== null ? ` · still solid ${pct(r)}` : ''}
       </span>
+      {props.details && (
+        <ul class="guided-targets">
+          {sp.step.targets.map((t, k) => {
+            const st = sp.states[k];
+            return (
+              <li key={k} class={st.solid ? 'solid' : ''}>
+                <span>{targetLabel(t)}</span>
+                <span class="num">
+                  {st.solid
+                    ? 'solid ✓'
+                    : st.count === 0
+                      ? 'not asked yet'
+                      : st.count < SOLID_LAST
+                        ? `${st.right} right of ${st.count} (needs ${SOLID_LAST})`
+                        : `${st.right} of last ${st.count} right`}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }

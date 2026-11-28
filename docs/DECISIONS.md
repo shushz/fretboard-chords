@@ -498,3 +498,16 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
 - Daily cap = session length (20 if timed); counted in IndexedDB `reviewsToday`. Order:
   last answer wrong (most recent first), then most overdue.
 - Per-key stats stay for mastery, the What-to-practice map and Practice's weighting.
+
+## Critique pass 3 + tap zone (fix-critique-3)
+
+- Mastery on Progress counts question types (families), matching reviews and the weakest
+  list.
+- Guided reviews and warm-ups weight targets whose question type is due ×4 (DUE_WEIGHT),
+  so the two review systems work together.
+- Repeats: the previous target gets weight 0.25 instead of being excluded.
+- Tap zone (owner report: a slip outside the window registered even with "allow one note
+  outside" off): TapQuestion ignores taps on required strings outside window ± 0 (± 1 with
+  allowOutside; ± 2 for nearby modes and anchor strings) and shows a note. This replaces
+  the "Right chord, but outside frets…" message in Find the chord (such taps no longer
+  register); it remains for From the tonic / Progression walk beyond their 2-fret margin.

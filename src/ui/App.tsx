@@ -8,7 +8,7 @@ import { PreferencesScreen } from './screens/PreferencesScreen';
 import { Practice } from './screens/Practice';
 import { Stats } from './screens/Stats';
 import { About } from './screens/About';
-import { sessionHeader } from './sessionHeader';
+import { screenTitle, sessionHeader } from './sessionHeader';
 
 const TITLES: Record<Route, string> = {
   home: 'Fretboard Chords',
@@ -36,7 +36,11 @@ export function App() {
           // The app icon (same as the favicon and the installed app), precached with the app.
           <img class="logo" src={`${import.meta.env.BASE_URL}icon.svg`} alt="" aria-hidden="true" />
         )}
-        {r === 'practice' && sessionHeader.value ? <SessionStatus /> : <h1>{TITLES[r]}</h1>}
+        {r === 'practice' && sessionHeader.value ? (
+          <SessionStatus />
+        ) : (
+          <h1>{(r === 'practice' && screenTitle.value) || TITLES[r]}</h1>
+        )}
         <button
           type="button"
           class="icon-btn"

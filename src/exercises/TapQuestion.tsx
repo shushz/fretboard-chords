@@ -5,7 +5,13 @@ import type { ComponentChildren } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { feedback, playNote, revealSound, strum } from '../audio/engine';
 import { type Chord, toneForPitchClass } from '../theory/chords';
-import { type FretWindow, type Region, formatWindow } from '../fretboard/regions';
+import {
+  type FretWindow,
+  type Region,
+  formatWindow,
+  stringsOf,
+  windowEnd,
+} from '../fretboard/regions';
 import { type StringNum, midiAt, pitchClassAt } from '../fretboard/tuning';
 import {
   type Voicing,
@@ -22,7 +28,7 @@ import { noteMarker } from '../ui/markers';
 import { useBoardWidth } from '../ui/useViewport';
 import { type Taps, applyTapTo } from './taps';
 import { voicingOptions } from './config';
-import { shapeAnywhere } from './region';
+import { NEARBY_SLACK, shapeAnywhere } from './region';
 
 export type { Taps };
 
@@ -87,6 +93,8 @@ export function TapQuestion(props: TapQuestionProps) {
   const [grade, setGrade] = useState<TapGrade | null>(null);
   const [timedOut, setTimedOut] = useState(false);
   const [shown, setShown] = useState(false);
+  /** The last tap was outside the area where answers count (ignored). */
+  const [outside, setOutside] = useState(false);
   // The right chord, played somewhere the question doesn't accept: told apart from a mistake.
   const [elsewhere, setElsewhere] = useState(false);
   const tapsRef = useRef<Taps>(taps);
@@ -138,8 +146,25 @@ export function TapQuestion(props: TapQuestionProps) {
     props.onGraded(g.correct, timeMs, g.matched, reveal);
   };
 
+  // Only taps where an answer can count register: the window (one more fret each side
+  // with "allow one note outside"; two in the "nearby" modes, and for a root on 6/5). A slip
+  // outside it is ignored, with a note saying so.
+  const setStrings = stringsOf(props.region.stringSet);
+  const inZone = (s: StringNum, f: number) => {
+    const w = props.region.window;
+    const slack =
+      props.nearby || !setStrings.includes(s) ? NEARBY_SLACK : p.fretboard.allowOutside ? 1 : 0;
+    const lo = w.start - slack;
+    const hi = windowEnd(w) + slack;
+    return (f >= lo || (f === 0 && w.start <= 1 + slack)) && f <= hi;
+  };
   const onTap = (s: StringNum, f: number) => {
     if (grade) return;
+    if (props.requiredStrings.includes(s) && !inZone(s, f)) {
+      setOutside(true);
+      return;
+    }
+    setOutside(false);
     const next = applyTapTo(props.requiredStrings, taps, s, f);
     if (next === taps) return;
     if (next.get(s) === f) playNote(midiAt(s, f));
@@ -209,6 +234,12 @@ export function TapQuestion(props: TapQuestionProps) {
         <div class="prompt-main">{props.prompt.main}</div>
         {props.prompt.sub && <div class="prompt-sub">{props.prompt.sub}</div>}
         {props.prompt.hint && <div class="prompt-hint">{props.prompt.hint}</div>}
+        {outside && !grade && (
+          <div class="outside-tap" aria-live="polite">
+            That tap is outside {formatWindow(props.region.window)}: only taps in or next to the
+            dashed box count.
+          </div>
+        )}
       </div>
       <BoardFrame>
         <Fretboard

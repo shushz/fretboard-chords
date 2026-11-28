@@ -5,6 +5,7 @@
  */
 import { parseKeyName } from '../theory/keys';
 import { stringsOf } from '../fretboard/regions';
+import { isFamilyKey } from '../progress/families';
 import { median } from '../exercises/session';
 import type { LogEntry } from '../progress/log';
 import { type Item, parseItemKey } from '../progress/types';
@@ -33,7 +34,9 @@ const SEVENTH = new Set(['maj7', '7', 'm7', 'm7b5', 'dim7']);
 export function matchesTarget(t: Target, item: Item): boolean {
   if (item.mode !== t.mode || item.degree !== t.degree) return false;
   if (!(t.sevenths ? SEVENTH : TRIAD).has(item.quality)) return false;
-  if (parseKeyName(item.key)?.mode !== t.keyMode) return false;
+  // a question type ('@major' / '@minor') or a key of the target's mode
+  const mode = isFamilyKey(item.key) ? item.key.slice(1) : parseKeyName(item.key)?.mode;
+  if (mode !== t.keyMode) return false;
   if (t.inversion && item.inversion !== t.inversion) return false;
   const v = item.variant ?? '';
   switch (t.mode) {
