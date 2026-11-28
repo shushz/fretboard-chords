@@ -40,7 +40,7 @@ async function missThreeTimes(page: Page) {
 test('reviewing one due item asks it once, not over and over', async ({ page }) => {
   await missThreeTimes(page);
   await page.goto('./');
-  await page.getByRole('button', { name: /Review due items \(1\)/ }).click();
+  await page.getByRole('button', { name: /Review due items 1 for today/ }).click();
   await expect(page.locator('.session-progress')).toHaveText('1/1');
   await page.getByRole('button', { name: 'Show answer' }).click();
   await page.getByRole('button', { name: 'Next' }).click();
@@ -58,7 +58,8 @@ test('drilling one weak item twice uses a different fret window the second time'
   await page.getByRole('button', { name: 'Show answer' }).click();
   await page.getByRole('button', { name: 'Next' }).click();
   await expect(page.locator('.session-progress')).toHaveText('2/2');
-  await expect(page.locator('.prompt-main')).toHaveText('F♯m · iv');
+  // asked in a random minor key now, as the question type it is
+  await expect(page.locator('.prompt-main')).toContainText('m · iv');
   const second = await page.locator('.prompt-sub').textContent();
   expect(second).not.toBe(first);
   await shot(page, 'drill-second-window');

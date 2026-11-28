@@ -5,7 +5,8 @@ import { IS_PREVIEW } from '../env';
 import { prefs } from '../prefs/store';
 import { makeDemoAttempts } from './demo';
 import { type DayStats, type ItemStats, dayKey, updateDaily, updateStats } from './stats';
-import { itemKey } from './types';
+import { itemKey, parseItemKey } from './types';
+import { buildFamilies, familyKey, isFamilyKey, updateFamilies } from './families';
 import { type LogEntry, appendLog, sanitizeLog } from './log';
 import { type History, type Rollup, compact, rawFrom, sanitizeRollups } from './history';
 
@@ -25,6 +26,7 @@ const OLD_LOG_KEY = 'log';
 const DAYS_KEY = 'logDays';
 const ROLLUPS_KEY = 'rollups';
 const BACKUP_KEY = 'lastBackup';
+const REVIEWS_KEY = 'reviewsToday';
 const dayLogKey = (d: string) => `log:${d}`;
 
 export const stats = signal<Record<string, ItemStats>>({});
@@ -43,6 +45,10 @@ export const lastBackup = signal<number | null>(null);
 /** Whether the browser has agreed to keep this data (null: unknown / unsupported). */
 export const storagePersisted = signal<boolean | null>(null);
 export const progressLoaded = signal(false);
+/** Review state per question type (any key): rebuilt from the history, see families.ts. */
+export const families = signal<Record<string, ItemStats>>({});
+/** Review questions answered today (the daily review budget). */
+export const reviewsToday = signal<{ day: string; done: number }>({ day: '', done: 0 });
 
 /** Days whose log:… key is in storage. */
 let storedDays: string[] = [];
@@ -86,10 +92,13 @@ export async function loadProgress(): Promise<void> {
     }
     answerLog.value = log.sort((a, b) => a.t - b.t);
     compactNow();
+    const rt = await get(REVIEWS_KEY);
+    if (rt && typeof rt === 'object') reviewsToday.value = rt as { day: string; done: number };
     if (dropOldLog || rollupsDirty) persist();
   } catch {
     /* IndexedDB unavailable: in-memory only */
   }
+  rebuildFamilies();
   void checkPersisted();
   progressLoaded.value = true;
   // PR previews start with a demo history so Progress, reviews and drills have data.
@@ -193,6 +202,7 @@ export function installProgressRecorder(): void {
     stats.value = s;
     daily.value = d;
     answerLog.value = appendLog(answerLog.value, attempts);
+    families.value = updateFamilies(families.value, attempts, fastTimes());
     compactNow();
     persist();
     if (!IS_PREVIEW) void askPersist();
@@ -212,7 +222,33 @@ export function replaceProgress(
   for (const e of answerLog.value) dirtyDays.add(dayKey(e.t));
   rollupsDirty = true;
   compactNow();
+  rebuildFamilies();
   persist();
+}
+
+function fastTimes() {
+  return {
+    triadMs: prefs.value.practice.masteryTimeTriadMs,
+    seventhMs: prefs.value.practice.masteryTimeSeventhMs,
+  };
+}
+
+function rebuildFamilies(): void {
+  families.value = buildFamilies(answerLog.value, stats.value, fastTimes());
+}
+
+/** Count one answered review question toward today's budget. */
+export function countReview(now = Date.now()): void {
+  const day = dayKey(now);
+  const cur = reviewsToday.value;
+  reviewsToday.value = { day, done: (cur.day === day ? cur.done : 0) + 1 };
+  set(REVIEWS_KEY, reviewsToday.value).catch(() => undefined);
+}
+
+/** Review questions answered today. */
+export function reviewsDoneToday(now = Date.now()): number {
+  const cur = reviewsToday.value;
+  return cur.day === dayKey(now) ? cur.done : 0;
 }
 
 /** Remember that progress was just exported. */
@@ -223,6 +259,17 @@ export function markBackedUp(now = Date.now()): void {
 
 /** An item that can no longer be asked leaves reviews and the weakest list (see ItemStats). */
 export function retireItem(key: string): void {
+  // A question type: retire every per-key item of it.
+  if (isFamilyKey(parseItemKey(key).key)) {
+    const next = { ...stats.value };
+    for (const [k, s] of Object.entries(next))
+      if (familyKey(parseItemKey(k)) === key && !s.retired) next[k] = { ...s, retired: true };
+    stats.value = next;
+    const f = families.value[key];
+    if (f) families.value = { ...families.value, [key]: { ...f, retired: true } };
+    persist();
+    return;
+  }
   const s = stats.value[key];
   if (!s || s.retired) return;
   stats.value = { ...stats.value, [key]: { ...s, retired: true } };

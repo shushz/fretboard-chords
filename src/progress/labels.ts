@@ -2,6 +2,7 @@ import { type DegreeIndex, buildChord, romanNumeral } from '../theory/chords';
 import { parseKeyName, formatKey, scale } from '../theory/keys';
 import { type Preferences, numeralOptions } from '../prefs/model';
 import type { Item, ModeId } from './types';
+import { isFamilyKey } from './families';
 
 export const MODE_NAMES: Record<ModeId, string> = {
   find: 'Find the chord',
@@ -14,12 +15,16 @@ export const MODE_NAMES: Record<ModeId, string> = {
 };
 
 export function keyLabel(ascii: string, _p?: Preferences): string {
+  if (isFamilyKey(ascii)) return ascii === '@major' ? 'major keys' : 'minor keys';
   const k = parseKeyName(ascii);
   return k ? formatKey(k) : ascii;
 }
 
 export function degreeLabel(item: Item, p: Preferences): string {
-  const k = parseKeyName(item.key);
+  // A question type: numerals read the same in every key; C major / A minor stand in.
+  const k = isFamilyKey(item.key)
+    ? parseKeyName(item.key === '@major' ? 'C' : 'Am')
+    : parseKeyName(item.key);
   if (!k) return String(item.degree + 1);
   const d = item.degree as DegreeIndex;
   const root = scale(k)[d];

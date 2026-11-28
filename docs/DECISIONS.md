@@ -484,3 +484,17 @@ Format: **date — decision.** Why. Alternatives. How to change it (preference n
   questions, chosen like reviews (recent misses, time since last asked), before the new
   block. "First of the day" = no answers yet today in any mode (practice elsewhere counts
   as warming up). No warm-up until something has been learned.
+
+## Reviews by question type + daily cap (review-by-type)
+
+- Owner report: 215 items in Review due items after some guided practice. Cause: guided
+  asks in random keys, reviews were per key, so one question type spread over up to 12
+  items; a simulated week gave 190 due items vs 42 question types.
+- Families (`progress/families.ts`): the item with the key replaced by `@major` /
+  `@minor`. Not stored: rebuilt on load by replaying the answer log, falling back to the
+  latest per-key item stats for types with no logged answers; retired when all items are.
+  Reviews and drills of a family pick a random key (`drillConfig`), trying a few keys
+  before calling it unaskable.
+- Daily cap = session length (20 if timed); counted in IndexedDB `reviewsToday`. Order:
+  last answer wrong (most recent first), then most overdue.
+- Per-key stats stay for mastery, the What-to-practice map and Practice's weighting.

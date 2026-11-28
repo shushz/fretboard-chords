@@ -66,8 +66,10 @@ R–3–7 shells), in **one key or a random key** per question.
   days: 72% right (+23 points), 4.3 s per right answer (−1.0 s)…”). Filter by mode.
 - **What to practice:** a map of chords by numeral (across all keys) × string set, colored
   by recent accuracy. Tap a cell to see that chord's trend and practice it.
-- **Spaced repetition** steers questions toward what's due and what's weak. _Review due
-  items_ and _Practice these_ (your 10 weakest items) run targeted sessions.
+- **Spaced repetition** steers questions toward what's due and what's weak. Reviews go by
+  question type, not key (an answer in any key counts; a review asks in a random key), and
+  _Review due items_ offers at most one session a day, most important first. _Practice these_
+  drills your 10 weakest question types.
 - **All time:** after a month of practice, the charts can also show every week since you
   started, compared with your first weeks. Older days are stored as compact daily summaries,
   so a year of daily practice takes well under 1 MB.

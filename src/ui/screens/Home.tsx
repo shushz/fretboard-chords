@@ -2,13 +2,19 @@ import { navigate } from '../router';
 import { pendingGuided } from '../../guided/store';
 import { GuidedProgress, SkipChallenge } from '../../guided/GuidedStatus';
 import { REPO_URL, versionLabel } from '../../version';
-import { stats } from '../../progress/store';
-import { dueItems } from '../../progress/srs';
+import { families, reviewsDoneToday } from '../../progress/store';
+import { dueFamilies, reviewsLeftToday } from '../../progress/families';
+import { prefs } from '../../prefs/store';
 import { pendingDrill } from '../../exercises/drillState';
 import { parseItemKey } from '../../progress/types';
 
 export function Home() {
-  const due = dueItems(stats.value, Date.now());
+  const now = Date.now();
+  const due = dueFamilies(families.value, now);
+  const sl = prefs.value.practice.sessionLength;
+  // A daily cap: at most one session's worth of reviews a day, most important first.
+  const cap = sl.kind === 'questions' ? sl.count : 20;
+  const today = Math.min(due.length, reviewsLeftToday(cap, reviewsDoneToday(now)));
   return (
     <div class="home">
       <p class="lead">
@@ -32,21 +38,24 @@ export function Home() {
           <strong>Practice</strong>
           <span>Choose a mode and set it up yourself</span>
         </button>
-        {due.length > 0 && (
+        {today > 0 && (
           <button
             type="button"
             class="menu-item"
             onClick={() => {
               pendingDrill.value = {
                 title: 'Review',
-                items: due.slice(0, 20).map((s) => parseItemKey(s.key)),
+                items: due.slice(0, today).map((s) => parseItemKey(s.key)),
                 passes: 1,
               };
               navigate('practice');
             }}
           >
-            <strong>Review due items ({due.length})</strong>
-            <span>Questions that are due for review</span>
+            <strong>Review due items</strong>
+            <span>
+              {today} for today, most important first
+              {due.length > today ? '; the rest waits for another day' : ''}
+            </span>
           </button>
         )}
         <button type="button" class="menu-item" onClick={() => navigate('stats')}>

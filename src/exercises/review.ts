@@ -9,6 +9,7 @@ import { numeralOptions, symbolOptions } from '../prefs/model';
 import type { FretWindow } from '../fretboard/regions';
 import { type Item, itemKey } from '../progress/types';
 import { matchesItem } from '../progress/srs';
+import { familyKey, isFamilyKey } from '../progress/families';
 import { type PracticeConfig, voicingOptions } from './config';
 import { drillConfig, drillMode } from './drill';
 import { findItem, generateFindQuestion } from './find/logic';
@@ -81,10 +82,11 @@ export function reviewWeight(target: Item): (item: Item) => number {
 /** Can a question of `cfg` record `item`? */
 export function canAsk(cfg: PracticeConfig, item: Item, p: Preferences): boolean {
   const k = itemKey(item);
+  const family = isFamilyKey(item.key);
   // Picks are random among matching candidates; a couple of tries settles it.
   for (let i = 0; i < 2; i++) {
     const got = recordedItems(cfg, p, Math.random, reviewWeight(item));
-    if (got?.some((g) => itemKey(g) === k)) return true;
+    if (got?.some((g) => (family ? familyKey(g) : itemKey(g)) === k)) return true;
   }
   return false;
 }
@@ -110,7 +112,26 @@ export function reviewConfig(
   rand: () => number,
   avoidStart?: number,
 ): PracticeConfig | null {
-  const c = drillConfig(item, p);
+  // A question type is asked in a random key; if that key can't ask it, try a few others
+  // before deciding it can't be asked at all.
+  if (isFamilyKey(item.key)) {
+    for (let i = 0; i < 6; i++) {
+      const c = reviewConfigIn(item, drillConfig(item, p, rand), p, stored, rand, avoidStart);
+      if (c) return c;
+    }
+    return null;
+  }
+  return reviewConfigIn(item, drillConfig(item, p, rand), p, stored, rand, avoidStart);
+}
+
+function reviewConfigIn(
+  item: Item,
+  c: PracticeConfig | null,
+  p: Preferences,
+  stored: unknown,
+  rand: () => number,
+  avoidStart?: number,
+): PracticeConfig | null {
   if (!c) return null;
   const def = p.fretboard.window;
   const width = isWindow(stored) ? stored.width : def.width;
