@@ -8,6 +8,8 @@ import {
   type MasteryThresholds,
 } from './stats';
 import { type Item, itemKey } from './types';
+import { isFamilyKey } from './families';
+import { parseKeyName } from '../theory/keys';
 
 export interface SrsOptions {
   now: number;
@@ -44,11 +46,17 @@ export function makeItemWeight(
   return (item) => srsWeight(stats[itemKey(item)], item, o);
 }
 
+/** Same key; a question type ('@major' / '@minor') matches any key of that mode. */
+function sameKey(pattern: string, key: string): boolean {
+  if (pattern === key) return true;
+  return isFamilyKey(pattern) && parseKeyName(key)?.mode === pattern.slice(1);
+}
+
 /** Does `item` match `pattern`? '*' in the pattern's string set / inversion matches anything. */
 export function matchesItem(pattern: Item, item: Item): boolean {
   return (
     pattern.mode === item.mode &&
-    pattern.key === item.key &&
+    sameKey(pattern.key, item.key) &&
     pattern.degree === item.degree &&
     pattern.quality === item.quality &&
     (pattern.stringSet === '*' || pattern.stringSet === item.stringSet) &&

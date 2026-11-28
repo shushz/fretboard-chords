@@ -30,7 +30,8 @@ test('attempts are recorded, persisted, exported, imported and reset', async ({ 
   await expect(page.locator('.fn-grid')).toContainText('Minor keys');
   await expect(page.locator('.fn-grid')).toContainText('67%');
   await expect(page.locator('.line-chart')).toHaveCount(2);
-  await expect(page.locator('.weak')).toContainText('F♯m · i · 1–3');
+  // weakest items are listed by question type, in any key
+  await expect(page.locator('.weak')).toContainText('minor keys · i · 1–3');
   await page.waitForTimeout(400);
   await page.reload();
   await expect(page.locator('.fn-grid')).toContainText('67%');

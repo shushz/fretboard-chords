@@ -4,6 +4,7 @@ import { prefs, setPreferences } from '../../prefs/store';
 import {
   answerLog,
   daily,
+  families,
   history,
   lastBackup,
   markBackedUp,
@@ -565,7 +566,8 @@ function ByKey(props: { stats: Record<string, ItemStats>; p: Preferences }) {
 }
 
 function Weakest(props: { stats: Record<string, ItemStats>; p: Preferences }) {
-  const w = weakest(props.stats, 10, props.p.practice.masteryTimeTriadMs);
+  // By question type (any key): one weakness isn't listed once per key.
+  const w = weakest(families.value, 10, props.p.practice.masteryTimeTriadMs);
   if (w.length === 0) return null;
   return (
     <Section title="Weakest items">

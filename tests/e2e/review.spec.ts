@@ -15,12 +15,17 @@ async function tap(page: Page, s: number, f: number) {
     .dispatchEvent('pointerdown');
 }
 
-/** Answer a Find the chord question in F♯m correctly, using the app's own theory code. */
+/**
+ * Answer a Find the chord question in a minor key correctly, using the app's own theory
+ * code. Reviews ask in a random key of the item's mode, so the key is read off the prompt.
+ */
 async function answerFind(page: Page) {
-  const main = (await page.locator('.prompt-main').textContent())!; // "F♯m · iv"
+  const main = (await page.locator('.prompt-main').textContent())!; // "Am · iv"
   const sub = (await page.locator('.prompt-sub').textContent())!; // "strings 2–4 · frets 5–9"
   const m = /strings (\d)–(\d) · frets (\d+)–(\d+)/.exec(sub)!;
-  const chord = diatonicChord(parseKeyName('F#m')!, DEGREE[main.split(' · ')[1]], false, P.harmony);
+  const [keyName, numeral] = main.split(' · ');
+  const key = parseKeyName(keyName.replace('♯', '#').replace('♭', 'b'))!;
+  const chord = diatonicChord(key, DEGREE[numeral], false, P.harmony);
   const region = {
     stringSet: `${m[1]}-${m[2]}` as StringSetId,
     window: { start: +m[3], width: +m[4] - +m[3] + 1 },
@@ -48,7 +53,7 @@ test('a perfect review clears every due item, progression steps included', async
   await page.waitForTimeout(400);
 
   await page.goto('./');
-  await page.getByRole('button', { name: /Review due items \(3\)/ }).click();
+  await page.getByRole('button', { name: /Review due items 3 for today/ }).click();
   for (let i = 0; i < 3; i++) {
     await answerFind(page);
     await page.getByRole('button', { name: 'Next' }).click();

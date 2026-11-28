@@ -1,7 +1,8 @@
 /** Build practice configs that target specific items (weak-spot drilling, reviews). */
 import type { Preferences } from '../prefs/model';
 import { ANCHOR_STRINGS } from '../prefs/model';
-import { parseKeyName, resolveKey } from '../theory/keys';
+import { type Key, parseKeyName, resolveKey, selectableKeys } from '../theory/keys';
+import { isFamilyKey } from '../progress/families';
 import type { DegreeIndex } from '../theory/chords';
 import { type Item, type ModeId, itemKey } from '../progress/types';
 import { isSeventhItem } from '../progress/stats';
@@ -24,10 +25,26 @@ function variantFor(item: Item): string | undefined {
   }
 }
 
-export function drillConfig(item: Item, p: Preferences): PracticeConfig | null {
-  const k = parseKeyName(item.key);
-  if (!k) return null;
-  const key = resolveKey(k, { ...p.spelling, allowTheoretical: true }).key;
+/**
+ * The config to ask about one item. A question type (key '@major' / '@minor', see
+ * families.ts) is asked in a random key of that mode (`rand`).
+ */
+export function drillConfig(
+  item: Item,
+  p: Preferences,
+  rand: () => number = Math.random,
+): PracticeConfig | null {
+  let key: Key;
+  if (isFamilyKey(item.key)) {
+    const mode = item.key.slice(1);
+    const keys = selectableKeys(p.spelling).filter((k) => k.mode === mode);
+    if (!keys.length) return null;
+    key = keys[Math.floor(rand() * keys.length)];
+  } else {
+    const k = parseKeyName(item.key);
+    if (!k) return null;
+    key = resolveKey(k, { ...p.spelling, allowTheoretical: true }).key;
+  }
   const sevenths = isSeventhItem(item);
   return {
     mode: drillMode(item.mode),

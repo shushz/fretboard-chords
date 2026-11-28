@@ -116,10 +116,14 @@ export function About() {
             quick right answer spaces it out: 1 day, then 3, 7 and 21 days. A right but slow answer
             (slower than the mastery time below) brings it back within 3 days until you're quick.
             Time spent in Preferences or Help, or with the app in the background, doesn't count
-            toward an answer. A review asks each item where you last practiced it; an item the app
-            can no longer ask (after an update, or with an option turned off) leaves the reviews. It
-            counts as mastered at 90% right over the last 10 tries with a median answer under 3 s (5
-            s for seventh chords). Thresholds are in Preferences.
+            toward an answer. Reviews go by question type, not key (e.g. “I in root position → IV on
+            strings 2–4, major keys”): an answer in any key counts, and a review asks it in a random
+            key, since a shape works the same in every key. <b>Review due items</b> offers at most
+            one session a day (your session length), most important first: what you got wrong last,
+            then what's most overdue; the rest waits for another day. A question type the app can no
+            longer ask (after an update, or with an option turned off) leaves the reviews. It counts
+            as mastered at 90% right over the last 10 tries with a median answer under 3 s (5 s for
+            seventh chords). Thresholds are in Preferences.
           </dd>
         </dl>
       </Section>

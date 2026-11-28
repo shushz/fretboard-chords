@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { prefs } from '../../prefs/store';
-import { answerLog, retireItem, stats } from '../../progress/store';
+import { answerLog, countReview, retireItem, stats } from '../../progress/store';
 import { type PracticeConfig, concreteConfig, defaultConfig } from '../../exercises/config';
 import type { Key } from '../../theory/keys';
 import { Setup } from '../../exercises/Setup';
@@ -326,6 +326,7 @@ export function Practice() {
           itemWeight={current.itemWeight}
           onGraded={(a: Attempt[]) => {
             recordAttempts(a);
+            if (drill?.title === 'Review') countReview();
             setSession((s) => (s ? recordAttempt(s, a) : s));
             if (guidedRun) {
               const passed = advanceGuided();

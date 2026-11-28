@@ -10,6 +10,7 @@ import type { FretWindow } from '../fretboard/regions';
 import { type Item, type ModeId, itemKey, parseItemKey } from '../progress/types';
 import { defaultConfig } from './config';
 import { recordedItems, reviewConfig, reviewWeight } from './review';
+import { familyKey, familyOf } from '../progress/families';
 
 const P = DEFAULT_PREFERENCES;
 const KEYS = selectableKeys(P.spelling);
@@ -66,6 +67,15 @@ describe('a review question updates the item it reviews', () => {
               `${itemKey(item)} (${stored ? 'stored' : 'no'} window) → ${got?.map(itemKey) ?? 'none'}`,
             );
         }
+      }
+      // and as a question type (any key): what Review due items asks now
+      for (const { item } of items) {
+        const fam = familyOf(item);
+        if (!fam) continue;
+        const cfg = reviewConfig(fam, P, undefined, rand);
+        const got = cfg && recordedItems(cfg, P, rand, reviewWeight(fam));
+        if (!got?.some((g) => familyKey(g) === itemKey(fam)))
+          misses.push(`${itemKey(fam)} (question type) → ${got?.map(itemKey) ?? 'none'}`);
       }
       expect(misses, `${misses.length} of ${items.length * 2} reviews miss their item`).toEqual([]);
     });

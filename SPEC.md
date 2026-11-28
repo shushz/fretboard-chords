@@ -258,6 +258,14 @@ An automatic, progress-based path for learners who'd rather not set up sessions.
   progression step. An item that can't be asked in any window any more (a mode changed,
   a preference turned it off, a damaged key) is never replaced by another question: it is
   marked retired and leaves the due list and the weakest list until it's answered again.
+- **Reviews by question type**: Review due items and the weakest list use _families_:
+  items with the key replaced by major/minor (`src/progress/families.ts`), rebuilt from
+  the answer log (and per-key stats for older days) on load. Answers in any key update a
+  family; a review asks it in a random key of that mode. Per-key item stats still drive
+  mastery, the What-to-practice map and question weighting in Practice.
+- **Daily review cap**: Review due items offers at most one session a day (the session
+  length, else 20): due families, last answer wrong first (latest first), then most
+  overdue. The rest waits for another day.
 - **Mastery**: ≥ 90 % over the last 10 attempts and median time ≤ 3 s (triads) /
   ≤ 5 s (sevenths). Thresholds configurable.
 - Question selection: weighted toward due and weak items, with ~20 % fresh/random items.
